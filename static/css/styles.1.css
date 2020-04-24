@@ -1,0 +1,42 @@
+#container {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#container .inputContainer {
+  margin: 1em;
+  width: 100%;
+  box-sizing: border-box;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+#container .inputContainer label {
+  display: block;
+}
+
+#container .inputContainer textarea {
+  width: 100%;
+  flex: 1;
+}
+
+#errorMsg {
+  color: red;
+  display: block;
+}
+
+.interval-config input {
+  width: 6em;
+}
+
+.variable-selector div.option {
+  display: inline-block;
+  margin: 0 0.8em;
+}
+
+/* Prevents the flash of unitialized vue instance */
+[v-cloak] {
+  display: none;
+}
