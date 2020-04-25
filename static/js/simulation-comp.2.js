@@ -196,8 +196,6 @@ Vue.component("simulation", {
         layout: { ...graphLayout, sliders: slider },
         frames: frames,
         config: plotConfig,
-      }).then(() => {
-        Plotly.animate("plotDiv", [this._getIndexAsString(this.graphHistoricData.length - 1)]); // Animate to last frame.
       });
     },
   },
