@@ -40,9 +40,23 @@ const defaultConfigText = `{
     "r-leaping" : {}
 }`;
 
+const defaultIterConfig = {
+  from: 0,
+  to: 1,
+  step: 0.05,
+  iteratingVariable: null,
+};
+
+const SIM_STATE = {
+  DONE: 0,
+  INPROGRESS: 1,
+  CANCELED: 2,
+};
+
 /** Name of the LocalStorage keys */
 const SIMULATION_MODEL_KEY = "simulationModel";
 const SIMULATION_CONFIG_KEY = "simulationConfig";
+const SIMULATION_ITER_CONFIG_KEY = "simulationIterConfig";
 
 /**
  * Finds the name of declared variables in the model.
@@ -57,43 +71,4 @@ const graphLayout = {
   xaxis: {
     title: "Days",
   },
-  updatemenus: [
-    {
-      x: 0,
-      y: 0,
-      yanchor: "top",
-      xanchor: "left",
-      showactive: false,
-      direction: "left",
-      type: "buttons",
-      pad: { t: 87, r: 10 },
-      buttons: [
-        {
-          method: "animate",
-          args: [
-            null,
-            {
-              mode: "next",
-              fromcurrent: true,
-              transition: { duration: 400, easing: "linear" },
-              frame: { duration: 800, redraw: true },
-            },
-          ],
-          label: "▶",
-        },
-        {
-          method: "animate",
-          args: [
-            [null],
-            {
-              mode: "next",
-              transition: { duration: 0 },
-              frame: { duration: 0, redraw: false },
-            },
-          ],
-          label: "||",
-        },
-      ],
-    },
-  ],
 };

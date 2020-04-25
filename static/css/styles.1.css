@@ -36,6 +36,17 @@
   margin: 0 0.8em;
 }
 
+#plotAnimDiv {
+  /* This is a hack, TODO: look on plotly doc is there's a way to insert a DOM element as button for a better way to position this */
+  position: absolute;
+  bottom: 36px;
+  left: 120px;
+}
+
+#plotAnimDiv button {
+  padding: .6em .8em;
+}
+
 /* Prevents the flash of unitialized vue instance */
 [v-cloak] {
   display: none;

@@ -4,12 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-    <link rel="stylesheet" href="css/styles.1.css">
+    <link rel="stylesheet" href="css/styles.1.css" />
     <title>Simulation</title>
   </head>
 
@@ -26,65 +23,30 @@
           <textarea name="configInput" v-model="simulationConfig"></textarea>
         </div>
       </div>
+      <iter-controls
+        @submit="handleSubmit"
+        :button-disabled="simulationState === SIM_STATE.DONE && !pendingChanges"
+        :button-text="simulationState === SIM_STATE.INPROGRESS ? 'Stop Simulation' : 'Simulate'"
+        :model-variables="modelVariables"
+        :config-interval="configInterval"
+      ></iter-controls>
 
-      <div>
-        <label for="decimalPresicion">Significant digits: </label>
-        <input
-          style="width: 3em;"
-          name="decimalPresicion"
-          type="number"
-          v-model="preciseDecimalPlaces"
-        />
-        <button @click="simulate">Simulate</button>
-        <button @click="reset" style="float: right; margin-right: 2em;">
-          Reset to default
-        </button>
-        <error-msg v-if="errorMsg" :error="errorMsg"></error-msg>
-        <span v-if="statusMsg" id="statusMsg"> {{ statusMsg }} </span>
-      </div>
-
-      <div>
-        <div>
-          <ul class="variable-selector">
-            <div v-for="(variable, index) in modelVariables" class="option">
-              <input
-                type="radio"
-                name="iter-var"
-                :id="index"
-                :value="variable"
-                @change="selectVariable"
-              />
-              <label :for="index">{{ variable }}</label>
-            </div>
-          </ul>
-
-          <div class="interval-config">
-            <label for="from">From: </label>
-            <input
-              type="number"
-              name="from"
-              v-model.number="intervalConfig.from"
-            />
-
-            <label for="to">To: </label>
-            <input type="number" name="to" v-model.number="intervalConfig.to" />
-
-            <label for="step">Step: </label>
-            <input
-              type="number"
-              name="step"
-              v-model.number="intervalConfig.step"
-            />
-          </div>
-        </div>
-
-        <div id="plotDiv"></div>
-      </div>
+      <simulation
+        :sim="currentSimulation"
+        :sim-cancel="simCancel"
+        :sim-state="simulationState"
+        @sim-start="handleSimStart"
+        @sim-error="handleSimError"
+        @sim-done="handleSimDone"
+        @sim-cancel="handleSimCancel"
+      ></simulation>
     </div>
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="js/simulation-comp.1.js"></script>
+    <script src="js/iter-controls-comp.1.js"></script>
     <script src="js/error-msg-comp.1.js"></script>
     <script src="js/constants.1.js"></script>
     <script src="js/main.1.js"></script>
