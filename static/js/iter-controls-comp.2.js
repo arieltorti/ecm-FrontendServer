@@ -28,7 +28,7 @@ Vue.component("iter-controls", {
           <option v-for="(variable, index) in modelVariables" :value="variable">{{ variable }}</option>
         </select>
 
-        <div class="interval-config">
+        <div class="interval-config" v-if="formData.iteratingVariable">
           <label for="from">From: </label>
           <input
             type="number"
