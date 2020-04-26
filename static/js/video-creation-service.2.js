@@ -45,13 +45,40 @@ function convertDataURIToBinary(dataURI) {
   return array;
 }
 
+// https://benohead.com/blog/2017/12/06/cross-domain-cross-browser-web-workers/
+function createWorker(workerUrl) {
+  let worker = null;
+  try {
+    // Non cross-origin case
+    worker = new Worker(workerUrl);
+  } catch (e) {
+    try {
+      // Cross-origin case
+      var blob;
+      try {
+        blob = new Blob(["importScripts('" + workerUrl + "');"], { type: "application/javascript" });
+      } catch (e1) {
+        var blobBuilder = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder)();
+        blobBuilder.append("importScripts('" + workerUrl + "');");
+        blob = blobBuilder.getBlob("application/javascript");
+      }
+      const url = window.URL || window.webkitURL;
+      const blobUrl = url.createObjectURL(blob);
+      worker = new Worker(blobUrl);
+    } catch (e2) {
+      throw e2;
+    }
+  }
+  return worker;
+}
+
 const videoCreationService = (function () {
   let _state = VCStates.IDLE;
   let _done = false;
   let _cancel = false;
   let onDone = () => {};
   let _messageHandler = () => {};
-  let worker = new Worker("js/ffmpeg-worker-mp4.js");
+  let worker = createWorker("https://cdn.jsdelivr.net/gh/maks500/CMS-FrontendServer@WIP-video-rendering/static/js/ffmpeg-worker-mp4.js");
 
   function generateVideo(el) {
     const messageHandler = handleWorkerMessages(_onDone);
