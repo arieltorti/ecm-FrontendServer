@@ -15,16 +15,21 @@ const app = new Vue({
       SIM_STATE: SIM_STATE, // Declare enum variable so vue can access it on the template
 
       simulationState: SIM_STATE.DONE,
-      simulationModel: localStorage.getItem(SIMULATION_MODEL_KEY) || defaultSimulationModel,
-      simulationConfig: localStorage.getItem(SIMULATION_CONFIG_KEY) || defaultConfigText,
+      simulationModel:
+        localStorage.getItem(SIMULATION_MODEL_KEY) || defaultSimulationModel,
+      simulationConfig:
+        localStorage.getItem(SIMULATION_CONFIG_KEY) || defaultConfigText,
       errorMsg: null,
       statusMsg: null,
 
       configInterval: getConfigInterval(),
 
       currentSimulation: null,
-      simCancel: false,
       pendingChanges: true,
+
+      // We're using the bus pattern here, but it would be better if we can do something like
+      // a service.
+      simCancel: false,
     };
   },
   computed: {
@@ -60,11 +65,14 @@ const app = new Vue({
         config: this.simulationConfig,
         intervalConfig: Vue.util.extend({}, configInterval),
       };
-      setTimeout(() => {this.pendingChanges = false}, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account
+      setTimeout(() => {
+        this.pendingChanges = false;
+      }, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account
     },
     stopSimulation: function () {
       this.simCancel = true;
     },
+
     setError: function (message) {
       this.errorMsg = "[ERROR]: " + message;
       this.statusMsg = null;

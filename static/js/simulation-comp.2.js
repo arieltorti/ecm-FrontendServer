@@ -1,5 +1,5 @@
 Vue.component("simulation", {
-  props: ["sim", "simCancel", "simState"],
+  props: ["sim", "simCancel", "simPlay", "simState"],
   data: function () {
     return {
       SIM_STATE: SIM_STATE,
@@ -9,9 +9,15 @@ Vue.component("simulation", {
         currentStep: null,
       },
 
+      simSpeed: 600,
+      eventsRegistered: false,
       abortSignal: null, // Stores the signal to abort the current request
       playing: false,
+      recording: false,
     };
+  },
+  created: function () {
+    this.videoCreationService = videoCreationService;
   },
   watch: {
     sim: function (_sim) {
@@ -21,6 +27,12 @@ Vue.component("simulation", {
       if (stop) {
         this.abortSignal.abort();
         this.$emit("sim-cancel");
+      }
+    },
+    simPlay: function (play) {
+      if (play) {
+        this._play();
+        this.$emit("sim-play");
       }
     },
   },
@@ -33,17 +45,38 @@ Vue.component("simulation", {
       }
     },
 
+    handleAnimEvent: function (ev) {
+      debugger;
+      if (ev === "done") {
+        this.$refs.videoControls.stop();
+      }
+    },
+
+    createVideo() {
+      this.recording = true;
+      this.simSpeed = 3000;
+      this._play();
+      this.$refs.videoControls.record(this.$refs.plotDivRef);
+    },
+
+    videoDone() {
+      this.recording = false;
+      this.simSpeed = 600;
+    },
+
     stop: function () {},
 
     _play: function () {
+      this.playing = true;
       Plotly.animate("plotDiv", null, {
         mode: "immediate",
         fromcurrent: true,
-        transition: { duration: 300 },
-        frame: { duration: 500, redraw: false },
+        transition: { duration: this.simSpeed },
+        frame: { duration: this.simSpeed + 200, redraw: false },
       }).then(() => (this.playing = false));
     },
     _pause: function () {
+      this.playing = false;
       Plotly.animate("plotDiv", [null], {
         mode: "immediate",
         fromcurrent: true,
@@ -58,7 +91,6 @@ Vue.component("simulation", {
       } else {
         this._play();
       }
-      this.playing = !this.playing;
     },
 
     simulate: function () {
@@ -68,6 +100,7 @@ Vue.component("simulation", {
 
       console.log("Simulating", this.sim);
       this.$emit("sim-start");
+
       this.graphHistoricData = [];
 
       if (this.sim.intervalConfig.iteratingVariable != null) {
@@ -80,7 +113,11 @@ Vue.component("simulation", {
         let promiseChain = Promise.resolve();
 
         this.stats.totalSteps = Math.floor(
-          1 + (this.sim.intervalConfig.to - this.sim.intervalConfig.from) / this.sim.intervalConfig.step
+          1 +
+            Math.floor(
+              (this.sim.intervalConfig.to - this.sim.intervalConfig.from) / this.sim.intervalConfig.step +
+                EPSILON
+            )
         );
         this.stats.currentStep = 0;
 
@@ -164,8 +201,8 @@ Vue.component("simulation", {
             [this._getIndexAsString(i)],
             {
               mode: "next",
-              transition: { duration: 400, easing: "linear" },
-              frame: { duration: 800, redraw: true },
+              transition: { duration: this.simSpeed, easing: "linear" },
+              frame: { duration: this.simSpeed + 200, redraw: true },
             },
           ],
         });
@@ -175,6 +212,7 @@ Vue.component("simulation", {
         {
           pad: { l: 130, t: 55 },
           steps: sliderSteps,
+          gripbgcolor: "red",
         },
       ];
 
@@ -190,21 +228,41 @@ Vue.component("simulation", {
       // to the initial frame. We deeply copy the initial data object to avoid this issue.
       const data = JSON.parse(JSON.stringify(this.graphHistoricData[0]));
 
-      debugger;
       Plotly.newPlot("plotDiv", {
         data: data,
         layout: { ...graphLayout, sliders: slider },
         frames: frames,
         config: plotConfig,
       });
+
+      if (!this.eventsRegistered) {
+        this.eventsRegistered = true;
+        const plotDiv = document.getElementById("plotDiv");
+        plotDiv.on("plotly_animating", () => this.$emit("sim-anim-start"));
+        plotDiv.on("plotly_animationinterrupted", () => {
+          this.handleAnimEvent("interrupted");
+          this.$emit("sim-anim-stop");
+        });
+        plotDiv.on("plotly_animated", () => {
+          this.handleAnimEvent("done");
+          this.$emit("sim-anim-done");
+        });
+      }
     },
   },
-  // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly   
+  // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly
   template: `<div style="position: relative">
     <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">
         Simulating {{ stats.currentStep }} / {{ stats.totalSteps }}
     </div>
-    <div id="plotDiv" v-once></div>
+    <div v-if="simState === SIM_STATE.DONE && (sim && sim.intervalConfig.iteratingVariable)">
+      <button @click="createVideo">Record Video</button>
+      <video-record-controls ref="videoControls" @video-done="videoDone">
+      </video-record-controls>
+    </div>
+    <div :class="{'event-cover': recording}">
+      <div id="plotDiv" ref="plotDivRef" v-once></div>
+    </div>
     <div v-if="simState === SIM_STATE.DONE && (sim && sim.intervalConfig.iteratingVariable)" id="plotAnimDiv">
         <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
     </div>

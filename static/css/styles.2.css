@@ -47,8 +47,14 @@
   padding: .6em .8em;
 }
 
-.slider-grip-rect {
-  fill: #ff4242 !important;
+.event-cover:before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 9999;
 }
 
 /* Prevents the flash of unitialized vue instance */

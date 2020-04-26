@@ -72,3 +72,19 @@ const graphLayout = {
     title: "Days",
   },
 };
+
+const EPSILON = 0.0000001;
+
+const VCStates = {
+  IDLE: 1,
+  INPROGRESS: 2,
+  STOP: 3,
+  DONE: 4,
+};
+
+const requestAnimationFrame =
+  window.requestAnimationFrame ||
+  window.mozRequestAnimationFrame ||
+  window.webkitRequestAnimationFrame ||
+  window.msRequestAnimationFrame;
+window.requestAnimationFrame = requestAnimationFrame;
