@@ -51,6 +51,7 @@ const SIM_STATE = {
   DONE: 0,
   INPROGRESS: 1,
   CANCELED: 2,
+  ERROR: 3,
 };
 
 /** Name of the LocalStorage keys */

@@ -57,6 +57,7 @@ const app = new Vue({
 
   methods: {
     buildSimulation(configInterval) {
+      this.setError("");
       this.configInterval = configInterval;
 
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
@@ -101,8 +102,28 @@ const app = new Vue({
     handleSimStart: function () {
       this.simulationState = SIM_STATE.INPROGRESS;
     },
-    handleSimError: function () {
-      // this.simulationState = SIM_STATE.INPROGRESS;
+    handleSimError: function (err) {
+      this.simulationState = SIM_STATE.ERROR;
+
+      if (err.status === 500) {
+        this.setError(`A server error ocurred while running the simulation`);
+      } else if (err.status === 400) {
+        err.text().then((msg) => {
+          if (
+            msg &&
+            msg.indexOf("The given key was not present in the dictionary.")
+          ) {
+            // Most probably we encountered a variable that's not defined
+            let errorMsg = "There is an error on the model definition";
+
+            const variable = msg.match(/'\w+'/); // Naive regex to match possible undefined variable
+            errorMsg += `\nCould it be that ${variable[0]} is not defined?`;
+            this.setError(errorMsg);
+          }
+        });
+      } else {
+        this.setError(`There was an error while running the simulation`);
+      }
     },
     handleSimDone: function () {
       this.simulationState = SIM_STATE.DONE;
