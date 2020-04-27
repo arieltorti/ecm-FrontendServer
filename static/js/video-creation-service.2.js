@@ -1,12 +1,15 @@
 "use strict";
 
-function handleWorkerMessages(_onDone) {
+const CURRENT_FRAME_REGEX = /frame=\s*(\d+)/;
+
+function handleWorkerMessages(_onDone, _onMessage) {
   return function (e) {
     const msg = e.data;
     switch (msg.type) {
       case "stdout":
       case "stderr":
         console.debug(msg.data);
+        _onMessage(msg.data);
         break;
       case "exit":
         console.debug("Process exited with code " + msg.data);
@@ -56,9 +59,13 @@ function createWorker(workerUrl) {
       // Cross-origin case
       var blob;
       try {
-        blob = new Blob(["importScripts('" + workerUrl + "');"], { type: "application/javascript" });
+        blob = new Blob(["importScripts('" + workerUrl + "');"], {
+          type: "application/javascript",
+        });
       } catch (e1) {
-        var blobBuilder = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder)();
+        var blobBuilder = new (window.BlobBuilder ||
+          window.WebKitBlobBuilder ||
+          window.MozBlobBuilder)();
         blobBuilder.append("importScripts('" + workerUrl + "');");
         blob = blobBuilder.getBlob("application/javascript");
       }
@@ -77,27 +84,36 @@ const videoCreationService = (function () {
   let _done = false;
   let _cancel = false;
   let onDone = () => {};
+  let onMessage = () => {};
   let _messageHandler = () => {};
-  let worker = createWorker("https://cdn.jsdelivr.net/gh/maks500/CMS-FrontendServer@WIP-video-rendering/static/js/ffmpeg-worker-mp4.js");
+  let worker = createWorker(
+    "https://cdn.jsdelivr.net/gh/maks500/CMS-FrontendServer@WIP-video-rendering/static/js/ffmpeg-worker-mp4.js"
+  );
+  let images = [];
 
   function generateVideo(el) {
-    const messageHandler = handleWorkerMessages(_onDone);
+    const promiseArray = [];
+    const messageHandler = handleWorkerMessages(_onDone, _onMessage);
     _messageHandler = messageHandler;
     worker.addEventListener("message", messageHandler);
 
     function getFrame() {
-      html2canvas(el, {
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-      }).then((canvas) => {
-        const imgString = canvas.toDataURL("image/jpeg", 1);
-        const data = convertDataURIToBinary(imgString);
+      promiseArray.push(
+        html2canvas(el, {
+          scrollX: -window.scrollX,
+          scrollY: -window.scrollY,
+        })
+          .then((canvas) => {
+            const imgString = canvas.toDataURL("image/jpeg", 1);
+            const data = convertDataURIToBinary(imgString);
 
-        images.push({
-          name: `img${align(images.length, 6)}.jpeg`,
-          data,
-        });
-      });
+            images.push({
+              name: `img${align(images.length, 6)}.jpeg`,
+              data,
+            });
+          })
+          .catch((err) => console.error(err))
+      );
 
       if (_cancel) {
         return;
@@ -111,32 +127,37 @@ const videoCreationService = (function () {
     }
 
     function buildVideo() {
-      const width = el.clientWidth % 2 == 0 ? el.clientWidth : el.clientWidth + 1;
-      const height = el.clientHeight % 2 == 0 ? el.clientHeight : el.clientHeight + 1;
+      const width =
+        el.clientWidth % 2 == 0 ? el.clientWidth : el.clientWidth + 1;
+      const height =
+        el.clientHeight % 2 == 0 ? el.clientHeight : el.clientHeight + 1;
 
-      worker.postMessage({
-        type: "run",
-        TOTAL_MEMORY: 1024 * 1024 * 1024,
-        arguments: [
-          "-r",
-          "25",
-          "-i",
-          "img%06d.jpeg",
-          "-c:v",
-          "libx264",
-          "-preset",
-          "ultrafast",
-          "-vf",
-          `scale=${width}:${height}`,
-          "-pix_fmt",
-          "yuv420p",
-          "out.mp4",
-        ],
-        MEMFS: images,
+      // Wait for all images
+      Promise.all(promiseArray).then(() => {
+        worker.postMessage({
+          type: "run",
+          TOTAL_MEMORY: 1024 * 1024 * 1024,
+          arguments: [
+            "-r",
+            "25",
+            "-i",
+            "img%06d.jpeg",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-vf",
+            `scale=${width}:${height}`,
+            "-pix_fmt",
+            "yuv420p",
+            "out.mp4",
+          ],
+          MEMFS: images,
+        });
       });
     }
 
-    const images = [];
+    images = [];
     _state = VCStates.INPROGRESS;
     getFrame();
   }
@@ -148,14 +169,28 @@ const videoCreationService = (function () {
     _state = VCStates.IDLE;
   }
 
-  function state() {
-    return _state;
+  function _onMessage(msg) {
+    const match = msg.match(CURRENT_FRAME_REGEX);
+
+    if (match != null) {
+      onMessage({ currentFrame: match[1], totalFrames: images.length });
+    }
   }
 
-  function record(el, cb) {
+  function record(el, cb, messageCb) {
     _cancel = false;
     _done = false;
+
+    if (cb == null) {
+      throw new Error("A callback must be given to the video creation service");
+    }
     onDone = cb;
+
+    if (messageCb != null) {
+      onMessage = messageCb;
+    } else {
+      onMessage = () => {};
+    }
     generateVideo(el);
   }
 

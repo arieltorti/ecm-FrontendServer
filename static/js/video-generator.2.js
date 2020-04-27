@@ -5,7 +5,6 @@ Vue.component("video-record-controls", {
   data: function () {
     return {
       videoCreator: {},
-      videoURL: null,
       statusMsg: "",
     };
   },
@@ -13,18 +12,31 @@ Vue.component("video-record-controls", {
     this.videoCreationService = videoCreationService;
   },
   methods: {
+    renderingUpdate: function (stats) {
+      const _videoRenderingProgress = (
+        stats.currentFrame / stats.totalFrames * 100
+      ).toPrecision(2);
+
+      this.statusMsg = `Rendering video... ${_videoRenderingProgress}%`;
+    },
     videoDone: function (blob, err) {
       if (err == null) {
         this.$emit("video-done", blob);
-        this.videoURL = URL.createObjectURL(blob);
+        const videoURL = URL.createObjectURL(blob);
+        downloadLink(videoURL, "mp4");
         this.statusMsg = "";
       } else {
         this.statusMsg = "There was an error while processing the video.";
       }
     },
     record: function (el) {
-      this.videoCreationService.record(el, this.videoDone.bind(this));
-      this.statusMsg = "Recording video... (Try not to leave this tab, otherwise video may end up snappy)";
+      this.videoCreationService.record(
+        el,
+        this.videoDone.bind(this),
+        this.renderingUpdate.bind(this)
+      );
+      this.statusMsg =
+        "Recording video... (Try not to leave this tab, otherwise video may end up snappy)";
     },
     stop: function () {
       if (this.videoCreationService.state === VCStates.INPROGRESS) {
@@ -37,6 +49,5 @@ Vue.component("video-record-controls", {
   },
   template: `<div>
         <span>{{ statusMsg }}</span>
-        <video controls v-if="videoURL" :src="videoURL"></video>
     </div>`,
 });

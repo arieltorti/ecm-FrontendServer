@@ -344,10 +344,10 @@ function getCurrentDate() {
   return `${now.getUTCFullYear()}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
-function downloadLink(href) {
+function downloadLink(href, extension="csv") {
   const linkEl = document.createElement("a");
   linkEl.setAttribute("href", href);
-  linkEl.setAttribute("download", `sim-${getCurrentDate()}.csv`);
+  linkEl.setAttribute("download", `sim-${getCurrentDate()}.${extension}`);
 
   document.body.appendChild(linkEl);
   linkEl.click();
