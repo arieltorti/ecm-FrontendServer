@@ -47,17 +47,20 @@ Vue.component("simulation", {
     },
 
     handleAnimEvent: function (ev) {
-      debugger;
       if (ev === "done") {
         this.$refs.videoControls.stop();
       }
     },
 
     createVideo() {
-      this.recording = true;
       this.simSpeed = 3000;
-      this._play();
-      this.$refs.videoControls.record(this.$refs.plotDivRef);
+
+      this._goToFirstFrame().then(() => {
+        // NOTE: This will emit an `sim-anim-done` event, we may want to avoid it.
+        this.recording = true;
+        this._play();
+        this.$refs.videoControls.record(this.$refs.plotDivRef);
+      });
     },
 
     videoDone() {
@@ -66,6 +69,14 @@ Vue.component("simulation", {
     },
 
     stop: function () {},
+
+    _goToFirstFrame: function () {
+      return Plotly.animate("plotDiv", [this._getIndexAsString(0)], {
+        mode: "immediate",
+        transition: { duration: 0 },
+        frame: { duration: 0, redraw: true },
+      });
+    },
 
     _play: function () {
       this.playing = true;
@@ -116,7 +127,8 @@ Vue.component("simulation", {
         this.stats.totalSteps = Math.floor(
           1 +
             Math.floor(
-              (this.sim.intervalConfig.to - this.sim.intervalConfig.from) / this.sim.intervalConfig.step +
+              (this.sim.intervalConfig.to - this.sim.intervalConfig.from) /
+                this.sim.intervalConfig.step +
                 EPSILON
             )
         );
@@ -131,13 +143,19 @@ Vue.component("simulation", {
             this.stats.currentStep += 1;
             return this._simulate(
               this.sim.config,
-              _replaceModelVariableValue(this.sim.model, this.sim.intervalConfig.iteratingVariable, from),
+              _replaceModelVariableValue(
+                this.sim.model,
+                this.sim.intervalConfig.iteratingVariable,
+                from
+              ),
               from
             );
           });
         }
 
-        promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
+        promiseChain
+          .then(() => this.dataFetchingDone())
+          .catch((err) => this.handleError(err));
       } else {
         this.stats.totalSteps = this.stats.currentStep = 1;
         this._simulate(this.sim.config, this.sim.model)
@@ -177,7 +195,10 @@ Vue.component("simulation", {
 
     /** Precisely rounds number based on the number of significant decimal places */
     _preciseRound: function (number, presicion = 7) {
-      return Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) / Math.pow(10, presicion);
+      return (
+        Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) /
+        Math.pow(10, presicion)
+      );
     },
     _getIndexAsString: function (i) {
       return "" + this.graphHistoricData[i]._iterVal || i;

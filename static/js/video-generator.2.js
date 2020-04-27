@@ -27,12 +27,11 @@ Vue.component("video-record-controls", {
       this.statusMsg = "Recording video... (Try not to leave this tab, otherwise video may end up snappy)";
     },
     stop: function () {
-      debugger;
       if (this.videoCreationService.state === VCStates.INPROGRESS) {
         this.statusMsg = "Rendering video...";
         setTimeout(() => {
           this.videoCreationService.stop();
-        }, 1000); // Don't stop it immediately because we may lose frames.
+        }, 1800); // Don't stop it immediately because we may lose frames.
       }
     },
   },
