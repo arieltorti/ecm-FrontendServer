@@ -41,7 +41,6 @@ Vue.component("simulation", {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         console.debug("Request aborted");
       } else {
-        this.abortSignal.abort();
         this.$emit("sim-error", err);
         console.error(err);
       }

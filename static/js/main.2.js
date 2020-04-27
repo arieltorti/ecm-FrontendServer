@@ -75,7 +75,12 @@ const app = new Vue({
     },
 
     setError: function (message) {
-      this.errorMsg = "[ERROR]: " + message;
+      if (message) {
+        this.errorMsg = "[ERROR]: " + message;
+      } else {
+        this.errorMsg = null;
+      }
+
       this.statusMsg = null;
     },
     setStatus: function (message) {
