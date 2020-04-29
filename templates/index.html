@@ -35,12 +35,16 @@
         :config-interval="configInterval"
       ></iter-controls>
 
+      <label for="autoRenderVideo">Render video when done: </label>
+      <input type="checkbox" v-model="autoRenderVideo" name="autoRenderVideo" />
+
       <error-msg> {{ errorMsg }} </error-msg>
 
       <simulation
         :sim="currentSimulation"
         :sim-cancel="simCancel"
         :sim-state="simulationState"
+        :sim-auto-render="autoRenderVideo"
         @sim-start="handleSimStart"
         @sim-error="handleSimError"
         @sim-done="handleSimDone"

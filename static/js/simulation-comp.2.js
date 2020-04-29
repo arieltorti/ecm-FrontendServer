@@ -1,5 +1,5 @@
 Vue.component("simulation", {
-  props: ["sim", "simCancel", "simPlay", "simState"],
+  props: ["sim", "simCancel", "simPlay", "simState", "simAutoRender"],
   data: function () {
     return {
       SIM_STATE: SIM_STATE,
@@ -210,8 +210,6 @@ Vue.component("simulation", {
        * migrate to using addFrames and resize/relayout instead.
        */
 
-      this.$emit("sim-done");
-
       // Configure the number and style of the slider steps
       var sliderSteps = [];
       for (let i = 0; i < this.graphHistoricData.length; i++) {
@@ -255,6 +253,11 @@ Vue.component("simulation", {
         layout: { ...graphLayout, sliders: slider },
         frames: frames,
         config: plotConfig,
+      }).then(() => {
+        this.$emit("sim-done");
+        if (this.simAutoRender) {
+          this.createVideo();
+        }
       });
 
       if (!this.eventsRegistered) {
