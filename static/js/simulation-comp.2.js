@@ -254,6 +254,8 @@ Vue.component("simulation", {
         config: plotConfig,
       }).then(() => {
         this.$emit("sim-done");
+        this.videoDuration = frames.length; // 1 Second per frame.
+
         if (this.simAutoRender) {
           this.createVideo();
         }
