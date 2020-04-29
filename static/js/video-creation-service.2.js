@@ -2,7 +2,7 @@
 
 const CURRENT_FRAME_REGEX = /frame=\s*(\d+)/;
 
-function handleWorkerMessages(_onDone, _onMessage) {
+function handleWorkerMessages(_onDone, _onMessage, _onError) {
   return function (e) {
     const msg = e.data;
     switch (msg.type) {
@@ -12,6 +12,9 @@ function handleWorkerMessages(_onDone, _onMessage) {
         _onMessage(msg.data);
         break;
       case "exit":
+        if (msg.data === 1) {
+          _onError("Process exited with code " + msg.data);
+        }
         console.debug("Process exited with code " + msg.data);
         break;
 
@@ -63,9 +66,7 @@ function createWorker(workerUrl) {
           type: "application/javascript",
         });
       } catch (e1) {
-        var blobBuilder = new (window.BlobBuilder ||
-          window.WebKitBlobBuilder ||
-          window.MozBlobBuilder)();
+        var blobBuilder = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder)();
         blobBuilder.append("importScripts('" + workerUrl + "');");
         blob = blobBuilder.getBlob("application/javascript");
       }
@@ -85,15 +86,17 @@ const videoCreationService = (function () {
   let _cancel = false;
   let onDone = () => {};
   let onMessage = () => {};
+  let onError = () => {};
   let _messageHandler = () => {};
   let worker = createWorker(
     "https://cdn.jsdelivr.net/gh/maks500/CMS-FrontendServer@WIP-video-rendering/static/js/ffmpeg-worker-mp4.js"
   );
   let images = [];
+  let videoDuration = 0;
 
   function generateVideo(el) {
     const promiseArray = [];
-    const messageHandler = handleWorkerMessages(_onDone, _onMessage);
+    const messageHandler = handleWorkerMessages(_onDone, _onMessage, _onError);
     _messageHandler = messageHandler;
     worker.addEventListener("message", messageHandler);
 
@@ -118,19 +121,16 @@ const videoCreationService = (function () {
       if (_cancel) {
         return;
       }
-
-      if (!_done) {
-        requestAnimationFrame(getFrame);
-      } else {
-        requestAnimationFrame(buildVideo);
-      }
     }
 
     function buildVideo() {
-      const width =
-        el.clientWidth % 2 == 0 ? el.clientWidth : el.clientWidth + 1;
-      const height =
-        el.clientHeight % 2 == 0 ? el.clientHeight : el.clientHeight + 1;
+      plotDiv.removeListener("plotly_redraw", getFrame);
+      plotDiv.removeListener("plotly_animated", buildVideo);
+      getFrame(); // Last frame
+
+      const width = el.clientWidth % 2 == 0 ? el.clientWidth : el.clientWidth + 1;
+      const height = el.clientHeight % 2 == 0 ? el.clientHeight : el.clientHeight + 1;
+      const frameRate = (images.length / (videoDuration || 1)).toFixed(1);
 
       // Wait for all images
       Promise.all(promiseArray).then(() => {
@@ -139,7 +139,7 @@ const videoCreationService = (function () {
           TOTAL_MEMORY: 1024 * 1024 * 1024,
           arguments: [
             "-r",
-            "25",
+            frameRate,
             "-i",
             "img%06d.jpeg",
             "-c:v",
@@ -159,7 +159,9 @@ const videoCreationService = (function () {
 
     images = [];
     _state = VCStates.INPROGRESS;
-    getFrame();
+
+    plotDiv.on("plotly_redraw", getFrame);
+    plotDiv.on("plotly_animated", buildVideo);
   }
 
   function _onDone(blob) {
@@ -167,6 +169,10 @@ const videoCreationService = (function () {
     worker.removeEventListener("message", _messageHandler);
     onDone(blob);
     _state = VCStates.IDLE;
+  }
+
+  function _onError(msg) {
+    onError(msg);
   }
 
   function _onMessage(msg) {
@@ -177,9 +183,10 @@ const videoCreationService = (function () {
     }
   }
 
-  function record(el, cb, messageCb) {
+  function record(el, _videoDuration = 1, cb, messageCb, errorCb) {
     _cancel = false;
     _done = false;
+    videoDuration = _videoDuration;
 
     if (cb == null) {
       throw new Error("A callback must be given to the video creation service");
@@ -191,6 +198,13 @@ const videoCreationService = (function () {
     } else {
       onMessage = () => {};
     }
+
+    if (errorCb != null) {
+      onError = errorCb;
+    } else {
+      onError = () => {};
+    }
+
     generateVideo(el);
   }
 

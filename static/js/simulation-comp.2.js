@@ -14,6 +14,7 @@ Vue.component("simulation", {
       abortSignal: null, // Stores the signal to abort the current request
       playing: false,
       recording: false,
+      videoDuration: 0,
     };
   },
   created: function () {
@@ -53,19 +54,27 @@ Vue.component("simulation", {
     },
 
     createVideo() {
-      this.simSpeed = 3000;
+      if (this.sim.intervalConfig.iteratingVariable == null) {
+        return;
+      }
+
+      this.simSpeed = 0;
 
       this._goToFirstFrame().then(() => {
         // NOTE: This will emit an `sim-anim-done` event, we may want to avoid it.
         this.recording = true;
         this._play();
-        this.$refs.videoControls.record(this.$refs.plotDivRef);
+        this.$refs.videoControls.record(this.$refs.plotDivRef, this.videoDuration);
       });
     },
 
     videoDone() {
       this.recording = false;
       this.simSpeed = 600;
+    },
+
+    handleVideoError() {
+      this.recording = false;
     },
 
     stop: function () {},
@@ -84,7 +93,7 @@ Vue.component("simulation", {
         mode: "immediate",
         fromcurrent: true,
         transition: { duration: this.simSpeed },
-        frame: { duration: this.simSpeed + 200, redraw: false },
+        frame: { duration: this.simSpeed + 200, redraw: true },
       }).then(() => (this.playing = false));
     },
     _pause: function () {
@@ -127,8 +136,7 @@ Vue.component("simulation", {
         this.stats.totalSteps = Math.floor(
           1 +
             Math.floor(
-              (this.sim.intervalConfig.to - this.sim.intervalConfig.from) /
-                this.sim.intervalConfig.step +
+              (this.sim.intervalConfig.to - this.sim.intervalConfig.from) / this.sim.intervalConfig.step +
                 EPSILON
             )
         );
@@ -143,19 +151,13 @@ Vue.component("simulation", {
             this.stats.currentStep += 1;
             return this._simulate(
               this.sim.config,
-              _replaceModelVariableValue(
-                this.sim.model,
-                this.sim.intervalConfig.iteratingVariable,
-                from
-              ),
+              _replaceModelVariableValue(this.sim.model, this.sim.intervalConfig.iteratingVariable, from),
               from
             );
           });
         }
 
-        promiseChain
-          .then(() => this.dataFetchingDone())
-          .catch((err) => this.handleError(err));
+        promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
       } else {
         this.stats.totalSteps = this.stats.currentStep = 1;
         this._simulate(this.sim.config, this.sim.model)
@@ -195,10 +197,7 @@ Vue.component("simulation", {
 
     /** Precisely rounds number based on the number of significant decimal places */
     _preciseRound: function (number, presicion = 7) {
-      return (
-        Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) /
-        Math.pow(10, presicion)
-      );
+      return Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) / Math.pow(10, presicion);
     },
     _getIndexAsString: function (i) {
       return "" + this.graphHistoricData[i]._iterVal || i;
@@ -282,7 +281,9 @@ Vue.component("simulation", {
     </div>
     <div v-if="simState === SIM_STATE.DONE && (sim && sim.intervalConfig.iteratingVariable)">
       <button @click="createVideo">Record Video</button>
-      <video-record-controls ref="videoControls" @video-done="videoDone">
+      <label for="videoDuration">Video duration (in seconds): </label>
+      <input type="number" name="videoDuration" v-model.number="videoDuration" style="width: 4em" />
+      <video-record-controls ref="videoControls" @video-done="videoDone" @video-error="handleVideoError">
       </video-record-controls>
     </div>
     <div :class="{'event-cover': recording}">
@@ -347,7 +348,7 @@ function getCurrentDate() {
   return `${now.getUTCFullYear()}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
-function downloadLink(href, extension="csv") {
+function downloadLink(href, extension = "csv") {
   const linkEl = document.createElement("a");
   linkEl.setAttribute("href", href);
   linkEl.setAttribute("download", `sim-${getCurrentDate()}.${extension}`);
