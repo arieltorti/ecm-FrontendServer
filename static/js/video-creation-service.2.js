@@ -126,14 +126,13 @@ const videoCreationService = (function () {
     function buildVideo() {
       plotDiv.removeListener("plotly_redraw", getFrame);
       plotDiv.removeListener("plotly_animated", buildVideo);
-      getFrame(); // Last frame
 
       const width = el.clientWidth % 2 == 0 ? el.clientWidth : el.clientWidth + 1;
       const height = el.clientHeight % 2 == 0 ? el.clientHeight : el.clientHeight + 1;
-      const frameRate = (images.length / (videoDuration || 1)).toFixed(1);
 
       // Wait for all images
       Promise.all(promiseArray).then(() => {
+        const frameRate = (images.length / (videoDuration || 1)).toFixed(1);
         worker.postMessage({
           type: "run",
           TOTAL_MEMORY: 1024 * 1024 * 1024,
