@@ -53,19 +53,23 @@ R = res[:,2]
 """
 import pandas as pd
 from scipy.integrate import odeint
-from .base import Model
+from .base import Model, Variable, Param
 
 
 class SIR(Model):
-    columns = ("S", "I", "R")
-    params = ("beta", "gamma", "N")
+    S = Variable(default=999600)
+    I = Variable(default=400)
+    R = Variable(default=0)
+    beta = Param(default=0.3)
+    gamma = Param(default=0.2)
+    N = Param(default=1000000)
 
     def solve(self):
         beta, gamma, N = self.params
         res = odeint(
             self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, N)
         )
-        res = pd.DataFrame(data=res, columns=self.columns)
+        res = pd.DataFrame(data=res, columns=[x.name for x in self.variables])
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, N):
