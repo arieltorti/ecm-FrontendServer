@@ -51,37 +51,112 @@ I = res[:,1]
 R = res[:,2]
 
 """
-import numpy as np
 import pandas as pd
 from scipy.integrate import odeint
-
-DAYS = 365
-STEP = 1
+from .base import Model
 
 
-class Model:
-    """
-    Helper base class to manipulate the models without actually knowing about them.
-    """
+class SIR(Model):
+    columns = ("S", "I", "R")
+    params = ("beta", "gamma", "N")
 
-    def __init__(self, initial_conditions, tspan, params, days=DAYS, step=STEP):
-        self.index = np.arange(0, days, step)
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    def solve(self):
+        beta, gamma, N = self.params
+        res = odeint(
+            self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, N)
+        )
+        res = pd.DataFrame(data=res, columns=self.columns)
+        return res
 
-    @classmethod
-    def available_models(cls):
-        return cls.__subclasses__()
+    def __ode_model(self, initial_conditions, tspan, beta, gamma, N):
+        S, I, _ = initial_conditions
 
-    @classmethod
-    def get_model(cls, name):
-        subclasses = cls.__subclasses__()
-        return [x for x in subclasses if x.__name__.lower() == name].pop()
+        dSdt = -((beta * S * I) / N)
+        dIdt = ((beta * S * I) / N) - (gamma * I)
+        dRdt = gamma * I
+
+        return [dSdt, dIdt, dRdt]
+
+
+class SEIR(Model):
+    columns = ("S", "E", "I", "R")
+    params = ("beta", "gamma", "sigma", "N")
+
+    def solve(self):
+        beta, gamma, sigma, N = self.params
+        res = odeint(
+            self.__ode_model,
+            self.initial_conditions,
+            self.tspan,
+            args=(beta, gamma, sigma, N),
+        )
+        res = pd.DataFrame(data=res, columns=self.columns)
+        return res
+
+    def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, N):
+        S, E, I, _ = initial_conditions
+
+        dSdt = -((beta * S * I) / N)
+        dEdt = ((beta * S * I) / N) - (sigma * E)
+        dIdt = (sigma * E) - (gamma * I)
+        dRdt = gamma * I
+
+        return [dSdt, dEdt, dIdt, dRdt]
+
+
+class SIR_D(Model):
+    columns = ("S", "I", "R")
+    params = ("beta", "gamma", "F", "L", "Nof", "Nol", "D")
+
+    def solve(self):
+        beta, gamma, F, L, Nof, Nol, D = self.params
+        Q = ((Nof * (1 - D) * F) + ((Nol + Nof * D) * L)) / (Nof * F + Nol * L)
+        res = odeint(
+            self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, Q)
+        )
+        res = pd.DataFrame(data=res, columns=self.columns)
+        return res
+
+    def __ode_model(self, initial_conditions, tspan, beta, gamma, Q):
+        S, I, _ = initial_conditions
+
+        dSdt = -(beta * S * I * Q)
+        dIdt = (beta * S * I * Q) - (gamma * I)
+        dRdt = gamma * I
+
+        return [dSdt, dIdt, dRdt]
+
+
+class SEIR_D(Model):
+    columns = ("S", "E", "I", "R")
+    params = ("beta", "gamma", "sigma", "F", "L", "Nof", "Nol", "D")
+
+    def solve(self):
+        beta, gamma, sigma, F, L, Nof, Nol, D = self.params
+        Q = ((Nof * (1 - D) * F) + ((Nol + Nof * D) * L)) / (Nof * F + Nol * L)
+        res = odeint(
+            self.__ode_model,
+            self.initial_conditions,
+            self.tspan,
+            args=(beta, gamma, sigma, Q),
+        )
+        res = pd.DataFrame(data=res, columns=self.columns)
+        return res
+
+    def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, Q):
+        S, E, I, _ = initial_conditions
+
+        dSdt = -(beta * S * I * Q)
+        dEdt = (beta * S * I * Q) - (sigma * E)
+        dIdt = (sigma * E) - (gamma * I)
+        dRdt = gamma * I
+
+        return [dSdt, dEdt, dIdt, dRdt]
 
 
 class SplittedSIR(Model):
     columns = ("Sl", "Sf", "Il", "If", "Rl", "Rf")
+    params = ("beta", "gamma", "F", "L", "Nof", "Nol")
 
     def solve(self):
         beta, gamma, F, L, Nof, Nol = self.params
@@ -115,6 +190,7 @@ class SplittedSIR(Model):
 
 class SplittedSEIR(Model):
     columns = ("Sl", "Sf", "El", "Ef", "Il", "If", "Rl", "Rf")
+    params = ("beta", "gamma", "sigma", "F", "L", "Nof", "Nol")
 
     def solve(self):
         beta, gamma, sigma, F, L, Nof, Nol = self.params
@@ -143,95 +219,4 @@ class SplittedSEIR(Model):
         return [dSldt, dSfdt, dEldt, dEfdt, dIldt, dIfdt, dRldt, dRfdt]
 
 
-class SIR(Model):
-    columns = ("S", "I", "R")
-
-    def solve(self):
-        beta, gamma, N = self.params
-        res = odeint(
-            self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, N)
-        )
-        res = pd.DataFrame(data=res, columns=self.columns)
-        return res
-
-    def __ode_model(self, initial_conditions, tspan, beta, gamma, N):
-        S, I, _ = initial_conditions
-
-        dSdt = -((beta * S * I) / N)
-        dIdt = ((beta * S * I) / N) - (gamma * I)
-        dRdt = gamma * I
-
-        return [dSdt, dIdt, dRdt]
-
-
-class SEIR(Model):
-    columns = ("S", "E", "I", "R")
-
-    def solve(self):
-        beta, gamma, sigma, N = self.params
-        res = odeint(
-            self.__ode_model,
-            self.initial_conditions,
-            self.tspan,
-            args=(beta, gamma, sigma, N),
-        )
-        res = pd.DataFrame(data=res, columns=self.columns)
-        return res
-
-    def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, N):
-        S, E, I, _ = initial_conditions
-
-        dSdt = -((beta * S * I) / N)
-        dEdt = ((beta * S * I) / N) - (sigma * E)
-        dIdt = (sigma * E) - (gamma * I)
-        dRdt = gamma * I
-
-        return [dSdt, dEdt, dIdt, dRdt]
-
-
-class SIR_D(Model):
-    columns = ("S", "I", "R")
-
-    def solve(self):
-        beta, gamma, F, L, Nof, Nol, D = self.params
-        Q = ((Nof * (1 - D) * F) + ((Nol + Nof * D) * L)) / (Nof * F + Nol * L)
-        res = odeint(
-            self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, Q)
-        )
-        res = pd.DataFrame(data=res, columns=self.columns)
-        return res
-
-    def __ode_model(self, initial_conditions, tspan, beta, gamma, Q):
-        S, I, _ = initial_conditions
-
-        dSdt = -(beta * S * I * Q)
-        dIdt = (beta * S * I * Q) - (gamma * I)
-        dRdt = gamma * I
-
-        return [dSdt, dIdt, dRdt]
-
-
-class SEIR_D(Model):
-    columns = ("S", "E", "I", "R")
-
-    def solve(self):
-        beta, gamma, sigma, F, L, Nof, Nol, D = self.params
-        Q = ((Nof * (1 - D) * F) + ((Nol + Nof * D) * L)) / (Nof * F + Nol * L)
-        res = odeint(
-            self.__ode_model,
-            self.initial_conditions,
-            self.tspan,
-            args=(beta, gamma, sigma, Q),
-        )
-        res = pd.DataFrame(data=res, columns=self.columns)
-        return res
-
-    def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, Q):
-        S, E, I, _ = initial_conditions
-
-        dSdt = -(beta * S * I * Q)
-        dEdt = (beta * S * I * Q) - (sigma * E)
-        dIdt = (sigma * E) - (gamma * I)
-        dRdt = gamma * I
-
-        return [dSdt, dEdt, dIdt, dRdt]
+__all__ = ["SIR", "SEIR", "SIR_D", "SEIR_D", "SplittedSIR", "SplittedSEIR"]
