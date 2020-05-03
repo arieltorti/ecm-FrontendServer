@@ -3,8 +3,7 @@
 
 import datetime
 import json
-import numpy as np
-import pandas as pd
+
 import matplotlib.pyplot as plt
 
 from flask import Flask, request, send_from_directory, render_template, send_file
@@ -14,7 +13,7 @@ from models import Model
 
 HTTP_400_BAD_REQUEST = 400
 
-BASE_PATH = Path(__file__)
+BASE_PATH = Path(".")
 STATIC_PATH = BASE_PATH / "static"
 SIMULATION_ENGINE_PATH = "compartments\\compartments.exe"
 SIMULATION_WD = (BASE_PATH / ".." / SIMULATION_ENGINE_PATH / "..").resolve()
@@ -57,26 +56,23 @@ def serve_styles(path):
 @app.route("/animate/<model_name>", methods=["POST"])
 def animate(model_name):
     model = Model.get_model(model_name)
-
-    days = request.args.get("days", default=365, type=int)
-    step = request.args.get("step", default=1, type=int)
-    time = np.arange(0, days, step)
-    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
-
-    filepath = STATIC_PATH / f"{model_name}-{timestamp}.png"
     data = request.json
     if not data:
         raise BadRequest(description="No input data")
 
-    breakpoint()
-    results = model(**request.json).solve()
-    
-    S, I, R = results[:, 0], results[:, 1], results[:, 2]
-    df = pd.DataFrame(data={"S": S, "I": I, "R": R}, index=time)
-    df.plot()
+    days = request.args.get("days", default=365, type=int)
+    step = request.args.get("step", default=1, type=int)
+
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
+
+    filepath = STATIC_PATH / "simulations" / f"{model_name}-{timestamp}.png"
+
+    results = model(days=days, step=step, **request.json).solve()
+
+    results.plot()
     plt.grid(True)
     plt.savefig(filepath)
-    return filepath
+    return send_file(filepath, mimetype="image/png",)
 
 
 @app.route("/result/<string:filepath>")

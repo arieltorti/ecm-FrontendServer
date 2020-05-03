@@ -1,8 +1,8 @@
 import pytest
-import json
+import requests
 import numpy as np
 
-from app import create_app
+from app import app as application
 
 initSl = 599800
 initSf = 399800
@@ -37,19 +37,18 @@ days = 365
 
 @pytest.fixture
 def app():
-    return create_app()
+    return application
 
 
 def test_animate(client):
     mimetype = "application/json"
-    headers = {"Content-Type": mimetype, "Accept": mimetype}
+
     data = {
         "initial_conditions": [initS, initI, initR],
         "params": [beta, gamma, N],
         "tspan": np.arange(0, days, 1).tolist(),
     }
-    url = "/animate/sir/"
-    breakpoint()
-    response = client.post("/animat", data=json.dumps(data), content_type=mimetype)
-    print(response)
-    assert response
+    url = "/animate/sir"
+    response = client.post(url, json=data, content_type=mimetype)
+
+    assert response.status_code == 200

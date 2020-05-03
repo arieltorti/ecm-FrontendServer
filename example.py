@@ -40,10 +40,31 @@ params = [beta, gamma, sigma, F, L, Nof, Nol]
 tspan = np.arange(0, days, 1)
 model = SplittedSEIR(initial_conditions, tspan, params)
 res = model.solve()
-Sl, Sf, El, Ef, Il, If, Rl, Rf = res[:, 0], res[:, 1], res[:, 2], res[:, 3], res[:, 4], res[:, 5], res[:, 6], res[:, 7]
+Sl, Sf, El, Ef, Il, If, Rl, Rf = (
+    res[:, 0],
+    res[:, 1],
+    res[:, 2],
+    res[:, 3],
+    res[:, 4],
+    res[:, 5],
+    res[:, 6],
+    res[:, 7],
+)
 step = 1
 t = np.arange(0, days, step)
-df = pd.DataFrame(data={"Sl":Sl, "Sf":Sf, "El":El, "Ef":Ef, "Il":Il, "If":If, "Rl":Rl, "Rf":Rf},index= t)
+df = pd.DataFrame(
+    data={
+        "Sl": Sl,
+        "Sf": Sf,
+        "El": El,
+        "Ef": Ef,
+        "Il": Il,
+        "If": If,
+        "Rl": Rl,
+        "Rf": Rf,
+    },
+    index=t,
+)
 
 df.plot()
 plt.grid(True)
@@ -61,12 +82,10 @@ res = model.solve()
 S, I, R = res[:, 0], res[:, 1], res[:, 2]
 step = 1
 t = np.arange(0, days, step)
-df = pd.DataFrame(data={"S":S, "I":I, "R":R},index= t)
+df = pd.DataFrame(data={"S": S, "I": I, "R": R}, index=t)
 
 df.plot()
 plt.grid(True)
 plt.show()
 
 # #######################################################################################################
-
-

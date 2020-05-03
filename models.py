@@ -1,5 +1,3 @@
-from scipy.integrate import odeint
-
 """
 Order of Initial Conditions and Parameters
 
@@ -53,12 +51,25 @@ I = res[:,1]
 R = res[:,2]
 
 """
+import numpy as np
+import pandas as pd
+from scipy.integrate import odeint
+
+DAYS = 365
+STEP = 1
 
 
 class Model:
     """
     Helper base class to manipulate the models without actually knowing about them.
     """
+
+    def __init__(self, initial_conditions, tspan, params, days=DAYS, step=STEP):
+        self.index = np.arange(0, days, step)
+        self.initial_conditions = initial_conditions
+        self.params = params
+        self.tspan = tspan
+
     @classmethod
     def available_models(cls):
         return cls.__subclasses__()
@@ -70,13 +81,7 @@ class Model:
 
 
 class SplittedSIR(Model):
-    def __init__(self, initial_conditions, tspan, params):
-        # XXX: It would be helpful to annotate the variables and their default values
-        #      in the model definition, so clients may inspect the class and get them
-        #      to perform validation, serialization and generally asume less information.
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    columns = ("Sl", "Sf", "Il", "If", "Rl", "Rf")
 
     def solve(self):
         beta, gamma, F, L, Nof, Nol = self.params
@@ -92,6 +97,7 @@ class SplittedSIR(Model):
             self.tspan,
             args=(beta, gamma, F, L, T),
         )
+        res = pd.DataFrame(data=res, columns=self.columns)
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, F, L, T):
@@ -108,10 +114,7 @@ class SplittedSIR(Model):
 
 
 class SplittedSEIR(Model):
-    def __init__(self, initial_conditions, tspan, params):
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    columns = ("Sl", "Sf", "El", "Ef", "Il", "If", "Rl", "Rf")
 
     def solve(self):
         beta, gamma, sigma, F, L, Nof, Nol = self.params
@@ -122,6 +125,7 @@ class SplittedSEIR(Model):
             self.tspan,
             args=(beta, gamma, sigma, F, L, T),
         )
+        res = pd.DataFrame(data=res, columns=self.columns)
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, F, L, T):
@@ -140,16 +144,14 @@ class SplittedSEIR(Model):
 
 
 class SIR(Model):
-    def __init__(self, initial_conditions, tspan, params):
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    columns = ("S", "I", "R")
 
     def solve(self):
         beta, gamma, N = self.params
         res = odeint(
             self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, N)
         )
+        res = pd.DataFrame(data=res, columns=self.columns)
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, N):
@@ -163,10 +165,7 @@ class SIR(Model):
 
 
 class SEIR(Model):
-    def __init__(self, initial_conditions, tspan, params):
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    columns = ("S", "E", "I", "R")
 
     def solve(self):
         beta, gamma, sigma, N = self.params
@@ -176,6 +175,7 @@ class SEIR(Model):
             self.tspan,
             args=(beta, gamma, sigma, N),
         )
+        res = pd.DataFrame(data=res, columns=self.columns)
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, N):
@@ -190,10 +190,7 @@ class SEIR(Model):
 
 
 class SIR_D(Model):
-    def __init__(self, initial_conditions, tspan, params):
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    columns = ("S", "I", "R")
 
     def solve(self):
         beta, gamma, F, L, Nof, Nol, D = self.params
@@ -201,6 +198,7 @@ class SIR_D(Model):
         res = odeint(
             self.__ode_model, self.initial_conditions, self.tspan, args=(beta, gamma, Q)
         )
+        res = pd.DataFrame(data=res, columns=self.columns)
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, Q):
@@ -214,10 +212,7 @@ class SIR_D(Model):
 
 
 class SEIR_D(Model):
-    def __init__(self, initial_conditions, tspan, params):
-        self.initial_conditions = initial_conditions
-        self.params = params
-        self.tspan = tspan
+    columns = ("S", "E", "I", "R")
 
     def solve(self):
         beta, gamma, sigma, F, L, Nof, Nol, D = self.params
@@ -228,6 +223,7 @@ class SEIR_D(Model):
             self.tspan,
             args=(beta, gamma, sigma, Q),
         )
+        res = pd.DataFrame(data=res, columns=self.columns)
         return res
 
     def __ode_model(self, initial_conditions, tspan, beta, gamma, sigma, Q):
