@@ -1,0 +1,103 @@
+{
+    "schemaVersion" : 1,
+    "simulation" : {
+        "step" : 1,
+        "days" : 365,
+        "initial_conditions": {
+            "Sl": 599800,
+            "Sf": 399800,
+            "Il": 200,
+            "If": 200,
+            "Rl": 0,
+            "Rf": 0
+        },
+        "params" : {
+            "beta": 0.05,
+            "gamma": 0.2,
+            "F": 8,
+            "L": 1,
+            "T": 3800000
+        }
+    },
+    "model" : {
+        "name" : "SIR_split",
+        "compartments" : 
+        [
+            {
+                "name": "Sl",
+                "description": ""
+            },
+            {
+                "name": "Sf",
+                "description": ""
+            },
+            {
+                "name": "Il",
+                "description": ""
+            },
+            {
+                "name": "If",
+                "description": ""
+            },
+            {
+                "name": "Rl",
+                "description": ""
+            },
+            {
+                "name": "Rf",
+                "description": ""
+            }
+        ],
+        "params" : [
+            {
+                "name": "beta",
+                "description": ""
+            },
+            {
+                "name": "gamma",
+                "description": ""
+            },
+            {
+                "name": "F",
+                "description": ""
+            },
+            {
+                "name": "L",
+                "description": ""
+            },
+            {
+                "name": "T",
+                "description": ""
+            }
+        ],
+        "reactions": [
+            { 
+                "from": "Sf",
+                "to": "If",
+                "function": 
+                ["/", ["*", "beta", "F", "Sf", ["+", ["*", "If", "F"], ["*", "Il", "L"]]], "T"],
+                "description": ""
+            },
+            { 
+                "from": "Sl",
+                "to": "Il",
+                "function":
+                ["/", ["*", "beta", "L", "Sl", ["+", ["*", "If", "F"], ["*", "Il", "L"]]], "T"],
+                "description": ""
+            },
+            { 
+                "from": "If",
+                "to": "Rf",
+                "function":
+                    ["*", "gamma", "If"],
+                "description": ""
+            },
+            { 
+                "from": "Il",
+                "to": "Rl",
+                "function": ["*", "gamma", "Il"],
+                "description": ""
+            }
+        ]
+    }
+}

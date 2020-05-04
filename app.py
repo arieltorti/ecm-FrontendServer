@@ -7,7 +7,7 @@ import json
 from flask import Flask, request, send_from_directory, render_template, send_file
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
-from models import Model
+from models import build_model
 
 HTTP_400_BAD_REQUEST = 400
 
@@ -38,18 +38,16 @@ def serve_styles(path):
 
 @app.route("/simulate/<model_name>", methods=["POST"])
 def simulate(model_name):
-    model = Model.get_model(model_name)
+
     data = request.json
     if not data:
         raise BadRequest(description="No input data")
 
-    days = request.args.get("days", default=365, type=int)
-    step = request.args.get("step", default=1, type=int)
-
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
 
     filepath = STATIC_PATH / "simulations" / f"{model_name}-{timestamp}.png"
-    simulation = model(days=days, step=step, **request.json)
+    model = build_model(model_name, data["model"])
+    simulation = model(**data["simulation"])
     results = simulation.solve()
     results.plot()
     plt.grid(True)

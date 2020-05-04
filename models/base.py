@@ -68,17 +68,27 @@ class ModelMeta(type):
         return cls
 
 
-class Model(metaclass=ModelMeta):
+class Model:
     """
     Helper base class to manipulate the models without actually knowing about them.
     """
-    params = ()
-    variables = ()
+    columns = ()
     results = None
 
-    def __init__(self, initial_conditions, tspan, params, days=DAYS, step=STEP):
-        self.initial_conditions = initial_conditions  # must be a `Variable`s collection
-        self.params = params  # Similar to `initial_conditions` with `Param`s instead
+    def __parse_initials(self, initials):
+        out = ()
+        if isinstance(initials, dict):
+            out = tuple(initials.values())
+        elif isinstance(initials, (list, tuple)):
+            out = initials
+        else:
+            out = ()
+        return out
+
+    def __init__(self, initial_conditions=None, tspan=None, params=None, days=DAYS, step=STEP):
+        
+        self.initial_conditions = self.__parse_initials(initial_conditions)
+        self.params = self.__parse_initials(params)
         self.tspan = tspan if tspan is not None else np.arange(0, days, step)
 
     def validate(self):
@@ -104,7 +114,7 @@ class Model(metaclass=ModelMeta):
         data = {
             "name": self.__class__.__name__,
         }
-        data.update({x.name: x.default for x in self.variables})
+        data.update({x.name: x.default for x in self.columns})
         data.update({"params": [x for x in self.original_params]})
         return data
 
@@ -112,4 +122,4 @@ class Model(metaclass=ModelMeta):
         return self.__class__.__name__
     
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.variables} ({self.params})"
+        return f"{self.__class__.__name__}({self.columns} ({self.params})"
