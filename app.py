@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import json
-
 import matplotlib.pyplot as plt
-
+import json
 from flask import Flask, request, send_from_directory, render_template, send_file
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
@@ -22,25 +20,10 @@ SIMULATION_WD = (BASE_PATH / ".." / SIMULATION_ENGINE_PATH / "..").resolve()
 app = Flask(__name__, static_url_path="")
 
 
-def handle_response(inputs):
-    error_dict = {}
-    inputs_dict = {}
-
-    for input_name in inputs:
-        _input = request.form.get(input_name, None)
-        if _input is None:
-            error_dict[input_name] = f"The field {input_name} is required"
-        else:
-            inputs_dict[input_name] = _input
-
-    if error_dict.keys():
-        raise BadRequest(json.dumps(error_dict))
-    return inputs_dict
-
-
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("index.html")
+    models = Model.available_models()
+    return render_template("index.html", models=models)
 
 
 @app.route("/js/<path:path>")
@@ -53,8 +36,8 @@ def serve_styles(path):
     return send_from_directory("static/css", path)
 
 
-@app.route("/animate/<model_name>", methods=["POST"])
-def animate(model_name):
+@app.route("/simulate/<model_name>", methods=["POST"])
+def simulate(model_name):
     model = Model.get_model(model_name)
     data = request.json
     if not data:
@@ -66,9 +49,8 @@ def animate(model_name):
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
 
     filepath = STATIC_PATH / "simulations" / f"{model_name}-{timestamp}.png"
-
-    results = model(days=days, step=step, **request.json).solve()
-
+    simulation = model(days=days, step=step, **request.json)
+    results = simulation.solve()
     results.plot()
     plt.grid(True)
     plt.savefig(filepath)
