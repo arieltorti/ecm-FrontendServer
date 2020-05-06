@@ -75,10 +75,10 @@ class Model:
     columns = ()
     results = None
 
-    def __parse_initials(self, initials):
+    def __parse_initials(self, initials, labels):
         out = ()
         if isinstance(initials, dict):
-            out = tuple(initials.values())
+            out = tuple(initials[c] for c in labels)
         elif isinstance(initials, (list, tuple)):
             out = initials
         else:
@@ -86,9 +86,8 @@ class Model:
         return out
 
     def __init__(self, initial_conditions=None, tspan=None, params=None, days=DAYS, step=STEP):
-        
-        self.initial_conditions = self.__parse_initials(initial_conditions)
-        self.params = self.__parse_initials(params)
+        self.initial_conditions = self.__parse_initials(initial_conditions, self.columns)
+        self.params = self.__parse_initials(params, self.params)
         self.tspan = tspan if tspan is not None else np.arange(0, days, step)
 
     def validate(self):
