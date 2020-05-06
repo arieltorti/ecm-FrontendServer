@@ -1,43 +1,67 @@
 "use strict";
 
-const defaultSimulationModel = `; simplemodel
-
-(import (rnrs) (emodl cmslib))
-
-(start-model "seir.emodl")
-
-(species S 990)
-(species E)
-(species I 10)
-(species R)
-
-(observe susceptible S)
-(observe exposed     E)
-(observe infectious  I)
-(observe recovered   R)
-
-(param Ki 0.0005)
-(param Kl 0.2)
-(param Kr (/ 1 7))
-
-(reaction exposure   (S I) (E I) (* Ki S I))
-(reaction infection  (E)   (I)   (* Kl E))
-(reaction recovery   (I)   (R)   (* Kr I))
-
-(end-model)`;
-
-const defaultConfigText = `{
-    "duration" : 365,
-    "runs" : 1,
-    "samples" : 365,
-    "solver" : "R",
-    "output" : {
-        "headers" : true
-    },
-    "tau-leaping" : {
-        "epsilon" : 0.01
-    },
-    "r-leaping" : {}
+const defaultSimulationModel = `{
+  "schemaVersion" : 1,
+  "simulation" : {
+      "step" : 1,
+      "days" : 10,
+      "initial_conditions": {
+          "S": 999600,
+          "I": 400,
+          "R": 0
+      },
+      "params" : {
+          "beta": 0.3,
+          "gamma": 0.2,
+          "N": 1000000
+      }
+  },
+  "model" : {
+      "name" : "SIR",
+      "compartments" :
+      [
+          {
+              "name": "S",
+              "description": ""
+          },
+          {
+              "name": "I",
+              "description": ""
+          },
+          {
+              "name": "R",
+              "description": ""
+          }
+      ],
+      "params" : [
+          {
+              "name": "beta",
+              "description": ""
+          },
+          {
+              "name": "gamma",
+              "description": ""
+          },
+          {
+              "name": "N",
+              "description": ""
+          }
+      ],
+      "reactions": [
+          {
+              "from": "S",
+              "to": "I",
+              "function": ["/", ["*", "beta", "S", "I"], "N"],
+              "description": ""
+          },
+          {
+              "from": "I",
+              "to": "R",
+              "function": ["*", "gamma", "I"],
+              "description": ""
+          }
+      ]
+  }
 }`;
 
 const defaultIterConfig = {

@@ -92,7 +92,6 @@ Vue.component("simulation", {
           promiseChain = promiseChain.then(() => {
             this.stats.currentStep += 1;
             return this._simulate(
-              this.sim.config,
               _replaceModelVariableValue(this.sim.model, this.sim.intervalConfig.iteratingVariable, from),
               from
             );
@@ -102,24 +101,23 @@ Vue.component("simulation", {
         promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
       } else {
         this.stats.totalSteps = this.stats.currentStep = 1;
-        this._simulate(this.sim.config, this.sim.model)
+        this._simulate(this.sim.model)
           .then(() => this.dataFetchingDone())
           .catch((err) => this.handleError(err));
       }
     },
-    _simulate: function (config, model, iterVarValue) {
-      const formData = new FormData();
-
-      formData.append("config", config);
-      formData.append("model", model);
-
+    _simulate: function (model, iterVarValue) {
       const controller = new AbortController();
       const signal = controller.signal;
       this.abortSignal = controller;
 
-      const req = fetch("/api/compute", {
+      const req = fetch("/simulate/model", {
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
         method: "POST",
-        body: formData,
+        body: model,
         signal,
       });
 
@@ -190,7 +188,6 @@ Vue.component("simulation", {
       // to the initial frame. We deeply copy the initial data object to avoid this issue.
       const data = JSON.parse(JSON.stringify(this.graphHistoricData[0]));
 
-      debugger;
       Plotly.newPlot("plotDiv", {
         data: data,
         layout: { ...graphLayout, sliders: slider },
@@ -224,11 +221,9 @@ function escapeRegExp(str) {
  * @param {*} value New value
  */
 function _replaceModelVariableValue(model, variable, value) {
-  const singleVariableRegex = new RegExp(
-    `^(?!;)(.*\\(\\s*param\\s+${escapeRegExp(variable)}\\s+)(.*)\s*(\\))`,
-    "gm"
-  );
-  return model.replace(singleVariableRegex, `$1${value}$3`);
+  objectModel = JSON.parse(model);
+  objectModel.simulation.params[variable] = value;
+  return JSON.stringify(objectModel);
 }
 
 /**
@@ -237,14 +232,7 @@ function _replaceModelVariableValue(model, variable, value) {
  * @param {*} model Simulation model string
  */
 function _extractModelVariables(model) {
-  // We could use matchAll, but as we're not using a transpiler and someone may use this on IE11
-  // we'll do it the old way instead.
-  let match;
-  const variables = [];
-  while ((match = VARIABLES_REGEX.exec(model)) != null) {
-    variables.push(match[1]);
-  }
-  return variables;
+  return JSON.parse(model).model.params.map(x => x.name);
 }
 
 /**
@@ -324,14 +312,14 @@ const plotConfig = {
  * @param {*} data
  */
 function makeGraphData(data) {
-  const xAxis = data.SampleTimes;
+  const xAxis = data.columns;
   const graphData = [];
 
-  for (let i = 0; i < data.ChannelData.length; i++) {
+  for (let i = 0; i < data.data.length; i++) {
     graphData.push({
       x: xAxis,
-      y: data.ChannelData[i],
-      name: data.ObservableNames[i],
+      y: data.data[i],
+      name: data.index[i],
     });
   }
 

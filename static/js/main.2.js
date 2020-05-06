@@ -16,7 +16,6 @@ const app = new Vue({
 
       simulationState: SIM_STATE.DONE,
       simulationModel: localStorage.getItem(SIMULATION_MODEL_KEY) || defaultSimulationModel,
-      simulationConfig: localStorage.getItem(SIMULATION_CONFIG_KEY) || defaultConfigText,
       errorMsg: null,
       statusMsg: null,
 
@@ -37,10 +36,6 @@ const app = new Vue({
       this.pendingChanges = true;
       localStorage.setItem(SIMULATION_MODEL_KEY, val);
     },
-    simulationConfig: function (val) {
-      this.pendingChanges = true;
-      localStorage.setItem(SIMULATION_CONFIG_KEY, val);
-    },
     configInterval: {
       handler(val) {
         this.pendingChanges = true;
@@ -57,7 +52,6 @@ const app = new Vue({
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
       this.currentSimulation = {
         model: this.simulationModel,
-        config: this.simulationConfig,
         intervalConfig: Vue.util.extend({}, configInterval),
       };
       setTimeout(() => {this.pendingChanges = false}, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account
@@ -76,7 +70,6 @@ const app = new Vue({
 
     reset: function (event) {
       this.simulationModel = defaultSimulationModel;
-      this.simulationConfig = defaultConfigText;
     },
 
     handleError: function (error) {
