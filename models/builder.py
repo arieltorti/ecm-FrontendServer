@@ -52,7 +52,7 @@ def eval_function_expr(compartments, variables, farray):
 
 
 def build_ode_model_function(schema):
-    expressions = {p["name"]: p["value"] for p in schema["expressions"]}
+    expressions = {p["name"]: p["value"] for p in schema.get("expressions", [])}
     # TODO: Check recursion of expressions
     variables = [p["name"] for p in schema["params"]]
     variables_with_expr = variables + list(expressions.keys())

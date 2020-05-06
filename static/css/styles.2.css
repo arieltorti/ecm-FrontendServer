@@ -27,9 +27,7 @@
   display: block;
 }
 
-.interval-config input {
-  width: 6em;
-}
+
 
 .variable-selector div.option {
   display: inline-block;
@@ -54,4 +52,15 @@
 /* Prevents the flash of unitialized vue instance */
 [v-cloak] {
   display: none;
+}
+
+.interval-config label{
+  display: inline-block !important;
+  width: 4em;
+  text-align: right;
+}
+
+.interval-config input {
+  display: inline-block !important;
+  width: 6em;
 }
