@@ -10,7 +10,7 @@ FIXTURE_DIR = Path(__file__).parent / "fixtures"
 @pytest.fixture
 def sir_splitted_schema():
     data = ""
-    with open(FIXTURE_DIR / "SIR_split.json", "r") as f:
+    with open(FIXTURE_DIR / "SplittedSIR.json", "r") as f:
         data = json.loads(f.read())
     return data
 

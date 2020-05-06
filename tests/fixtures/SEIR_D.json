@@ -1,0 +1,109 @@
+{
+    "schemaVersion" : 1,
+    "simulation" : {
+        "step" : 1,
+        "days" : 365,
+        "initial_conditions": {
+            "S": 999600,
+            "E": 0,
+            "I": 400,
+            "R": 0
+        },
+        "params" : {
+            "beta": 0.3,
+            "gamma": 0.2,
+            "sigma": 0.14,
+            "F": 8,
+            "L": 1,
+            "Nof": 400000,
+            "Nol": 600000,
+            "D": 0
+        }
+    },
+    "model" : {
+        "name" : "SIR_D",
+        "compartments" :
+        [
+            {
+                "name": "S",
+                "description": ""
+            },
+            {
+                "name": "E",
+                "description": ""
+            },
+            {
+                "name": "I",
+                "description": ""
+            },
+            {
+                "name": "R",
+                "description": ""
+            }
+        ],
+        "params" : [
+            {
+                "name": "beta",
+                "description": ""
+            },
+            {
+                "name": "gamma",
+                "description": ""
+            },
+            {
+                "name": "sigma",
+                "description": ""
+            },
+            {
+                "name": "F",
+                "description":""
+            },
+            {
+                "name": "L",
+                "description":""
+            },
+            {
+                "name": "Nof",
+                "description":""
+            },
+            {
+                "name": "Nol",
+                "description":""
+            },
+            {
+                "name": "D",
+                "description":""
+            }
+        ],
+        "expressions": [
+            {
+                "name": "Q",
+                "value" : ["/",
+                    ["+", ["*", "Nof", ["-", 1, "D"], "F"], ["*", ["+", "Nol", ["*", "Nof", "D"]], "L"]],
+                    ["+", ["*", "Nof", "F"], ["*", "Nol", "L"]]
+                ],
+                "description": ""
+            }
+        ],
+        "reactions": [
+            {
+                "from": "S",
+                "to": "E",
+                "function": ["*", "beta", "S", "I", "Q"],
+                "description": ""
+            },
+            {
+                "from": "E",
+                "to": "I",
+                "function": ["*", "sigma", "E"],
+                "description": ""
+            },
+            {
+                "from": "I",
+                "to": "R",
+                "function": ["*", "gamma", "I"],
+                "description": ""
+            }
+        ]
+    }
+}
