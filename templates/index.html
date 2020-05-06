@@ -17,11 +17,6 @@
           <label for="modelInput">Simulation Model:</label>
           <textarea name="modelInput" v-model="simulationModel"></textarea>
         </div>
-
-        <div class="inputContainer" style="flex-basis: 400px;">
-          <label for="configInput">Configuration:</label>
-          <textarea name="configInput" v-model="simulationConfig"></textarea>
-        </div>
       </div>
       <iter-controls
         @submit="handleSubmit"

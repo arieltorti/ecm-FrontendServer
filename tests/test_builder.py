@@ -1,4 +1,4 @@
-from models import build_model
+from models.builder import build_model, build_ode_model_function
 from pathlib import Path
 from matplotlib import pyplot as plt
 
@@ -17,3 +17,10 @@ def test_sir_splitted_build(sir_splitted_schema):
     plt.savefig(filepath)
     assert not results.empty
     # assert results[:0] == [599800.000000, 399800.000000, 2.000000e+02, 2.000000e+02, 0.000000, 0.000000]
+
+
+def test_build_ode_model_function(sir_splitted_schema):
+
+    model = build_ode_model_function(sir_splitted_schema["model"])
+
+    assert model
