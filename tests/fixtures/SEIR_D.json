@@ -21,7 +21,7 @@
         }
     },
     "model" : {
-        "name" : "SIR_D",
+        "name" : "SEIR_D",
         "compartments" :
         [
             {
@@ -83,13 +83,18 @@
                     ["+", ["*", "Nof", "F"], ["*", "Nol", "L"]]
                 ],
                 "description": ""
+            },
+            {
+                "name": "N",
+                "value": ["+","Nof","Nol"],
+                "description": ""
             }
         ],
         "reactions": [
             {
                 "from": "S",
                 "to": "E",
-                "function": ["*", "beta", "S", "I", "Q"],
+                "function": ["/", ["*", "beta", "S", "I", "Q"], "N"],
                 "description": ""
             },
             {

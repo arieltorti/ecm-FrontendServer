@@ -73,6 +73,11 @@
                     ["+", ["*", "Nof", "F"], ["*", "Nol", "L"]]
                 ],
                 "description": ""
+            },
+            {
+                "name": "N",
+                "value": ["+","Nof","Nol"],
+                "description": ""
             }
         ],
         "reactions": [
@@ -80,7 +85,7 @@
                 "from": "S",
                 "to": "I",
                 "function":
-                ["*", "beta", "S", "I", "Q"],
+                ["/",["*", "beta", "S", "I", "Q"], "N"],
                 "description": ""
             },
             {
