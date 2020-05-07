@@ -232,7 +232,13 @@ function _replaceModelVariableValue(model, variable, value) {
  * @param {*} model Simulation model string
  */
 function _extractModelVariables(model) {
-  return JSON.parse(model).model.params.map(x => x.name);
+  let out = [];
+  try {
+    out = JSON.parse(model).model.params.map(x => x.name);
+  } catch (e) {
+    console.error(e);
+  }
+  return out;
 }
 
 /**
