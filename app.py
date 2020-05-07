@@ -1,9 +1,8 @@
 #!/usr/bin env python3
 # -*- coding: utf-8 -*-
 
-import datetime
-import matplotlib.pyplot as plt
-import json
+import logging
+import sys
 from flask import Flask, request, send_from_directory, render_template, send_file
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
@@ -18,6 +17,19 @@ SIMULATION_WD = (BASE_PATH / ".." / SIMULATION_ENGINE_PATH / "..").resolve()
 
 
 app = Flask(__name__, static_url_path="")
+
+
+# Configure logging.
+app.logger.setLevel(logging.DEBUG)
+del app.logger.handlers[:]
+
+handler = logging.StreamHandler(stream=sys.stdout)
+handler.setLevel(logging.DEBUG)
+handler.formatter = logging.Formatter(
+    fmt=u"%(asctime)s level=%(levelname)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%SZ",
+)
+app.logger.addHandler(handler)
 
 
 @app.route("/", methods=["GET"])
