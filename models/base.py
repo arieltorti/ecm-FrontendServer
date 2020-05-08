@@ -87,7 +87,7 @@ class Model:
 
     def __init__(self, initial_conditions=None, tspan=None, params=None, days=DAYS, step=STEP):
         self.initial_conditions = self.__parse_initials(initial_conditions, self.columns)
-        self.params = self.__parse_initials(params, self.params)
+        self.params = self.__parse_initials(params, self.defaultparams)
         self.tspan = tspan if tspan is not None else np.arange(0, days, step)
 
     def validate(self):

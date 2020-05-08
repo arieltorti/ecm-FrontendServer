@@ -5,3 +5,5 @@ pytest
 pytest-flask
 matplotlib
 gunicorn
+sqlalchemy
+flask-sqlalchemy

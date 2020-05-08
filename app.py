@@ -7,6 +7,8 @@ from flask import Flask, request, send_from_directory, render_template, send_fil
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
 from models import build_model, Model
+from flask_sqlalchemy import SQLAlchemy
+
 
 HTTP_400_BAD_REQUEST = 400
 
@@ -18,6 +20,32 @@ SIMULATION_WD = (BASE_PATH / ".." / SIMULATION_ENGINE_PATH / "..").resolve()
 
 app = Flask(__name__, static_url_path="")
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cms-fudepan.db'
+db = SQLAlchemy(app)
+
+class Model(db.Model):
+    __tablename__ = 'model'
+    id = db.Column(db.Integer, primary_key=True)
+    compartments = db.Column(db.JSON)
+    params = db.Column(db.JSON)
+    expressions = db.Column(db.JSON)
+    reactions = db.Column(db.JSON)
+
+    def __repr__(self):
+        return '<Model %r>' % (self.name)
+
+class Simulation(db.Model):
+    __tablename__ = 'simulation'
+    id = db.Column(db.Integer, primary_key=True)
+    model = db.Column(db.ForeignKey("model.id"))
+    days = db.Column(db.Float)
+    step = db.Column(db.Float)
+    initial_conditions = db.Column(db.JSON)
+    params = db.Column(db.JSON)
+    iterate = db.Column(db.JSON)
+
+    def __repr__(self):
+        return '<Simuation %r>' % (self.name)
 
 # Configure logging.
 app.logger.setLevel(logging.DEBUG)

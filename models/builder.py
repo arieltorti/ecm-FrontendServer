@@ -104,7 +104,7 @@ def build_model(name, schema):
         (Model, object),
         {
             "columns": [c["name"] for c in schema["compartments"]],
-            "params": [p["name"] for p in schema["params"]],
+            "defaultparams": [p["name"] for p in schema["params"]],
             "solve": _solve,
             "__ode_model": __ode_model,
         },
