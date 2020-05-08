@@ -3,10 +3,18 @@
 
 import logging
 import sys
-from flask import Flask, request, send_from_directory, render_template, send_file
+import json
+from flask import (
+    Flask,
+    request,
+    send_from_directory,
+    render_template,
+    send_file,
+    Response,
+)
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
-from models import build_model, Model
+from models import build_model
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -20,22 +28,25 @@ SIMULATION_WD = (BASE_PATH / ".." / SIMULATION_ENGINE_PATH / "..").resolve()
 
 app = Flask(__name__, static_url_path="")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cms-fudepan.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cms-fudepan.db"
 db = SQLAlchemy(app)
 
+
 class Model(db.Model):
-    __tablename__ = 'model'
+    __tablename__ = "model"
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
     compartments = db.Column(db.JSON)
     params = db.Column(db.JSON)
     expressions = db.Column(db.JSON)
     reactions = db.Column(db.JSON)
 
     def __repr__(self):
-        return '<Model %r>' % (self.name)
+        return "<Model %r>" % (self.name)
+
 
 class Simulation(db.Model):
-    __tablename__ = 'simulation'
+    __tablename__ = "simulation"
     id = db.Column(db.Integer, primary_key=True)
     model = db.Column(db.ForeignKey("model.id"))
     days = db.Column(db.Float)
@@ -45,7 +56,8 @@ class Simulation(db.Model):
     iterate = db.Column(db.JSON)
 
     def __repr__(self):
-        return '<Simuation %r>' % (self.name)
+        return "<Simuation %r>" % (self.name)
+
 
 # Configure logging.
 app.logger.setLevel(logging.DEBUG)
@@ -54,15 +66,14 @@ del app.logger.handlers[:]
 handler = logging.StreamHandler(stream=sys.stdout)
 handler.setLevel(logging.DEBUG)
 handler.formatter = logging.Formatter(
-    fmt=u"%(asctime)s level=%(levelname)s %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%SZ",
+    fmt=u"%(asctime)s level=%(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%SZ",
 )
 app.logger.addHandler(handler)
 
 
 @app.route("/", methods=["GET"])
 def home():
-    models = Model.available_models()
+    models = Model.query.all()
     return render_template("index.html", models=models)
 
 
@@ -75,6 +86,17 @@ def serve_javascript(path):
 def serve_styles(path):
     return send_from_directory("static/css", path)
 
+
+@app.route("/api/models/", methods=["GET"])
+def list_models():
+    models = Model.query.all()
+    out = []
+    for m in models:
+        obj = {k: v for k, v in m.__dict__.items() if not k.startswith("_")}
+        out.append(obj)
+    return Response(json.dumps({"models": obj}), mimetype="application/json",)
+
+
 @app.route("/simulate/<model_name>", methods=["POST"])
 def simulate(model_name):
     data = request.json
@@ -84,7 +106,10 @@ def simulate(model_name):
     model = build_model(model_name, data["model"])
     simulation = model(**data["simulation"])
     results = simulation.solve()
-    return results.transpose().to_json(orient="split")
+    return Response(
+        results.transpose().to_json(orient="split"), mimetype="application/json"
+    )
+
 
 @app.route("/result/<string:filepath>")
 def serve_result(filepath):
