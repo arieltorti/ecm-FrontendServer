@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, Json
 
 class Var(BaseModel):
     name: str
+    default: float
     description: str = ""
 
 
@@ -67,7 +68,7 @@ class Simulation(BaseModel):
             "key": "",
             "step": 1,
             "start": 0,
-            "stop": 1
+            "end": 1
         }
     }
     """
@@ -76,9 +77,12 @@ class Simulation(BaseModel):
     days: int = 365
     initial_conditions: Dict[str, int]
     params: Dict[str, int]
+    iterate: Dict[str, int]
 
     class Config:
         orm_mode = True
+
+
 
 
 class Payload(BaseModel):
