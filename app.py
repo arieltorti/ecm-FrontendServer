@@ -111,6 +111,7 @@ def simulate(model_name):
     )
 
 
+
 @app.route("/result/<string:filepath>")
 def serve_result(filepath):
     return send_file(filepath, mimetype="image/png",)
