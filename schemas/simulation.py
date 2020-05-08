@@ -32,6 +32,7 @@ class Reaction(BaseModel):
 
 
 class Model(BaseModel):
+    id: int
     name: str
     compartments: List[Var]
     expressions: Optional[List[Dict]]  # List[Expression]
