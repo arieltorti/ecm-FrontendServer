@@ -24,6 +24,7 @@
         }
     },
     "model" : {
+        "id": "5",
         "name" : "Splitted SEIR",
         "compartments" :
         [

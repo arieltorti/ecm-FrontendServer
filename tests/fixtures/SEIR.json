@@ -17,6 +17,7 @@
         }
     },
     "model" : {
+        "id": 1,
         "name" : "SEIR",
         "compartments" :
         [

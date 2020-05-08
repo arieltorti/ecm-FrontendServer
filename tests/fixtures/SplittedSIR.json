@@ -21,6 +21,7 @@
         }
     },
     "model" : {
+        "id": 6,
         "name" : "Splitted SIR",
         "compartments" : 
         [
