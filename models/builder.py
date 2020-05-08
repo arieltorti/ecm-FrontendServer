@@ -89,10 +89,7 @@ def build_model(name, schema):
 
     def _solve(self):
         res = odeint(
-            self.__ode_model,
-            self.initial_conditions,
-            self.tspan,
-            args=self.params,
+            self.__ode_model, self.initial_conditions, self.tspan, args=self.params,
         )
 
         res = pd.DataFrame(data=res, columns=self.columns, index=self.tspan)

@@ -41,6 +41,11 @@ class Model(db.Model):
     expressions = db.Column(db.JSON)
     reactions = db.Column(db.JSON)
 
+    def solve(self, sim_data):
+        model_data = schemas.Model.from_orm(self)
+        model = build_model(self.name, model_data.dict())
+        return model(**sim_data).solve()
+
     def __repr__(self):
         return "<Model %r>" % (self.name)
 
@@ -98,16 +103,15 @@ def list_models():
     return Response(json.dumps({"models": out}), mimetype="application/json",)
 
 
-@app.route("/simulate/<model_name>", methods=["POST"])
-def simulate(model_name):
+@app.route("/simulate/<int:model_id>", methods=["POST"])
+def simulate(model_id):
     data = request.json
+    model = Model.query.get(model_id)
     if not data:
         raise BadRequest(description="No input data")
 
-    clean_data = schemas.Payload(**data)
-
-    model = build_model(model_name, clean_data.model.dict())
-    simulation = model(**clean_data.simulation.dict())
-    results = simulation.solve()
+    clean_data = schemas.Simulation(**data["simulation"])
+    sim_data = clean_data.dict()
+    results = model.solve(sim_data)
     response_data = results.transpose().to_json(orient="split")
     return Response(response_data, mimetype="application/json")

@@ -19,7 +19,8 @@ class Model:
         return out
 
     def __init__(
-        self, initial_conditions=None, params=None, tspan=None, days=DAYS, step=STEP
+        self, initial_conditions=None, params=None, tspan=None, days=DAYS, step=STEP,
+        **kwargs
     ):
 
         self.initial_conditions = self.__parse_initials(

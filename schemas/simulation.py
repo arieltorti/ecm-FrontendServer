@@ -35,7 +35,7 @@ class Model(BaseModel):
     id: int
     name: str
     compartments: List[Var]
-    expressions: Optional[List[Dict]]  # List[Expression]
+    expressions: Optional[List[Dict]] = []  # List[Expression]
     params: List[Var]
     reactions: List[Dict]  # List[Reaction]
 
@@ -76,6 +76,7 @@ class Simulation(BaseModel):
     days: int = 365
     initial_conditions: Dict[str, int]
     params: Dict[str, int]
+    iterate: Optional[Dict[str, int]]
 
     class Config:
         orm_mode = True
