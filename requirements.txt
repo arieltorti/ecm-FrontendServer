@@ -7,3 +7,4 @@ matplotlib
 gunicorn
 sqlalchemy
 flask-sqlalchemy
+pydantic
