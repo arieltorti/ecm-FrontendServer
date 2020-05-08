@@ -1,3 +1,4 @@
+import pandas as pd
 from models.builder import build_model, build_ode_model_function
 from pathlib import Path
 from matplotlib import pyplot as plt
@@ -15,6 +16,8 @@ def test_sir_splitted_build(simulation_schema):
     simulation = model(**sir_splitted_schema["simulation"])
 
     results = simulation.solve()
+    results = pd.DataFrame(data=results, columns=simulation.columns, index=simulation.tspan)
+
     results.plot()
     plt.grid(True)
     plt.savefig(filepath)
@@ -28,3 +31,13 @@ def test_build_ode_model_function(simulation_schema):
     model = build_ode_model_function(model_schema)
 
     assert model
+
+
+def test_animate(simulation_schema):
+    sir_splitted_schema = simulation_schema("SplittedSEIR.json")
+    sim = sir_splitted_schema["simulation"]
+    model = build_model('SplittedSIR', sir_splitted_schema["model"])
+    result = list(
+        model(**sim).animate("gamma", 1, 3, 1)
+    )
+    assert result

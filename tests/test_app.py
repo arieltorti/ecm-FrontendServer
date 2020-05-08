@@ -10,6 +10,5 @@ def test_simulate_endpoint(client, simulation_schema):
         json=sir_splitted_schema,
         content_type=mimetype
     )
-
     assert response.json
     assert response.status_code == 200

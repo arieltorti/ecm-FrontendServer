@@ -94,8 +94,6 @@ def build_model(name, schema):
             self.tspan,
             args=self.params,
         )
-
-        res = pd.DataFrame(data=res, columns=self.columns, index=self.tspan)
         return res
 
     def __ode_model(self, *args):
