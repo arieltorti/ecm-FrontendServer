@@ -20,28 +20,34 @@
         [
             {
                 "name": "S",
+                "default": 999600,
                 "description": ""
             },
             {
                 "name": "I",
+                "default": 400,
                 "description": ""
             },
             {
                 "name": "R",
+                "default": 0,
                 "description": ""
             }
         ],
         "params" : [
             {
                 "name": "beta",
+                "default": 0.3,
                 "description": ""
             },
             {
                 "name": "gamma",
+                "default": 0.2,
                 "description": ""
             },
             {
                 "name": "N",
+                "default": 1000000,
                 "description": ""
             }
         ],

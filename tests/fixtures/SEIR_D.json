@@ -26,52 +26,64 @@
         [
             {
                 "name": "S",
+                "default": 999600,
                 "description": ""
             },
             {
                 "name": "E",
+                "default": 0,
                 "description": ""
             },
             {
                 "name": "I",
+                "default": 400,
                 "description": ""
             },
             {
                 "name": "R",
+                "default": 0,
                 "description": ""
             }
         ],
         "params" : [
             {
                 "name": "beta",
+                "default": 0.3,
                 "description": ""
             },
             {
                 "name": "gamma",
+                "default": 0.2,
                 "description": ""
             },
             {
                 "name": "sigma",
+                "default": 0.14,
                 "description": ""
             },
             {
                 "name": "F",
+                "default": 8,
                 "description":""
             },
             {
                 "name": "L",
+                "default": 1,
                 "description":""
             },
             {
                 "name": "Nof",
+                "default": 400000,
                 "description":""
             },
             {
                 "name": "Nol",
+                "default": 600000,
                 "description":""
             },
             {
                 "name": "D",
+                "default": 0,
                 "description":""
             }
         ],
