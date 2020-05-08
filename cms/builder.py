@@ -1,6 +1,3 @@
-import pandas as pd
-from scipy.integrate import odeint
-from .base import Model
 from types import FunctionType
 from numbers import Number
 
@@ -52,7 +49,9 @@ def eval_function_expr(compartments, variables, farray):
 
 
 def build_ode_model_function(schema):
-    expressions = {p["name"]: p["value"] for p in schema.expressions}  # XXX: Expression type needs revision
+    expressions = {
+        p["name"]: p["value"] for p in schema.expressions
+    }  # XXX: Expression type needs revision
     # TODO: Check recursion of expressions
     variables = [p.name for p in schema.params]
     variables_with_expr = variables + list(expressions)
@@ -78,35 +77,14 @@ def build_ode_model_function(schema):
         modelstr += f"    dz[{compartments[model]}] = {formula}\n"
 
     modelstr += "    return dz"
-
     modelcode = compile(modelstr, f"<{schema.name}>", "exec")
 
     return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
 
 
-def build_model(name, schema):
+def build_model(schema):
     ode_model = build_ode_model_function(schema)
-
-    def _solve(self):
-        res = odeint(
-            self.__ode_model,
-            self.initial_conditions,
-            self.tspan,
-            args=self.params,
-        )
-        return res
-
     def __ode_model(self, *args):
         return ode_model(*args)
 
-    generated_model = type(
-        name,
-        (Model, object),
-        {
-            "columns": [c.name for c in schema.compartments],
-            "param_names": [p.name for p in schema.params],
-            "solve": _solve,
-            "__ode_model": __ode_model,
-        },
-    )
-    return generated_model
+    return __ode_model
