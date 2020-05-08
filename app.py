@@ -94,7 +94,7 @@ def list_models():
     for m in models:
         obj = {k: v for k, v in m.__dict__.items() if not k.startswith("_")}
         out.append(obj)
-    return Response(json.dumps({"models": obj}), mimetype="application/json",)
+    return Response(json.dumps({"models": out}), mimetype="application/json",)
 
 
 @app.route("/simulate/<model_name>", methods=["POST"])
