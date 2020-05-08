@@ -115,8 +115,3 @@ def simulate(model_name):
     results = simulation.solve()
     response_data = results.transpose().to_json(orient="split")
     return Response(response_data, mimetype="application/json")
-
-
-@app.route("/result/<string:filepath>")
-def serve_result(filepath):
-    return send_file(filepath, mimetype="image/png",)
