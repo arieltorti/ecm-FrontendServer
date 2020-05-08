@@ -12,17 +12,29 @@
 
   <body>
     <div id="app" v-cloak>
+      <label for="model">Choose a model:</label>
+      <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
+        <option v-for="(model, key) in modelList" v-bind:value="key">{{ model.name }}</option>
+      </select>
       <div id="container">
         <div class="inputContainer" style="flex: 1;">
-          <label for="modelInput">Simulation Model:</label>
-          <textarea name="modelInput" v-model="simulationModel"></textarea>
+          {{currentModel}}
         </div>
       </div>
+      <div v-for="comp in currentModel.compartments">
+        <label :for="comp">{{ comp.name }}:</label>
+        <input v-model="simulation.initial_conditions[comp.name]" type="number"> 
+      </div>
+      <div v-for="param in currentModel.params">
+        <label :for="param">{{ param.name }}:</label>
+        <input v-model="simulation.params[param.name]" type="number">
+      </div>
+
       <iter-controls
         @submit="handleSubmit"
         :button-disabled="simulationState === SIM_STATE.DONE && !pendingChanges"
         :button-text="simulationState === SIM_STATE.INPROGRESS ? 'Stop Simulation' : 'Simulate'"
-        :model-variables="modelVariables"
+        :model-variables="this.simulation.params"
         :config-interval="configInterval"
       ></iter-controls>
 

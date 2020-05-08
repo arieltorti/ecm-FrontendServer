@@ -10,6 +10,9 @@ function getConfigInterval() {
 
 const app = new Vue({
   el: "#app",
+  beforeMount(){
+    this.fetchModels();
+  },
   data: function () {
     return {
       SIM_STATE: SIM_STATE, // Declare enum variable so vue can access it on the template
@@ -18,17 +21,27 @@ const app = new Vue({
       simulationModel: localStorage.getItem(SIMULATION_MODEL_KEY) || defaultSimulationModel,
       errorMsg: null,
       statusMsg: null,
-
+      modelList: {},
+      modelSelected: null,
+      simulation : {
+        step : 1,
+        days : 365,
+        initial_conditions : {},
+        params : {}
+      },
       configInterval: getConfigInterval(),
-
       currentSimulation: null,
       simCancel: false,
       pendingChanges: true,
     };
   },
   computed: {
+    currentModel: function () {
+      return (this.modelSelected in this.modelList) ? 
+        this.modelList[this.modelSelected] : { params: [], compartments: []};
+    },
     modelVariables: function () {
-      return _extractModelVariables(this.simulationModel);
+      return Object.keys(this.simulation.params);
     },
   },
   watch: {
@@ -46,12 +59,34 @@ const app = new Vue({
   },
 
   methods: {
-    buildSimulation(configInterval) {
+    modelChange: function($event) {
+      this.currentModel.compartments.forEach(comp => {
+        this.simulation.initial_conditions[comp.name] = comp.default;
+      });
+      this.currentModel.params.forEach(param => {
+        this.simulation.params[param.name] = param.default;
+      });      
+    },
+    fetchModels: function () {
+      const req = fetch("/api/models/").then(resp => {
+        if (resp.status >= 400 && resp.status < 600) {
+          throw resp;
+        }
+        resp.json().then(json => {
+          json.models.forEach(element => {
+              this.modelList[element.id] = element;
+          });
+          this.modelSelected = 0;
+        });
+      });
+    },
+    buildSimulation: function (configInterval) {
       this.configInterval = configInterval;
 
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
       this.currentSimulation = {
-        model: this.simulationModel,
+        model: this.currentModel,
+        simulation: this.simulation,
         intervalConfig: Vue.util.extend({}, configInterval),
       };
       setTimeout(() => {this.pendingChanges = false}, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account

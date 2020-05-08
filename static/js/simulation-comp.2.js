@@ -91,8 +91,10 @@ Vue.component("simulation", {
         ) {
           promiseChain = promiseChain.then(() => {
             this.stats.currentStep += 1;
+            //TODO            
             return this._simulate(
-              _replaceModelVariableValue(this.sim.model, this.sim.intervalConfig.iteratingVariable, from),
+              _replaceModelVariableValue({simulation: this.sim.simulation, model: this.sim.model}, 
+                this.sim.intervalConfig.iteratingVariable, from),
               from
             );
           });
@@ -101,7 +103,7 @@ Vue.component("simulation", {
         promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
       } else {
         this.stats.totalSteps = this.stats.currentStep = 1;
-        this._simulate(this.sim.model)
+        this._simulate({simulation: this.sim.simulation, model: this.sim.model})
           .then(() => this.dataFetchingDone())
           .catch((err) => this.handleError(err));
       }
@@ -117,7 +119,7 @@ Vue.component("simulation", {
           'Content-Type': 'application/json'
         },
         method: "POST",
-        body: model,
+        body: JSON.stringify(model),
         signal,
       });
 
@@ -221,9 +223,8 @@ function escapeRegExp(str) {
  * @param {*} value New value
  */
 function _replaceModelVariableValue(model, variable, value) {
-  objectModel = JSON.parse(model);
-  objectModel.simulation.params[variable] = value;
-  return JSON.stringify(objectModel);
+  model.simulation.params[variable] = value;
+  return model;
 }
 
 /**
