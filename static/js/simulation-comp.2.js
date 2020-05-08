@@ -70,8 +70,8 @@ Vue.component("simulation", {
       this.$emit("sim-start");
       this.graphHistoricData = [];
 
-      if (this.sim.intervalConfig.iteratingVariable != null) {
-        if (this.sim.intervalConfig.step === 0) {
+      if (this.sim.simulation.iterate.key != null) {
+        if (this.sim.simulation.iterate.step === 0) {
           return;
         }
 
@@ -80,21 +80,21 @@ Vue.component("simulation", {
         let promiseChain = Promise.resolve();
 
         this.stats.totalSteps = Math.floor(
-          1 + (this.sim.intervalConfig.to - this.sim.intervalConfig.from) / this.sim.intervalConfig.step
+          1 + (this.sim.simulation.iterate.end - this.sim.simulation.start) / this.sim.simulation.step
         );
         this.stats.currentStep = 0;
 
         for (
-          let from = this.sim.intervalConfig.from;
-          from <= this.sim.intervalConfig.to;
-          from = this._preciseRound(from + this.sim.intervalConfig.step)
+          let from = this.sim.simulation.iterate.start;
+          from <= this.sim.simulation.iterate.end;
+          from = this._preciseRound(from + this.sim.simulation.iterate.step)
         ) {
           promiseChain = promiseChain.then(() => {
             this.stats.currentStep += 1;
             //TODO            
             return this._simulate(
               _replaceModelVariableValue({simulation: this.sim.simulation, model: this.sim.model}, 
-                this.sim.intervalConfig.iteratingVariable, from),
+                this.sim.simulation.iterate.key, from),
               from
             );
           });
@@ -103,7 +103,9 @@ Vue.component("simulation", {
         promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
       } else {
         this.stats.totalSteps = this.stats.currentStep = 1;
-        this._simulate({simulation: this.sim.simulation, model: this.sim.model})
+        const simulation = JSON.parse(JSON.stringify(this.sim.simulation));
+        delete simulation.iterate;
+        this._simulate({simulation: simulation, model: this.sim.model})
           .then(() => this.dataFetchingDone())
           .catch((err) => this.handleError(err));
       }
@@ -113,7 +115,7 @@ Vue.component("simulation", {
       const signal = controller.signal;
       this.abortSignal = controller;
 
-      const req = fetch("/simulate/model", {
+      const req = fetch("/simulate/"+model.model.id, {
         headers: {
           'Accept': 'application/json, text/plain, */*',
           'Content-Type': 'application/json'

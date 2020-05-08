@@ -27,7 +27,8 @@ const app = new Vue({
         step : 1,
         days : 365,
         initial_conditions : {},
-        params : {}
+        params : {},
+        iterate : {key : null, start: 0, end: 1, step: 0.1},
       },
       configInterval: getConfigInterval(),
       currentSimulation: null,
@@ -59,7 +60,21 @@ const app = new Vue({
   },
 
   methods: {
+    simulate: function() {
+      if (this.simulationState === SIM_STATE.INPROGRESS) {
+        this.stopSimulation();
+      } else {
+        this.buildSimulation();
+      }
+    },
+    paramUncheck: function(param) {
+      if (this.simulation.iterate.key == param) {
+        this.simulation.iterate.key = null;
+      }
+    },
     modelChange: function($event) {
+      this.simulation.initial_conditions = {};
+      this.simulation.params = {};
       this.currentModel.compartments.forEach(comp => {
         this.simulation.initial_conditions[comp.name] = comp.default;
       });
@@ -80,14 +95,12 @@ const app = new Vue({
         });
       });
     },
-    buildSimulation: function (configInterval) {
-      this.configInterval = configInterval;
+    buildSimulation: function () {
 
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
       this.currentSimulation = {
         model: this.currentModel,
-        simulation: this.simulation,
-        intervalConfig: Vue.util.extend({}, configInterval),
+        simulation: this.simulation
       };
       setTimeout(() => {this.pendingChanges = false}, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account
     },

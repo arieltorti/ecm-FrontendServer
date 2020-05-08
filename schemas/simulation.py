@@ -77,7 +77,7 @@ class Simulation(BaseModel):
     days: int = 365
     initial_conditions: Dict[str, int]
     params: Dict[str, int]
-    iterate: Optional[Dict[str, int]]
+    iterate: Optional[Dict]
 
     class Config:
         orm_mode = True
