@@ -3,10 +3,7 @@
 
 import logging
 import sys
-<<<<<<< HEAD
 import json
-=======
->>>>>>> Test cleanup
 from flask import (
     Flask,
     request,
@@ -18,11 +15,8 @@ from flask import (
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
 from models import build_model
-<<<<<<< HEAD
 from flask_sqlalchemy import SQLAlchemy
 
-=======
->>>>>>> Test cleanup
 
 HTTP_400_BAD_REQUEST = 400
 

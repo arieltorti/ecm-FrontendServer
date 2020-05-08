@@ -88,13 +88,11 @@ def build_model(name, schema):
     ode_model = build_ode_model_function(schema)
 
     def _solve(self):
-        initials = list(self.initial_conditions.values())
-        args = tuple(self.params.values())
         res = odeint(
             self.__ode_model,
-            initials,
+            self.initial_conditions,
             self.tspan,
-            args=args,
+            args=self.params,
         )
 
         res = pd.DataFrame(data=res, columns=self.columns, index=self.tspan)
