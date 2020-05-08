@@ -1,14 +1,21 @@
-from marshmallow import Schema, fields
+from typing import List, Dict, Iterable, Optional
+from pydantic import BaseModel, Field, Json
 
 
-class Var(Schema):
-    name = fields.String()
-    description = fields.String(default="")
+class Var(BaseModel):
+    name: str
+    description: str = ""
 
 
-class Reaction(Schema):
+class Expression(BaseModel):
+    name: str
+    value: List[Iterable]
+    description: str = ""
+
+
+class Reaction(BaseModel):
     """
-    { 
+    {
         "from": "Sf",
         "to": "If",
         "function": 
@@ -17,20 +24,25 @@ class Reaction(Schema):
     },
     """
 
-    _from = fields.String(data_key="from")
-    to = fields.String()
+    _from = Field(alias="from")
+    to: str
     # ((beta * F * Sf * ((If * F) + ( Il * L) / T)
-    function = fields.List(fields.List)
+    function: List[Iterable]
+    description: str = ""
 
 
-class Model(Schema):
-    name = fields.String()
-    compartments = fields.List(Var)
-    params = fields.List(Var)
-    reactions = fields.List(Reaction)
+class Model(BaseModel):
+    name: str
+    compartments: List[Var]
+    expressions: Optional[List[Dict]]  # List[Expression]
+    params: List[Var]
+    reactions: List[Dict]  # List[Reaction]
+
+    class Config:
+        orm_mode = True
 
 
-class Simulation(Schema):
+class Simulation(BaseModel):
     """
     "simulation" : {
         "step" : 1,
@@ -50,12 +62,28 @@ class Simulation(Schema):
             "L": 1,
             "T": 3800000
         }
+        "iterate": {
+            "key": "",
+            "step": 1,
+            "start": 0,
+            "stop": 1
+        }
     }
     """
 
-    step = fields.Integer(default=1)
-    days = fields.Integer(default=365)
-    initial_conditions = fields.Dict(
-        keys=fields.String, values=fields.Integer, required=True
-    )
-    params = fields.Dict(keys=fields.String, values=fields.Number, required=True)
+    step: int = 1
+    days: int = 365
+    initial_conditions: Dict[str, int]
+    params: Dict[str, int]
+
+    class Config:
+        orm_mode = True
+
+
+class Payload(BaseModel):
+    schemaVersion: int
+    simulation: Simulation
+    model: Model
+
+    class Config:
+        orm_mode = True

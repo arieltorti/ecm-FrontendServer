@@ -16,7 +16,7 @@ from werkzeug.exceptions import BadRequest
 from pathlib import Path
 from models import build_model
 from flask_sqlalchemy import SQLAlchemy
-
+import schemas
 
 HTTP_400_BAD_REQUEST = 400
 
@@ -66,7 +66,8 @@ del app.logger.handlers[:]
 handler = logging.StreamHandler(stream=sys.stdout)
 handler.setLevel(logging.DEBUG)
 handler.formatter = logging.Formatter(
-    fmt=u"%(asctime)s level=%(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%SZ",
+    fmt=u"%(asctime)s level=%(levelname)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%SZ",
 )
 app.logger.addHandler(handler)
 
@@ -92,8 +93,8 @@ def list_models():
     models = Model.query.all()
     out = []
     for m in models:
-        obj = {k: v for k, v in m.__dict__.items() if not k.startswith("_")}
-        out.append(obj)
+        obj = schemas.Model.from_orm(m)
+        out.append(obj.dict())
     return Response(json.dumps({"models": out}), mimetype="application/json",)
 
 
@@ -103,14 +104,10 @@ def simulate(model_name):
     if not data:
         raise BadRequest(description="No input data")
 
-    model = build_model(model_name, data["model"])
-    simulation = model(**data["simulation"])
+    clean_data = schemas.Payload(**data)
+
+    model = build_model(model_name, clean_data.model.dict())
+    simulation = model(**clean_data.simulation.dict())
     results = simulation.solve()
-    return Response(
-        results.transpose().to_json(orient="split"), mimetype="application/json"
-    )
-
-
-@app.route("/result/<string:filepath>")
-def serve_result(filepath):
-    return send_file(filepath, mimetype="image/png",)
+    response_data = results.transpose().to_json(orient="split")
+    return Response(response_data, mimetype="application/json")

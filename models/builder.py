@@ -88,9 +88,11 @@ def build_model(name, schema):
     ode_model = build_ode_model_function(schema)
 
     def _solve(self):
-
         res = odeint(
-            self.__ode_model, self.initial_conditions, self.tspan, args=self.params,
+            self.__ode_model,
+            self.initial_conditions,
+            self.tspan,
+            args=self.params,
         )
 
         res = pd.DataFrame(data=res, columns=self.columns, index=self.tspan)
@@ -104,7 +106,7 @@ def build_model(name, schema):
         (Model, object),
         {
             "columns": [c["name"] for c in schema["compartments"]],
-            "defaultparams": [p["name"] for p in schema["params"]],
+            "param_names": [p["name"] for p in schema["params"]],
             "solve": _solve,
             "__ode_model": __ode_model,
         },
