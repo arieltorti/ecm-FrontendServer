@@ -21,6 +21,7 @@
         }
     },
     "model" : {
+        "id": 3,
         "name" : "SEIR_D",
         "compartments" :
         [

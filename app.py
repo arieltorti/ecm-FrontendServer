@@ -43,8 +43,8 @@ class Model(db.Model):
 
     def solve(self, sim_data):
         model_data = schemas.Model.from_orm(self)
-        model = build_model(self.name, model_data.dict())
-        return model(**sim_data).solve()
+        model = build_model(self.name, model_data)
+        return model(**sim_data.dict()).solve()
 
     def __repr__(self):
         return "<Model %r>" % (self.name)
@@ -111,7 +111,8 @@ def simulate(model_id):
         raise BadRequest(description="No input data")
 
     clean_data = schemas.Simulation(**data["simulation"])
-    sim_data = clean_data.dict()
+    sim_data = clean_data
     results = model.solve(sim_data)
     response_data = results.transpose().to_json(orient="split")
+
     return Response(response_data, mimetype="application/json")

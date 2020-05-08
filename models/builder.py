@@ -52,14 +52,14 @@ def eval_function_expr(compartments, variables, farray):
 
 
 def build_ode_model_function(schema):
-    expressions = {p["name"]: p["value"] for p in schema.get("expressions", [])}
+    expressions = {p["name"]: p["value"] for p in schema.expressions}  # XXX: Expression type needs revision
     # TODO: Check recursion of expressions
-    variables = [p["name"] for p in schema["params"]]
-    variables_with_expr = variables + list(expressions.keys())
-    compartments = {x[1]["name"]: x[0] for x in enumerate(schema["compartments"])}
+    variables = [p.name for p in schema.params]
+    variables_with_expr = variables + list(expressions)
+    compartments = {var.name: i for i, var in enumerate(schema.compartments)}
     formulas = {x: "" for x in compartments}
 
-    for reaction in schema["reactions"]:
+    for reaction in schema.reactions:  # XXX: Reaction type needs revision
         expr = eval_function_expr(
             compartments, variables_with_expr, reaction["function"]
         )
@@ -79,7 +79,7 @@ def build_ode_model_function(schema):
 
     modelstr += "    return dz"
 
-    modelcode = compile(modelstr, f"<{schema['name']}>", "exec")
+    modelcode = compile(modelstr, f"<{schema.name}>", "exec")
 
     return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
 
@@ -89,7 +89,10 @@ def build_model(name, schema):
 
     def _solve(self):
         res = odeint(
-            self.__ode_model, self.initial_conditions, self.tspan, args=self.params,
+            self.__ode_model,
+            self.initial_conditions,
+            self.tspan,
+            args=self.params,
         )
 
         res = pd.DataFrame(data=res, columns=self.columns, index=self.tspan)
@@ -102,8 +105,8 @@ def build_model(name, schema):
         name,
         (Model, object),
         {
-            "columns": [c["name"] for c in schema["compartments"]],
-            "param_names": [p["name"] for p in schema["params"]],
+            "columns": [c.name for c in schema.compartments],
+            "param_names": [p.name for p in schema.params],
             "solve": _solve,
             "__ode_model": __ode_model,
         },
