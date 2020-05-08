@@ -15,7 +15,7 @@ class Expression(BaseModel):
 
 class Reaction(BaseModel):
     """
-    { 
+    {
         "from": "Sf",
         "to": "If",
         "function": 
@@ -34,9 +34,12 @@ class Reaction(BaseModel):
 class Model(BaseModel):
     name: str
     compartments: List[Var]
-    expressions: Optional[Json]  # List[Expression]
+    expressions: Optional[List[Dict]]  # List[Expression]
     params: List[Var]
-    reactions: List[Json]  # List[Reaction]
+    reactions: List[Dict]  # List[Reaction]
+
+    class Config:
+        orm_mode = True
 
 
 class Simulation(BaseModel):
@@ -73,8 +76,14 @@ class Simulation(BaseModel):
     initial_conditions: Dict[str, int]
     params: Dict[str, int]
 
+    class Config:
+        orm_mode = True
+
 
 class Payload(BaseModel):
     schemaVersion: int
     simulation: Simulation
     model: Model
+
+    class Config:
+        orm_mode = True

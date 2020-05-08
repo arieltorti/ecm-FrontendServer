@@ -13,4 +13,3 @@ def test_simulate_endpoint(client, simulation_schema):
 
     assert response.json
     assert response.status_code == 200
-    assert response.json
