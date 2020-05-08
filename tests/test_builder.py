@@ -2,7 +2,7 @@ from models.builder import build_model, build_ode_model_function
 from pathlib import Path
 from matplotlib import pyplot as plt
 
-BASE_PATH = Path(".")
+BASE_PATH = Path(__file__).parent / ".."
 STATIC_PATH = BASE_PATH / "static"
 
 

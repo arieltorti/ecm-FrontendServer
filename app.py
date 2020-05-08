@@ -3,7 +3,10 @@
 
 import logging
 import sys
+<<<<<<< HEAD
 import json
+=======
+>>>>>>> Test cleanup
 from flask import (
     Flask,
     request,
@@ -15,8 +18,11 @@ from flask import (
 from werkzeug.exceptions import BadRequest
 from pathlib import Path
 from models import build_model
+<<<<<<< HEAD
 from flask_sqlalchemy import SQLAlchemy
 
+=======
+>>>>>>> Test cleanup
 
 HTTP_400_BAD_REQUEST = 400
 
@@ -66,7 +72,8 @@ del app.logger.handlers[:]
 handler = logging.StreamHandler(stream=sys.stdout)
 handler.setLevel(logging.DEBUG)
 handler.formatter = logging.Formatter(
-    fmt=u"%(asctime)s level=%(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%SZ",
+    fmt=u"%(asctime)s level=%(levelname)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%SZ",
 )
 app.logger.addHandler(handler)
 
@@ -106,10 +113,8 @@ def simulate(model_name):
     model = build_model(model_name, data["model"])
     simulation = model(**data["simulation"])
     results = simulation.solve()
-    return Response(
-        results.transpose().to_json(orient="split"), mimetype="application/json"
-    )
-
+    response_data = results.transpose().to_json(orient="split")
+    return Response(response_data, mimetype="application/json")
 
 
 @app.route("/result/<string:filepath>")
