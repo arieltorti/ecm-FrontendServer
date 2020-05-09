@@ -12,24 +12,30 @@
 
   <body>
     <div id="app" v-cloak>
-      <label for="model">Choose a model:</label>
-      <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
-        <option v-for="(model, key) in modelList" v-bind:value="key">{{ model.name }}</option>
-      </select>
-      <div id="container" v-if="currentModel">
-        <h2>Reactions</h2>
+      <fieldset>
+        <legend>Choose a model:</legend>
+        <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
+          <option v-for="(model, key) in modelList" v-bind:value="key">{{ model.name }}</option>
+        </select>
+      </fieldset>
+      <details v-if="modelSelected" open>
+        <summary>Model Details</summary>
+
+        <h3>Reactions</h3>
         <div v-for="reaction in currentModel.reactions" class="reaction">
           <div>{{reaction.from}} -> {{reaction.to}}: {{ expression(reaction.function) }} </div>
         </div>
         <template v-if="currentModel.expressions">
-        <h2>Where</h2>
+        <h3>Where</h3>
         <div v-for="expr in currentModel.expressions" class="expression">
           <div>{{expr.name}} = {{ expression(expr.value) }} </div>
         </div>
         </template>
-      </div>
+      </details>
 
-      <div v-if="modelSelected">
+      <details v-if="modelSelected">
+        <summary>Simulation parameters</summary>
+
         <label :for="simulation.days">Days:</label>
         <input v-model.number="simulation.days" type="number"> 
 
@@ -58,7 +64,7 @@
             <input v-model.number="simulation.params[param.name]" type="number" :id="param">
           </div>
         </div>
-      </div>
+      </details>
       <button style="margin: 1em; padding: 0.4em 0.8em; font-size: 1.15em;" @click = "simulate">Simulate</button>
 
       <simulation
