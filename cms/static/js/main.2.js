@@ -65,7 +65,7 @@ const app = new Vue({
       if (expr instanceof Array) {
           if (expr.length > 1) {
               const values = expr.slice(1).map(x=> this.expression(x));
-              out =`(${values.reduce((xs, x) => xs + expr[0] + x)})`;
+              out ="("+values.reduce((xs, x) => `${xs} ${expr[0]} ${x}`)+")";
           }
       }
       else if (typeof expr === "string") {
