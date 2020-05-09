@@ -48,7 +48,7 @@ def simulate(model_id):
     if not data:
         raise BadRequest(description="No input data")
 
-    clean_data = schemas.Simulation(**data["simulation"])
+    clean_data = schemas.Simulation(**data)
     model.prepare(clean_data)
 
 

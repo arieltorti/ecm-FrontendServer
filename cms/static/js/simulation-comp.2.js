@@ -83,24 +83,23 @@ Vue.component("simulation", {
       } else {
         delete simulation.iterate;
       }
-      //this.stats.totalSteps = this.stats.currentStep = 1;
-      this._simulate({simulation: simulation, model: this.sim.model})
+      this._simulate(simulation, this.sim.model.id)
         .then(() => this.dataFetchingDone())
         .catch((err) => this.handleError(err));
 
     },
-    _simulate: function (model) {
+    _simulate: function (simulation, modelId) {
       const controller = new AbortController();
       const signal = controller.signal;
       this.abortSignal = controller;
 
-      const req = fetch("/simulate/"+model.model.id, {
+      const req = fetch(`/simulate/${modelId}`, {
         headers: {
           'Accept': 'application/json, text/plain, */*',
           'Content-Type': 'application/json'
         },
         method: "POST",
-        body: JSON.stringify(model),
+        body: JSON.stringify(simulation),
         signal,
       });
 
