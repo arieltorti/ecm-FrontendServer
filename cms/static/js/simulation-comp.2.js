@@ -13,6 +13,11 @@ Vue.component("simulation", {
       playing: false,
     };
   },
+  computed: {
+    isMultiple: function() {
+      return this.sim && this.sim.simulation.iterate.key != null;
+    }
+  },
   watch: {
     sim: function (_sim) {
       _sim != null && this.simulate();
@@ -70,47 +75,21 @@ Vue.component("simulation", {
       this.$emit("sim-start");
       this.graphHistoricData = [];
 
-      if (this.sim.simulation.iterate.key != null) {
+      const simulation = JSON.parse(JSON.stringify(this.sim.simulation));
+      if (this.isMultiple) {
         if (this.sim.simulation.iterate.step === 0) {
           return;
         }
-
-        // If we selected an interating variable send as many request as needed chaining them
-        // to avoid overloading the server.
-        let promiseChain = Promise.resolve();
-
-        this.stats.totalSteps = Math.floor(
-          1 + (this.sim.simulation.iterate.end - this.sim.simulation.start) / this.sim.simulation.step
-        );
-        this.stats.currentStep = 0;
-
-        for (
-          let from = this.sim.simulation.iterate.start;
-          from <= this.sim.simulation.iterate.end;
-          from = this._preciseRound(from + this.sim.simulation.iterate.step)
-        ) {
-          promiseChain = promiseChain.then(() => {
-            this.stats.currentStep += 1;
-            //TODO            
-            return this._simulate(
-              _replaceModelVariableValue({simulation: this.sim.simulation, model: this.sim.model}, 
-                this.sim.simulation.iterate.key, from),
-              from
-            );
-          });
-        }
-
-        promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
       } else {
-        this.stats.totalSteps = this.stats.currentStep = 1;
-        const simulation = JSON.parse(JSON.stringify(this.sim.simulation));
         delete simulation.iterate;
-        this._simulate({simulation: simulation, model: this.sim.model})
-          .then(() => this.dataFetchingDone())
-          .catch((err) => this.handleError(err));
       }
+      //this.stats.totalSteps = this.stats.currentStep = 1;
+      this._simulate({simulation: simulation, model: this.sim.model})
+        .then(() => this.dataFetchingDone())
+        .catch((err) => this.handleError(err));
+
     },
-    _simulate: function (model, iterVarValue) {
+    _simulate: function (model) {
       const controller = new AbortController();
       const signal = controller.signal;
       this.abortSignal = controller;
@@ -133,9 +112,17 @@ Vue.component("simulation", {
           return resp.json();
         })
         .then((data) => {
-          const graphData = makeGraphData(data);
-          graphData._iterVal = iterVarValue;
-          this.graphHistoricData.push(graphData);
+          if (this.isMultiple) {
+            data.forEach((d, i) => {
+              const graphData = makeGraphData(d);
+              graphData._iterVal = i;
+              this.graphHistoricData.push(graphData);
+            });
+          } else {
+            const graphData = makeGraphData(data);
+            graphData._iterVal = 0;
+            this.graphHistoricData.push(graphData);
+          }
         });
     },
 
@@ -203,10 +190,10 @@ Vue.component("simulation", {
   // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly   
   template: `<div style="position: relative">
     <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">
-        Simulating {{ stats.currentStep }} / {{ stats.totalSteps }}
+        Simulating
     </div>
     <div id="plotDiv" v-once></div>
-    <div v-if="simState === SIM_STATE.DONE && (sim && sim.intervalConfig.iteratingVariable)" id="plotAnimDiv">
+    <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
         <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
     </div>
   </div>`,

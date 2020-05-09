@@ -73,10 +73,10 @@ class Simulation(BaseModel):
     }
     """
 
-    step: int = 1
-    days: int = 365
-    initial_conditions: Dict[str, int]
-    params: Dict[str, int]
+    step: float = 1.
+    days: float = 365.
+    initial_conditions: Dict[str, float]
+    params: Dict[str, float]
     iterate: Optional[Dict]
 
     class Config:
