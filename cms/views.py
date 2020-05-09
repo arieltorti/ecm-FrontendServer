@@ -51,9 +51,17 @@ def simulate(model_id):
     clean_data = schemas.Simulation(**data["simulation"])
     model.prepare(clean_data)
 
-    results = model.solve()
-    df = pd.DataFrame(data=results, columns=model.compartments_names, index=model.tspan)
 
-    response_data = df.transpose().to_json(orient="split")
+    response_data = ""
+    if clean_data.iterate:
+        response = []
+        for result in model.animate():
+            df = pd.DataFrame(data=result, columns=model.compartments_names, index=model.tspan)
+            response.append(df.transpose().to_dict(orient="split"))
+        response_data = json.dumps(response)
+    else:
+        result = model.solve()
+        df = pd.DataFrame(data=result, columns=model.compartments_names, index=model.tspan)
+        response_data = df.transpose().to_json(orient="split")
 
     return Response(response_data, mimetype="application/json")

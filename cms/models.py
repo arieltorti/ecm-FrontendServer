@@ -64,12 +64,12 @@ class Model(db.Model):
         return res
 
     def animate(self):
-        for i in np.arange(self.start, self.stop, self.step):
+        for i in np.arange(self.start, self.end, self.step):
             index = self.params_names.index(self.key)
             old_params = list(self.params_values)
             new_params = old_params[:]  # shallow mutable copy
             new_params[index] = i
-            self.params = tuple(new_params)
+            self.params_values = tuple(new_params)
             yield self.solve()
 
     def __repr__(self):

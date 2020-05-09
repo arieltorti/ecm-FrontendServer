@@ -24,14 +24,14 @@
 
       <div v-if="modelSelected">
         <label :for="simulation.days">Days:</label>
-        <input v-model="simulation.days" type="number"> 
+        <input v-model.number="simulation.days" type="number"> 
 
         <label :for="simulation.step">Step:</label>
-        <input v-model="simulation.step" type="number"> 
+        <input v-model.number="simulation.step" type="number"> 
 
         <div v-for="comp in currentModel.compartments">
           <label :for="comp">{{ comp.name }}:</label>
-          <input v-model="simulation.initial_conditions[comp.name]" type="number"> 
+          <input v-model.number="simulation.initial_conditions[comp.name]" type="number"> 
         </div>
         <div v-for="param in currentModel.params">
           <span>{{ param.name }}</span>
@@ -40,15 +40,15 @@
 
           <div v-if="simulation.iterate.key == param.name">
             <label :for="param + 'Start'">Start:</label>
-            <input v-model="simulation.iterate.start" :id="param + 'Start'" type="number">
+            <input v-model.number="simulation.iterate.start" :id="param + 'Start'" type="number">
             <label :for="param + 'End'">End:</label>
-            <input v-model="simulation.iterate.end" :id="param + 'End'" type="number">
+            <input v-model.number="simulation.iterate.end" :id="param + 'End'" type="number">
             <label :for="param + 'Step'">Step:</label>  
-            <input v-model="simulation.iterate.step" :id="param + 'Step'" type="number">
+            <input v-model.number="simulation.iterate.step" :id="param + 'Step'" type="number">
           </div>
           <div v-else>
             <label :for="param">Value:</label>
-            <input v-model="simulation.params[param.name]" type="number" :id="param">
+            <input v-model.number="simulation.params[param.name]" type="number" :id="param">
           </div>
         </div>
         {{ simulation }}
