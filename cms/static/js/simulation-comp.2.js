@@ -15,7 +15,7 @@ Vue.component("simulation", {
   },
   computed: {
     isMultiple: function() {
-      return this.sim.simulation.iterate.key != null;
+      return this.sim && this.sim.simulation.iterate.key != null;
     }
   },
   watch: {
