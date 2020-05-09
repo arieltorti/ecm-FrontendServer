@@ -49,7 +49,7 @@
             <input v-model.number="simulation.initial_conditions[comp.name]" type="number"> 
           </div>
         </details>
-        <details>
+        <details v-if="modelSelected">
           <summary>Params</summary>
           <div v-for="param in currentModel.params">
             <span>{{ param.name }}</span>
