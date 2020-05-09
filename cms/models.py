@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.integrate import odeint
 from flask_sqlalchemy import SQLAlchemy
-from .builder import build_model
+from .builder import build_ode_model_function
 from . import schemas
 
 db = SQLAlchemy()
@@ -37,15 +37,17 @@ class Model(db.Model):
     def params_names(self):
         return tuple([p["name"] for p in self.params])
 
+    def __ode_model(self, *args):
+        return self.ode_model_f(*args)
+
     def prepare(self, sim_data):
 
         schema = schemas.Model.from_orm(self)
-        self.__ode_model = build_model(schema)
+        self.ode_model_f = build_ode_model_function(schema)
 
         self.initial_conditions = self.__parse_initials(
             sim_data.initial_conditions, self.compartments_names
         )
-        breakpoint()
         self.params_values = self.__parse_initials(sim_data.params, self.params_names)
         self.tspan = np.arange(0, sim_data.days, sim_data.step)
         if sim_data.iterate:

@@ -77,14 +77,8 @@ def build_ode_model_function(schema):
         modelstr += f"    dz[{compartments[model]}] = {formula}\n"
 
     modelstr += "    return dz"
+    print(modelstr)
     modelcode = compile(modelstr, f"<{schema.name}>", "exec")
 
     return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
 
-
-def build_model(schema):
-    ode_model = build_ode_model_function(schema)
-    def __ode_model(self, *args):
-        return ode_model(*args)
-
-    return __ode_model
