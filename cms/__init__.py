@@ -11,12 +11,6 @@ from .models import db
 
 HTTP_400_BAD_REQUEST = 400
 
-BASE_PATH = Path(".")
-STATIC_PATH = BASE_PATH / "static"
-SIMULATION_ENGINE_PATH = "compartments\\compartments.exe"
-SIMULATION_WD = (BASE_PATH / ".." / SIMULATION_ENGINE_PATH / "..").resolve()
-
-
 app = Flask(__name__, static_url_path="")
 app.register_blueprint(bp)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cms-fudepan.db"
