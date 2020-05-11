@@ -18,6 +18,7 @@ class Model(db.Model):
     params = db.Column(db.JSON)
     expressions = db.Column(db.JSON)
     reactions = db.Column(db.JSON)
+    preconditions = db.Column(db.JSON)
 
     def __parse_initials(self, initials, labels):
         out = ()
@@ -54,7 +55,7 @@ class Model(db.Model):
             self.key = sim_data.iterate.get("key")
             self.start = sim_data.iterate.get("start", 0)
             self.end = sim_data.iterate.get("end", 1)
-            self.step = sim_data.iterate.get("step", 1)
+            self.intervals = sim_data.iterate.get("intervals", 10)
 
     def solve(self):
         res = odeint(
@@ -64,7 +65,7 @@ class Model(db.Model):
         return res
 
     def animate(self):
-        for i in np.arange(self.start, self.end, self.step):
+        for i in np.linspace(self.start, self.end, self.intervals):
             index = self.params_names.index(self.key)
             old_params = list(self.params_values)
             new_params = old_params[:]  # shallow mutable copy

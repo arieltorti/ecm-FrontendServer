@@ -77,7 +77,7 @@ Vue.component("simulation", {
 
       const simulation = JSON.parse(JSON.stringify(this.sim.simulation));
       if (this.isMultiple) {
-        if (this.sim.simulation.iterate.step === 0) {
+        if (this.sim.simulation.iterate.intervals === 0) {
           return;
         }
       } else {

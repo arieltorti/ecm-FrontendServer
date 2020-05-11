@@ -28,7 +28,7 @@ const app = new Vue({
         days : 365,
         initial_conditions : {},
         params : {},
-        iterate : {key : null, start: 0, end: 1, step: 0.1},
+        iterate : {key : null, start: 0, end: 1, intervals: 10},
       },
       configInterval: getConfigInterval(),
       currentSimulation: null,

@@ -39,6 +39,7 @@ class Model(BaseModel):
     expressions: Optional[List[Dict]] = []  # List[Expression]
     params: List[Var]
     reactions: List[Dict]  # List[Reaction]
+    preconditions: Optional[List[Dict]]
 
     class Config:
         orm_mode = True
