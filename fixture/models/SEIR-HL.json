@@ -1,5 +1,4 @@
 {
-    "id": "seir-hl",
     "name": "SEIR-HL",
     "compartments": [
         {

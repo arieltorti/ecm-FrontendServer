@@ -1,5 +1,4 @@
 {
-    "id": "seir-hld",
     "name": "SEIR-HLD",
     "compartments": [
         {
@@ -43,71 +42,6 @@
             "description": ""
         }
     ],
-    "expressions": [
-        {
-            "name": "Q",
-            "value": [
-                "/",
-                [
-                    "+",
-                    [
-                        "*",
-                        "Nof",
-                        [
-                            "-",
-                            1,
-                            "D"
-                        ],
-                        "F"
-                    ],
-                    [
-                        "*",
-                        [
-                            "+",
-                            "Nol",
-                            [
-                                "*",
-                                "Nof",
-                                "D"
-                            ]
-                        ],
-                        "L"
-                    ]
-                ],
-                [
-                    "+",
-                    [
-                        "*",
-                        "Nof",
-                        "F"
-                    ],
-                    [
-                        "*",
-                        "Nol",
-                        "L"
-                    ]
-                ]
-            ],
-            "description": ""
-        },
-        {
-            "name": "T",
-            "value": [
-                "+",
-                [
-                    "*",
-                    "Noh",
-                    "H"
-                ],
-                [
-                    "*",
-                    "Nol",
-                    "L"
-                ]
-            ],
-            "description": ""
-        }
-    ],
     "params": [
         {
             "name": "beta",
@@ -117,6 +51,11 @@
         {
             "name": "gamma",
             "default": 0.2,
+            "description": ""
+        },
+        {
+            "name": "sigma",
+            "default": 0.14,
             "description": ""
         },
         {
@@ -145,30 +84,45 @@
             "description": ""
         }
     ],
+    "expressions": [
+        {
+            "name": "Q",
+            "value": ["/", 
+                ["+", ["*", "Noh", ["-", 1, "D"], "H"], ["*",[ "+", "Nol", ["*", "Noh", "D"]], "L"]],
+                ["+", ["*", "Noh", "H"], ["*", "Nol", "L"]]
+            ],
+            "description": ""
+        },
+        {
+            "name": "T",
+            "value": [
+                "+",
+                [
+                    "*",
+                    "Noh",
+                    "H"
+                ],
+                [
+                    "*",
+                    "Nol",
+                    "L"
+                ]
+            ],
+            "description": ""
+        }
+    ],
     "reactions": [
         {
             "from": "Sh",
-            "to": "Ih",
+            "to": "Eh",
             "function": [
                 "/",
                 [
                     "*",
-                    "Q",
-                    "beta",
-                    "H",
-                    "Sh",
+                    "Q", "beta", "H", "Sh",
                     [
                         "+",
-                        [
-                            "*",
-                            "Ih",
-                            "H"
-                        ],
-                        [
-                            "*",
-                            "Il",
-                            "L"
-                        ]
+                        ["*", "Ih", "H"], ["*", "Il", "L"]
                     ]
                 ],
                 "T"
@@ -177,30 +131,38 @@
         },
         {
             "from": "Sl",
-            "to": "Il",
+            "to": "El",
             "function": [
                 "/",
                 [
-                    "*",
-                    "Q",
-                    "beta",
-                    "L",
-                    "Sl",
+                    "*", 
+                    "Q", "beta", "L", "Sl", 
                     [
                         "+",
-                        [
-                            "*",
-                            "Ih",
-                            "H"
-                        ],
-                        [
-                            "*",
-                            "Il",
-                            "L"
-                        ]
+                        ["*", "Ih", "H"], ["*", "Il", "L"]
                     ]
                 ],
                 "T"
+            ],
+            "description": ""
+        },
+        {
+            "from": "Eh",
+            "to": "Ih",
+            "function": [
+                "*",
+                "sigma",
+                "Eh"
+            ],
+            "description": ""
+        },
+        {
+            "from": "El",
+            "to": "Il",
+            "function": [
+                "*",
+                "sigma",
+                "El"
             ],
             "description": ""
         },

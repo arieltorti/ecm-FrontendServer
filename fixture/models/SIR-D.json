@@ -1,5 +1,4 @@
 {
-    "id": "sir-d",
     "name": "SIR-D",
     "compartments": [
         {
@@ -27,13 +26,13 @@
                     "+",
                     [
                         "*",
-                        "Nof",
+                        "Noh",
                         [
                             "-",
                             1,
                             "D"
                         ],
-                        "F"
+                        "H"
                     ],
                     [
                         "*",
@@ -42,7 +41,7 @@
                             "Nol",
                             [
                                 "*",
-                                "Nof",
+                                "Noh",
                                 "D"
                             ]
                         ],
@@ -53,8 +52,8 @@
                     "+",
                     [
                         "*",
-                        "Nof",
-                        "F"
+                        "Noh",
+                        "H"
                     ],
                     [
                         "*",
@@ -69,7 +68,7 @@
             "name": "N",
             "value": [
                 "+",
-                "Nof",
+                "Noh",
                 "Nol"
             ],
             "description": ""
@@ -87,7 +86,7 @@
             "description": ""
         },
         {
-            "name": "F",
+            "name": "H",
             "default": 8.0,
             "description": ""
         },
@@ -97,7 +96,7 @@
             "description": ""
         },
         {
-            "name": "Nof",
+            "name": "Noh",
             "default": 400000.0,
             "description": ""
         },
