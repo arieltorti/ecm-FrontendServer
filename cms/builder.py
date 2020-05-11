@@ -68,7 +68,7 @@ def build_ode_model_function(schema):
     modelstr = f"def ode_model(z, t, {', '.join(variables)}):\n"
 
     for exp_name, exp_func in expressions.items():
-        expr = eval_function_expr([], variables_with_expr, exp_func)
+        expr = eval_function_expr({}, variables_with_expr, exp_func)
         modelstr += f"    {exp_name} = {expr}\n"
 
     modelstr += f"    dz = [0]*{len(compartments)}\n"
