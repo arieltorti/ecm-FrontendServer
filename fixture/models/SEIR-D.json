@@ -1,0 +1,164 @@
+{
+    "id": "seir-d",
+    "name": "SEIR-D",
+    "compartments": [
+        {
+            "name": "S",
+            "default": 999600.0,
+            "description": ""
+        },
+        {
+            "name": "E",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "I",
+            "default": 400.0,
+            "description": ""
+        },
+        {
+            "name": "R",
+            "default": 0.0,
+            "description": ""
+        }
+    ],
+    "expressions": [
+        {
+            "name": "Q",
+            "value": [
+                "/",
+                [
+                    "+",
+                    [
+                        "*",
+                        "Nof",
+                        [
+                            "-",
+                            1,
+                            "D"
+                        ],
+                        "F"
+                    ],
+                    [
+                        "*",
+                        [
+                            "+",
+                            "Nol",
+                            [
+                                "*",
+                                "Nof",
+                                "D"
+                            ]
+                        ],
+                        "L"
+                    ]
+                ],
+                [
+                    "+",
+                    [
+                        "*",
+                        "Nof",
+                        "F"
+                    ],
+                    [
+                        "*",
+                        "Nol",
+                        "L"
+                    ]
+                ]
+            ],
+            "description": ""
+        },
+        {
+            "name": "N",
+            "value": [
+                "+",
+                "Nof",
+                "Nol"
+            ],
+            "description": ""
+        }
+    ],
+    "params": [
+        {
+            "name": "beta",
+            "default": 0.3,
+            "description": ""
+        },
+        {
+            "name": "gamma",
+            "default": 0.2,
+            "description": ""
+        },
+        {
+            "name": "sigma",
+            "default": 0.14,
+            "description": ""
+        },
+        {
+            "name": "F",
+            "default": 8.0,
+            "description": ""
+        },
+        {
+            "name": "L",
+            "default": 1.0,
+            "description": ""
+        },
+        {
+            "name": "Nof",
+            "default": 400000.0,
+            "description": ""
+        },
+        {
+            "name": "Nol",
+            "default": 600000.0,
+            "description": ""
+        },
+        {
+            "name": "D",
+            "default": 0.0,
+            "description": ""
+        }
+    ],
+    "reactions": [
+        {
+            "from": "S",
+            "to": "E",
+            "function": [
+                "/",
+                [
+                    "*",
+                    "beta",
+                    "S",
+                    "I",
+                    "Q"
+                ],
+                "N"
+            ],
+            "description": ""
+        },
+        {
+            "from": "E",
+            "to": "I",
+            "function": [
+                "*",
+                "sigma",
+                "E"
+            ],
+            "description": ""
+        },
+        {
+            "from": "I",
+            "to": "R",
+            "function": [
+                "*",
+                "gamma",
+                "I"
+            ],
+            "description": ""
+        }
+    ],
+    "preconditions": []
+}

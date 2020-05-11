@@ -1,0 +1,229 @@
+{
+    "id": "seir-hld",
+    "name": "SEIR-HLD",
+    "compartments": [
+        {
+            "name": "Sl",
+            "default": 599800.0,
+            "description": ""
+        },
+        {
+            "name": "Sh",
+            "default": 399800.0,
+            "description": ""
+        },
+        {
+            "name": "El",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "Eh",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "Il",
+            "default": 200.0,
+            "description": ""
+        },
+        {
+            "name": "Ih",
+            "default": 200.0,
+            "description": ""
+        },
+        {
+            "name": "Rl",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "Rh",
+            "default": 0.0,
+            "description": ""
+        }
+    ],
+    "expressions": [
+        {
+            "name": "Q",
+            "value": [
+                "/",
+                [
+                    "+",
+                    [
+                        "*",
+                        "Nof",
+                        [
+                            "-",
+                            1,
+                            "D"
+                        ],
+                        "F"
+                    ],
+                    [
+                        "*",
+                        [
+                            "+",
+                            "Nol",
+                            [
+                                "*",
+                                "Nof",
+                                "D"
+                            ]
+                        ],
+                        "L"
+                    ]
+                ],
+                [
+                    "+",
+                    [
+                        "*",
+                        "Nof",
+                        "F"
+                    ],
+                    [
+                        "*",
+                        "Nol",
+                        "L"
+                    ]
+                ]
+            ],
+            "description": ""
+        },
+        {
+            "name": "T",
+            "value": [
+                "+",
+                [
+                    "*",
+                    "Noh",
+                    "H"
+                ],
+                [
+                    "*",
+                    "Nol",
+                    "L"
+                ]
+            ],
+            "description": ""
+        }
+    ],
+    "params": [
+        {
+            "name": "beta",
+            "default": 0.05,
+            "description": ""
+        },
+        {
+            "name": "gamma",
+            "default": 0.2,
+            "description": ""
+        },
+        {
+            "name": "H",
+            "default": 8.0,
+            "description": ""
+        },
+        {
+            "name": "L",
+            "default": 1.0,
+            "description": ""
+        },
+        {
+            "name": "Noh",
+            "default": 400000.0,
+            "description": ""
+        },
+        {
+            "name": "Nol",
+            "default": 600000.0,
+            "description": ""
+        },
+        {
+            "name": "D",
+            "default": 0.0,
+            "description": ""
+        }
+    ],
+    "reactions": [
+        {
+            "from": "Sh",
+            "to": "Ih",
+            "function": [
+                "/",
+                [
+                    "*",
+                    "Q",
+                    "beta",
+                    "H",
+                    "Sh",
+                    [
+                        "+",
+                        [
+                            "*",
+                            "Ih",
+                            "H"
+                        ],
+                        [
+                            "*",
+                            "Il",
+                            "L"
+                        ]
+                    ]
+                ],
+                "T"
+            ],
+            "description": ""
+        },
+        {
+            "from": "Sl",
+            "to": "Il",
+            "function": [
+                "/",
+                [
+                    "*",
+                    "Q",
+                    "beta",
+                    "L",
+                    "Sl",
+                    [
+                        "+",
+                        [
+                            "*",
+                            "Ih",
+                            "H"
+                        ],
+                        [
+                            "*",
+                            "Il",
+                            "L"
+                        ]
+                    ]
+                ],
+                "T"
+            ],
+            "description": ""
+        },
+        {
+            "from": "Ih",
+            "to": "Rh",
+            "function": [
+                "*",
+                "gamma",
+                "Ih"
+            ],
+            "description": ""
+        },
+        {
+            "from": "Il",
+            "to": "Rl",
+            "function": [
+                "*",
+                "gamma",
+                "Il"
+            ],
+            "description": ""
+        }
+    ],
+    "preconditions": []
+}
