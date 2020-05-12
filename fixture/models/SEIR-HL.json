@@ -59,43 +59,61 @@
                 ]
             ],
             "description": ""
+        },
+        {
+            "name":"beta",
+            "value": ["*", "p", "c"],
+            "description": ""
         }
     ],
     "params": [
         {
-            "name": "beta",
+            "name": "p",
             "default": 0.05,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "gamma",
-            "default": 0.2,
-            "description": ""
+            "default": 0.0714,
+            "description": "",
+            "iterable": true
         },
         {
             "name": "sigma",
             "default": 0.14,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "H",
-            "default": 8.0,
-            "description": ""
+            "default": 10.0,
+            "description": "",
+            "iterable": false
         },
         {
             "name": "L",
             "default": 1.0,
-            "description": ""
+            "description": "",
+            "iterable": false
+        },        
+        {
+            "name": "c",
+            "default": 1.0,
+            "description": "",
+            "iterable": false
         },
         {
             "name": "Noh",
             "default": 400000.0,
-            "description": ""
+            "description": "",
+            "iterable": false
         },
         {
             "name": "Nol",
             "default": 600000.0,
-            "description": ""
+            "description": "",
+            "iterable": false
         }
     ],
     "reactions": [

@@ -1,5 +1,5 @@
 {
-    "name": "SEIR-HLD",
+    "name": "SIR-HLD",
     "compartments": [
         {
             "name": "Sl",
@@ -9,16 +9,6 @@
         {
             "name": "Sh",
             "default": 399800.0,
-            "description": ""
-        },
-        {
-            "name": "El",
-            "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Eh",
-            "default": 0.0,
             "description": ""
         },
         {
@@ -56,12 +46,6 @@
             "iterable": true
         },
         {
-            "name": "sigma",
-            "default": 0.14,
-            "description": "",
-            "iterable": true
-        },
-        {
             "name": "H",
             "default": 10.0,
             "description": "",
@@ -72,7 +56,7 @@
             "default": 1.0,
             "description": "",
             "iterable": false
-        },        
+        },
         {
             "name": "c",
             "default": 1.0,
@@ -133,7 +117,7 @@
     "reactions": [
         {
             "from": "Sh",
-            "to": "Eh",
+            "to": "Ih",
             "function": [
                 "/",
                 [
@@ -150,7 +134,7 @@
         },
         {
             "from": "Sl",
-            "to": "El",
+            "to": "Il",
             "function": [
                 "/",
                 [
@@ -162,26 +146,6 @@
                     ]
                 ],
                 "T"
-            ],
-            "description": ""
-        },
-        {
-            "from": "Eh",
-            "to": "Ih",
-            "function": [
-                "*",
-                "sigma",
-                "Eh"
-            ],
-            "description": ""
-        },
-        {
-            "from": "El",
-            "to": "Il",
-            "function": [
-                "*",
-                "sigma",
-                "El"
             ],
             "description": ""
         },

@@ -78,37 +78,44 @@
         {
             "name": "beta",
             "default": 0.3,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "gamma",
-            "default": 0.2,
-            "description": ""
+            "default": 0.0714,
+            "description": "",
+            "iterable": true
         },
         {
             "name": "H",
             "default": 8.0,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "L",
             "default": 1.0,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "Noh",
             "default": 400000.0,
-            "description": ""
+            "description": "",
+            "iterable": false
         },
         {
             "name": "Nol",
             "default": 600000.0,
-            "description": ""
+            "description": "",
+            "iterable": false
         },
         {
             "name": "D",
             "default": 0.0,
-            "description": ""
+            "description": "",
+            "iterable": true
         }
     ],
     "reactions": [

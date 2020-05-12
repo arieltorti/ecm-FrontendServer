@@ -27,22 +27,26 @@
         {
             "name": "beta",
             "default": 0.3,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "gamma",
-            "default": 0.2,
-            "description": ""
+            "default": 0.0714,
+            "description": "",
+            "iterable": true
         },
         {
             "name": "sigma",
             "default": 0.14,
-            "description": ""
+            "description": "",
+            "iterable": true
         },
         {
             "name": "N",
             "default": 1000000.0,
-            "description": ""
+            "description": "",
+            "iterable": true
         }
     ],
     "reactions": [
