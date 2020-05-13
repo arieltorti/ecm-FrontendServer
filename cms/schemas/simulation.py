@@ -7,6 +7,8 @@ class Var(BaseModel):
     default: float
     description: str = ""
 
+class Param(Var):
+    iterable: bool
 
 class Expression(BaseModel):
     name: str
@@ -37,7 +39,7 @@ class Model(BaseModel):
     name: str
     compartments: List[Var]
     expressions: Optional[List[Dict]] = []  # List[Expression]
-    params: List[Var]
+    params: List[Param]
     reactions: List[Dict]  # List[Reaction]
     preconditions: Optional[List[Dict]]
 

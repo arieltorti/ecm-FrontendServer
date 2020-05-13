@@ -53,9 +53,14 @@
           <summary>Params</summary>
           <div v-for="param in currentModel.params">
             <span>{{ param.name }}</span>
-            <label for="param">with range:</label>
-            <input type="radio" v-model="simulation.iterate.key" id="param" :value="param.name" @click="paramUncheck(param.name)">
-
+            <template v-if="param.iterable">
+              <label for="param">with range:</label>
+              <input type="radio"
+                    v-model="simulation.iterate.key"
+                    id="param"
+                    :value="param.name"
+                    @click="paramUncheck(param.name)">
+            </template>
             <div v-if="simulation.iterate.key == param.name">
               <label :for="param + 'Start'">Start:</label>
               <input v-model.number="simulation.iterate.start" :id="param + 'Start'" type="number">
