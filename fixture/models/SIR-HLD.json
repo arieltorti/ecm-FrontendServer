@@ -35,7 +35,7 @@
     "params": [
         {
             "name": "p",
-            "default": 0.05,
+            "default": 0.1818,
             "description": "",
             "iterable": true
         },
@@ -49,13 +49,13 @@
             "name": "H",
             "default": 10.0,
             "description": "",
-            "iterable": false
+            "iterable": true
         },
         {
             "name": "L",
             "default": 1.0,
             "description": "",
-            "iterable": false
+            "iterable": true
         },
         {
             "name": "Noh",

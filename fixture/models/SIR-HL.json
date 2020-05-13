@@ -68,13 +68,13 @@
             "name": "H",
             "default": 10.0,
             "description": "",
-            "iterable": false
+            "iterable": true
         },
         {
             "name": "L",
             "default": 1.0,
             "description": "",
-            "iterable": false
+            "iterable": true
         },
         {
             "name": "Noh",
