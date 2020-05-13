@@ -59,17 +59,12 @@
                 ]
             ],
             "description": ""
-        },
-        {
-            "name":"beta",
-            "value": ["*", "p", "c"],
-            "description": ""
         }
     ],
     "params": [
         {
             "name": "p",
-            "default": 0.05,
+            "default": 0.1818,
             "description": "",
             "iterable": true
         },
@@ -96,12 +91,6 @@
             "default": 1.0,
             "description": "",
             "iterable": false
-        },        
-        {
-            "name": "c",
-            "default": 1.0,
-            "description": "",
-            "iterable": false
         },
         {
             "name": "Noh",
@@ -124,7 +113,7 @@
                 "/",
                 [
                     "*",
-                    "beta",
+                    "p",
                     "H",
                     "Sh",
                     [
@@ -152,7 +141,7 @@
                 "/",
                 [
                     "*",
-                    "beta",
+                    "p",
                     "L",
                     "Sl",
                     [

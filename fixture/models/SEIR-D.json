@@ -82,7 +82,7 @@
     "params": [
         {
             "name": "beta",
-            "default": 0.3,
+            "default": 1,
             "description": "",
             "iterable": true
         },

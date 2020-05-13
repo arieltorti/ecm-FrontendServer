@@ -45,7 +45,7 @@
     "params": [
         {
             "name": "p",
-            "default": 0.05,
+            "default": 0.1818,
             "description": "",
             "iterable": true
         },
@@ -69,12 +69,6 @@
         },
         {
             "name": "L",
-            "default": 1.0,
-            "description": "",
-            "iterable": false
-        },        
-        {
-            "name": "c",
             "default": 1.0,
             "description": "",
             "iterable": false
@@ -123,11 +117,6 @@
                 ]
             ],
             "description": ""
-        },
-        {
-            "name": "beta",
-            "value": ["*", "p", "c"],
-            "description": ""
         }
     ],
     "reactions": [
@@ -138,7 +127,7 @@
                 "/",
                 [
                     "*",
-                    "Q", "beta", "H", "Sh",
+                    "Q", "p", "H", "Sh",
                     [
                         "+",
                         ["*", "Ih", "H"], ["*", "Il", "L"]
@@ -155,7 +144,7 @@
                 "/",
                 [
                     "*", 
-                    "Q", "beta", "L", "Sl", 
+                    "Q", "p", "L", "Sl", 
                     [
                         "+",
                         ["*", "Ih", "H"], ["*", "Il", "L"]

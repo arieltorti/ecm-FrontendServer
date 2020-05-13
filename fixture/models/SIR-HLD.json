@@ -58,12 +58,6 @@
             "iterable": false
         },
         {
-            "name": "c",
-            "default": 1.0,
-            "description": "",
-            "iterable": false
-        },
-        {
             "name": "Noh",
             "default": 400000.0,
             "description": "",
@@ -107,11 +101,6 @@
                 ]
             ],
             "description": ""
-        },
-        {
-            "name": "beta",
-            "value": ["*", "p", "c"],
-            "description": ""
         }
     ],
     "reactions": [
@@ -122,7 +111,7 @@
                 "/",
                 [
                     "*",
-                    "Q", "beta", "H", "Sh",
+                    "Q", "p", "H", "Sh",
                     [
                         "+",
                         ["*", "Ih", "H"], ["*", "Il", "L"]
@@ -139,7 +128,7 @@
                 "/",
                 [
                     "*", 
-                    "Q", "beta", "L", "Sl", 
+                    "Q", "p", "L", "Sl", 
                     [
                         "+",
                         ["*", "Ih", "H"], ["*", "Il", "L"]
