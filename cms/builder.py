@@ -1,84 +1,86 @@
 from types import FunctionType
-from numbers import Number
-
-operators = ["+", "-", "*", "/"]
-
-
-class ParsingError(Exception):
-    pass
+from sympy import sympify
+from sympy import Symbol
+from .schemas import Model, Simulation
+from scipy.integrate import odeint
+import numpy as np
 
 
-def eval_function_expr(compartments, variables, farray):
-    out = ""
-    if type(farray) == list:
-        if len(farray) == 0:
-            raise ParsingError(
-                "eval_function_expr", f"Error parsing {farray}: empty array"
-            )
-        if farray[0] in operators:
-            if len(farray) > 1:
-                values = [
-                    eval_function_expr(compartments, variables, x) for x in farray[1:]
-                ]
-                out = f"({farray[0].join(values)})"
-            else:
-                raise ParsingError(
-                    "eval_function_expr", f"Error parsing {farray}: mising parameters"
-                )
-        else:
-            raise ParsingError(
-                "eval_function_expr", f"Error parsing {farray}: invalid expression"
-            )
-    elif type(farray) == str:
-        if farray in variables:
-            out = farray
-        elif farray in compartments.keys():
-            out = f"z[{compartments[farray]}]"
-        else:
-            raise ParsingError(
-                "eval_function_expr", f"Error parsing {farray}: variable doesn't exist"
-            )
-    elif isinstance(farray, Number):
-        out = str(farray)
-    else:
-        raise ParsingError(
-            "eval_function_expr", f"Error parsing {farray}: invalid type"
+class Simulator:
+
+    def __init__(self, model: Model):
+        self.params = {p.name: Symbol(p.name) for p in model.params}
+        
+        # initialize expression environment variables
+        self.expressionEnv = self.params.copy()
+        compartmentsInit = {f"{c.name}_0": Symbol(f"{c.name}_0") for c in model.compartments}
+        self.expressionEnv = dict(self.expressionEnv, **compartmentsInit)
+        expressionsVars = {e.name: Symbol(e.name) for e in model.expressions}
+        self.expressionEnv = dict(self.expressionEnv, **expressionsVars)
+
+        # TODO: Check recursion of expressions
+        self.expressions = {e.name: sympify(e.value, self.expressionEnv) for e in model.expressions}
+        self.compartments = {c.name: Symbol(c.name) for c in model.compartments}
+
+        # initialize reaction environment variables
+        self.reactionEnv = self.expressionEnv.copy()
+        self.reactionEnv = dict(self.expressionEnv, **self.compartments) 
+        self.reactionEnv["t"] = Symbol("t")
+
+        self.__initializeFormulas(model.reactions)
+
+    def simulate(self, simulation: Simulation):
+        self.__buildOdeModelFunction()
+        initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
+        params = {Symbol(c): simulation.params[c] for c in self.params}
+
+        rargs = list(self.odeVariables)
+
+        # Replace variable to expression
+        for i in range(len(rargs)):
+            print(rargs)
+            rargs[i] = rargs[i].subs(self.expressions.items())
+        
+        # Replace initial condition values
+        for i in range(len(rargs)):
+            print(rargs)
+            rargs[i] = rargs[i].subs(initialConditions.items())
+
+        # Replace param values
+        for i in range(len(rargs)):
+            print(rargs)
+            rargs[i] = rargs[i].subs(params.items())
+
+        # TODO: validate all values replaced
+
+        tspan = np.arange(0, simulation.days, simulation.step)
+
+        res = odeint(
+            self.__buildOdeModelFunction(), list(initialConditions.values()),
+            tspan, args=tuple(rargs)
         )
 
-    return out
+        return self.compartments.keys(), tspan, res
 
+    def __initializeFormulas(self, reactions):
+        self.formulas = {x: 0 for x in self.compartments}
+        self.odeVariables = set({})
+        for reaction in reactions:
+            funcExpr = sympify(reaction.function, self.reactionEnv)
+            self.odeVariables = self.odeVariables.union(funcExpr.free_symbols)
+            self.formulas[reaction.sfrom] -= funcExpr
+            self.formulas[reaction.sto] += funcExpr
+        self.odeVariables = tuple(self.odeVariables.difference(set(self.compartments.values())))
 
-def build_ode_model_function(schema):
-    expressions = {
-        p["name"]: p["value"] for p in schema.expressions
-    }  # XXX: Expression type needs revision
-    # TODO: Check recursion of expressions
-    variables = [p.name for p in schema.params]
-    variables_with_expr = variables + list(expressions)
-    compartments = {var.name: i for i, var in enumerate(schema.compartments)}
-    formulas = {x: "" for x in compartments}
+    def __buildOdeModelFunction(self):
+        modelstr = f"def ode_model(z, t, {', '.join(str(s) for s in self.odeVariables)}):\n"
+        modelstr += f"    dz = [0]*{len(self.compartments)}\n"
+        modelstr += f"    {', '.join(self.compartments.keys())} = z\n"
+        for idx, (compartment, formula) in enumerate(self.formulas.items()):
+            modelstr += f"    dz[{idx}] = {formula}\n"
+        modelstr += "    return dz"
 
-    for reaction in schema.reactions:  # XXX: Reaction type needs revision
-        expr = eval_function_expr(
-            compartments, variables_with_expr, reaction["function"]
-        )
-        formulas[reaction["from"]] += f"-{expr}"
-        formulas[reaction["to"]] += f"+{expr}"
-
-    modelstr = f"def ode_model(z, t, {', '.join(variables)}):\n"
-
-    for exp_name, exp_func in expressions.items():
-        expr = eval_function_expr({}, variables_with_expr, exp_func)
-        modelstr += f"    {exp_name} = {expr}\n"
-
-    modelstr += f"    dz = [0]*{len(compartments)}\n"
-
-    for model, formula in formulas.items():
-        modelstr += f"    dz[{compartments[model]}] = {formula}\n"
-
-    modelstr += "    return dz"
-    print(modelstr)
-    modelcode = compile(modelstr, f"<{schema.name}>", "exec")
-
-    return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
+        print(modelstr)
+        modelcode = compile(modelstr, f"<odeModel>", "exec")
+        return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
 

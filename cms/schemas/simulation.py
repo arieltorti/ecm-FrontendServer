@@ -12,9 +12,8 @@ class Param(Var):
 
 class Expression(BaseModel):
     name: str
-    value: List[Iterable]
+    value: str
     description: str = ""
-
 
 class Reaction(BaseModel):
     """
@@ -27,21 +26,27 @@ class Reaction(BaseModel):
     },
     """
 
-    _from = Field(alias="from")
-    to: str
-    # ((beta * F * Sf * ((If * F) + ( Il * L) / T)
-    function: List[Iterable]
+    sfrom: str
+    sto: str
+    function: str
     description: str = ""
 
+    class Config:
+        fields = {
+        'sfrom': 'from',
+        'sto':'to'
+        }
 
 class Model(BaseModel):
-    id: int
+    id: Optional[int]
     name: str
     compartments: List[Var]
-    expressions: Optional[List[Dict]] = []  # List[Expression]
+    expressions: List[Expression] = []  # List[Expression]
     params: List[Param]
-    reactions: List[Dict]  # List[Reaction]
+    reactions: List[Reaction]  # List[Reaction]
     preconditions: Optional[List[Dict]]
+
+
 
     class Config:
         orm_mode = True

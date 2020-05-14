@@ -1,6 +1,8 @@
+import os
 import json
 import pandas as pd
 from werkzeug.exceptions import BadRequest
+from .builder import Simulator
 
 from flask import (
     Blueprint,
@@ -8,11 +10,17 @@ from flask import (
     send_from_directory,
     render_template,
     Response,
+    send_from_directory
 )
 from .models import Model
 from . import schemas
 
 bp = Blueprint("cms", __name__, url_prefix="/")
+
+@bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(bp.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @bp.route("/", methods=["GET"])
 def home():
@@ -40,22 +48,23 @@ def list_models():
 def simulate(model_id):
     data = request.json
     model = Model.query.get(model_id)
-
+    modelSchema = schemas.Model.from_orm(model)
+    sim = Simulator(modelSchema)
     if not data:
         raise BadRequest(description="No input data")
     
-    clean_data = schemas.Simulation(**data)
-    model.prepare(clean_data)
+    simulationSchema = schemas.Simulation(**data)
     response_data = ""
-    if clean_data.iterate:
-        response = []
-        for result in model.animate():
-            df = pd.DataFrame(data=result, columns=model.compartments_names, index=model.tspan)
-            response.append(df.transpose().to_dict(orient="split"))
-        response_data = json.dumps(response)
+    if simulationSchema.iterate:
+        pass
+        #response = []
+        #for result in model.animate():
+        #    df = pd.DataFrame(data=result, columns=model.compartments_names, index=model.tspan)
+        #    response.append(df.transpose().to_dict(orient="split"))
+        #response_data = json.dumps(response)
     else:
-        result = model.solve()
-        df = pd.DataFrame(data=result, columns=model.compartments_names, index=model.tspan)
+        columns, tspan, data = sim.simulate(simulationSchema)
+        df = pd.DataFrame(data=data, columns=columns, index=tspan)
         response_data = df.transpose().to_json(orient="split")
 
     return Response(response_data, mimetype="application/json")

@@ -17,7 +17,12 @@
             "description": ""
         }
     ],
-    "expressions": [],
+    "expressions": [
+        {
+            "name": "N",
+            "value": "S0+I0+R0"
+        }
+    ],
     "params": [
         {
             "name": "beta",
@@ -30,38 +35,19 @@
             "default": 0.0714,
             "description": "",
             "iterable": true
-        },
-        {
-            "name": "N",
-            "default": 1000000.0,
-            "description": "",
-            "iterable": true
         }
     ],
     "reactions": [
         {
             "from": "S",
             "to": "I",
-            "function": [
-                "/",
-                [
-                    "*",
-                    "beta",
-                    "S",
-                    "I"
-                ],
-                "N"
-            ],
+            "function": "(beta*S*I)/N",
             "description": ""
         },
         {
             "from": "I",
             "to": "R",
-            "function": [
-                "*",
-                "gamma",
-                "I"
-            ],
+            "function": "gamma*I",
             "description": ""
         }
     ],

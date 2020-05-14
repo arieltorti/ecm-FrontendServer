@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 import cms
 
-FIXTURE_DIR = Path(__file__).parent / "fixtures"
+FIXTURE_DIR = Path(__file__).parent.parent / "fixture"
 
 
 @pytest.fixture
