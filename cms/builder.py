@@ -35,9 +35,6 @@ class Simulator:
         tspan = np.arange(0, simulation.days, simulation.step)
         odeModel = self.__buildOdeModelFunction()
         initialConditions, variables = self.__preprocessVariables(simulation)
-
-        print(self.odeVariables)
-
         if simulation.iterate:
             it = simulation.iterate
             tsimulation = simulation.copy()
@@ -48,7 +45,7 @@ class Simulator:
                 result.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, tspan))
         else:
             result = self.__singleSimulate(odeModel, initialConditions, variables, simulation.params, tspan)
-        return self.compartments.keys(), tspan, result
+        return list(self.compartments.keys()), tspan, result
 
     def __preprocessVariables(self, simulation):
         initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
@@ -71,12 +68,10 @@ class Simulator:
         for i in range(len(variables)):
             variables[i] = variables[i].subs(varParams)
 
-        # TODO: Validate that all values replaced
+        # Validates that all values replaced
         if (not any(isinstance(x, FloatT) for x in variables)):
             missingVariables = tuple(r for r in variables if not isinstance(r, float))
             raise ParsingError("simulate", f"Cannot solve symbols: {missingVariables}")
-
-        print(variables)
 
         return odeint(odeModel, initialConditions, tspan, args=tuple(float(v) for v in variables))
 
@@ -97,7 +92,5 @@ class Simulator:
         for idx, (compartment, formula) in enumerate(self.formulas.items()):
             modelstr += f"    dz[{idx}] = {formula} # {compartment}\n"
         modelstr += "    return dz"
-
-        print(modelstr)
         modelcode = compile(modelstr, f"<odeModel>", "exec")
         return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
