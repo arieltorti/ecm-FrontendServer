@@ -20,57 +20,12 @@
     "expressions": [
         {
             "name": "Q",
-            "value": [
-                "/",
-                [
-                    "+",
-                    [
-                        "*",
-                        "Noh",
-                        [
-                            "-",
-                            1,
-                            "D"
-                        ],
-                        "H"
-                    ],
-                    [
-                        "*",
-                        [
-                            "+",
-                            "Nol",
-                            [
-                                "*",
-                                "Noh",
-                                "D"
-                            ]
-                        ],
-                        "L"
-                    ]
-                ],
-                [
-                    "+",
-                    [
-                        "*",
-                        "Noh",
-                        "H"
-                    ],
-                    [
-                        "*",
-                        "Nol",
-                        "L"
-                    ]
-                ]
-            ],
+            "value": "(Noh * (1 - D) * H + (Nol + Noh * D) * L) / (Noh * H + Nol * L)",
             "description": ""
         },
         {
             "name": "N",
-            "value": [
-                "+",
-                "Noh",
-                "Nol"
-            ],
+            "value": "S_0 + I_0 + R_0",
             "description": ""
         }
     ],
@@ -122,27 +77,13 @@
         {
             "from": "S",
             "to": "I",
-            "function": [
-                "/",
-                [
-                    "*",
-                    "beta",
-                    "S",
-                    "I",
-                    "Q"
-                ],
-                "N"
-            ],
+            "function": "(beta * S * I * Q) / N",
             "description": ""
         },
         {
             "from": "I",
             "to": "R",
-            "function": [
-                "*",
-                "gamma",
-                "I"
-            ],
+            "function": "gamma * I",
             "description": ""
         }
     ],

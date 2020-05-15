@@ -1,13 +1,25 @@
 
 def test_simulate_endpoint(client, simulation_schema):
-    sir_splitted_schema = simulation_schema("SEIR.json")
+    simSIR = {
+        "step":5,
+        "days":50,
+        "initial_conditions": {
+            "S":999600,
+            "I":400,
+            "R":0
+        },
+        "params": {
+            "beta":1,
+            "gamma":0.0714
+        }
+    }
 
     mimetype = "application/json"
-    url = "/simulate/1"
+    url = "/simulate/8"
 
     response = client.post(
         url,
-        json=sir_splitted_schema,
+        json=simSIR,
         content_type=mimetype
     )
     assert response.json

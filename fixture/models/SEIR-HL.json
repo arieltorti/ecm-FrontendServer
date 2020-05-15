@@ -45,19 +45,7 @@
     "expressions": [
         {
             "name": "T",
-            "value": [
-                "+",
-                [
-                    "*",
-                    "Noh",
-                    "H"
-                ],
-                [
-                    "*",
-                    "Nol",
-                    "L"
-                ]
-            ],
+            "value": "Noh * H + Nol * L",
             "description": ""
         }
     ],
@@ -109,97 +97,37 @@
         {
             "from": "Sh",
             "to": "Eh",
-            "function": [
-                "/",
-                [
-                    "*",
-                    "p",
-                    "H",
-                    "Sh",
-                    [
-                        "+",
-                        [
-                            "*",
-                            "Ih",
-                            "H"
-                        ],
-                        [
-                            "*",
-                            "Il",
-                            "L"
-                        ]
-                    ]
-                ],
-                "T"
-            ],
+            "function": "(p * H * Sh * (Ih * H + Il * L)) / T",
             "description": ""
         },
         {
             "from": "Sl",
             "to": "El",
-            "function": [
-                "/",
-                [
-                    "*",
-                    "p",
-                    "L",
-                    "Sl",
-                    [
-                        "+",
-                        [
-                            "*",
-                            "Ih",
-                            "H"
-                        ],
-                        [
-                            "*",
-                            "Il",
-                            "L"
-                        ]
-                    ]
-                ],
-                "T"
-            ],
+            "function": "(p * L * Sl * (Ih * H + Il * L)) / T",
             "description": ""
         },
         {
             "from": "Eh",
             "to": "Ih",
-            "function": [
-                "*",
-                "sigma",
-                "Eh"
-            ],
+            "function": "sigma * Eh",
             "description": ""
         },
         {
             "from": "El",
             "to": "Il",
-            "function": [
-                "*",
-                "sigma",
-                "El"
-            ],
+            "function": "sigma * El",
             "description": ""
         },
         {
             "from": "Ih",
             "to": "Rh",
-            "function": [
-                "*",
-                "gamma",
-                "Ih"
-            ],
+            "function": "gamma * Ih",
             "description": ""
         },
         {
             "from": "Il",
             "to": "Rl",
-            "function": [
-                "*",
-                "gamma",
-                "Il"
-            ],
+            "function": "gamma * Il",
             "description": ""
         }
     ],

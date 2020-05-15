@@ -60,22 +60,6 @@ const app = new Vue({
   },
 
   methods: {
-    expression: function (expr) {
-      let out = "";
-      if (expr instanceof Array) {
-          if (expr.length > 1) {
-              const values = expr.slice(1).map(x=> this.expression(x));
-              out ="("+values.reduce((xs, x) => `${xs} ${expr[0]} ${x}`)+")";
-          }
-      }
-      else if (typeof expr === "string") {
-          out = expr;
-      }
-      else if (typeof expr === "number") {
-          out = expr.toString();
-      }
-      return out;
-    },
     simulate: function() {
       if (this.simulationState === SIM_STATE.INPROGRESS) {
         this.stopSimulation();

@@ -79,27 +79,12 @@
     "expressions": [
         {
             "name": "Q",
-            "value": ["/", 
-                ["+", ["*", "Noh", ["-", 1, "D"], "H"], ["*",[ "+", "Nol", ["*", "Noh", "D"]], "L"]],
-                ["+", ["*", "Noh", "H"], ["*", "Nol", "L"]]
-            ],
+            "value": "(Noh * (1 - D) * H + (Nol + Noh * D) * L) / (Noh * H + Nol * L)",
             "description": ""
         },
         {
             "name": "T",
-            "value": [
-                "+",
-                [
-                    "*",
-                    "Noh",
-                    "H"
-                ],
-                [
-                    "*",
-                    "Nol",
-                    "L"
-                ]
-            ],
+            "value": "Noh * H + Nol * L",
             "description": ""
         }
     ],
@@ -107,55 +92,25 @@
         {
             "from": "Sh",
             "to": "Ih",
-            "function": [
-                "/",
-                [
-                    "*",
-                    "Q", "p", "H", "Sh",
-                    [
-                        "+",
-                        ["*", "Ih", "H"], ["*", "Il", "L"]
-                    ]
-                ],
-                "T"
-            ],
+            "function": "(Q * p * H * Sh * (Ih * H + Il * L)) / T",
             "description": ""
         },
         {
             "from": "Sl",
             "to": "Il",
-            "function": [
-                "/",
-                [
-                    "*", 
-                    "Q", "p", "L", "Sl", 
-                    [
-                        "+",
-                        ["*", "Ih", "H"], ["*", "Il", "L"]
-                    ]
-                ],
-                "T"
-            ],
+            "function": "(Q * p * L * Sl * (Ih * H + Il * L)) / T",
             "description": ""
         },
         {
             "from": "Ih",
             "to": "Rh",
-            "function": [
-                "*",
-                "gamma",
-                "Ih"
-            ],
+            "function": "gamma * Ih",
             "description": ""
         },
         {
             "from": "Il",
             "to": "Rl",
-            "function": [
-                "*",
-                "gamma",
-                "Il"
-            ],
+            "function": "gamma * Il",
             "description": ""
         }
     ],

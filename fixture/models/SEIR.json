@@ -22,7 +22,13 @@
             "description": ""
         }
     ],
-    "expressions": [],
+    "expressions": [
+        {
+            "name": "N",
+            "value": "S_0 + E_0 + I_0 + R_0",
+            "description": ""
+        }
+    ],
     "params": [
         {
             "name": "beta",
@@ -41,48 +47,25 @@
             "default": 0.14,
             "description": "",
             "iterable": true
-        },
-        {
-            "name": "N",
-            "default": 1000000.0,
-            "description": "",
-            "iterable": true
         }
     ],
     "reactions": [
         {
             "from": "S",
             "to": "E",
-            "function": [
-                "/",
-                [
-                    "*",
-                    "beta",
-                    "S",
-                    "I"
-                ],
-                "N"
-            ],
+            "function": "(beta * S * I) / N",
             "description": ""
         },
         {
             "from": "E",
             "to": "I",
-            "function": [
-                "*",
-                "sigma",
-                "E"
-            ],
+            "function": "sigma * E",
             "description": ""
         },
         {
             "from": "I",
             "to": "R",
-            "function": [
-                "*",
-                "gamma",
-                "I"
-            ],
+            "function": "gamma * I",
             "description": ""
         }
     ],

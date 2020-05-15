@@ -1,15 +1,9 @@
 import numpy as np
 from scipy.integrate import odeint
 from flask_sqlalchemy import SQLAlchemy
-from .builder import build_ode_model_function
 from . import schemas
 
 db = SQLAlchemy()
-
-DAYS = 365
-STEP = 1
-
-
 class Model(db.Model):
     __tablename__ = "model"
     id = db.Column(db.Integer, primary_key=True)
@@ -20,62 +14,8 @@ class Model(db.Model):
     reactions = db.Column(db.JSON)
     preconditions = db.Column(db.JSON)
 
-    def __parse_initials(self, initials, labels):
-        out = ()
-        if isinstance(initials, dict):
-            out = tuple(initials[c] for c in labels)
-        elif isinstance(initials, (list, tuple)):
-            out = initials
-        else:
-            out = ()
-        return out
-
-    @property
-    def compartments_names(self):
-        return [c["name"] for c in self.compartments]
-
-    @property
-    def params_names(self):
-        return tuple([p["name"] for p in self.params])
-
-    def __ode_model(self, *args):
-        return self.ode_model_f(*args)
-
-    def prepare(self, sim_data):
-
-        schema = schemas.Model.from_orm(self)
-        self.ode_model_f = build_ode_model_function(schema)
-
-        self.initial_conditions = self.__parse_initials(
-            sim_data.initial_conditions, self.compartments_names
-        )
-        self.params_values = self.__parse_initials(sim_data.params, self.params_names)
-        self.tspan = np.arange(0, sim_data.days, sim_data.step)
-        if sim_data.iterate:
-            self.key = sim_data.iterate.get("key")
-            self.start = sim_data.iterate.get("start", 0)
-            self.end = sim_data.iterate.get("end", 1)
-            self.intervals = sim_data.iterate.get("intervals", 10)
-
-    def solve(self):
-        res = odeint(
-            self.__ode_model, self.initial_conditions,
-            self.tspan, args=self.params_values,
-        )
-        return res
-
-    def animate(self):
-        for i in np.linspace(self.start, self.end, self.intervals):
-            index = self.params_names.index(self.key)
-            old_params = list(self.params_values)
-            new_params = old_params[:]  # shallow mutable copy
-            new_params[index] = i
-            self.params_values = tuple(new_params)
-            yield self.solve()
-
     def __repr__(self):
         return "<Model %r>" % (self.name)
-
 
 class Simulation(db.Model):
     __tablename__ = "simulation"
