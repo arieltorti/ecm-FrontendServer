@@ -4,11 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from . import schemas
 
 db = SQLAlchemy()
-
-DAYS = 365
-STEP = 1
-
-
 class Model(db.Model):
     __tablename__ = "model"
     id = db.Column(db.Integer, primary_key=True)

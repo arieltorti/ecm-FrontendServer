@@ -22,12 +22,12 @@
         <legend>Model Details</legend>
         <h3>Reactions</h3>
         <div v-for="reaction in currentModel.reactions" class="reaction">
-          <div>{{reaction.from}} -> {{reaction.to}}: {{ expression(reaction.function) }} </div>
+          <div>{{reaction.sfrom}} -> {{reaction.sto}}: {{ reaction.function }} </div>
         </div>
         <template v-if="currentModel.expressions">
           <h3>Where</h3>
           <div v-for="expr in currentModel.expressions" class="expression">
-            <div>{{expr.name}} = {{ expression(expr.value) }} </div>
+            <div>{{expr.name}} = {{ expr.value }} </div>
           </div>
         </template>
       </fieldset>
@@ -45,7 +45,7 @@
         <details>
           <summary>Initial conditions</summary>
           <div v-for="comp in currentModel.compartments">
-            <label :for="comp">{{ comp.name }}:</label>
+            <label :for="comp">{{ comp.name }}_0:</label>
             <input v-model.number="simulation.initial_conditions[comp.name]" type="number"> 
           </div>
         </details>

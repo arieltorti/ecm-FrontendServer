@@ -1,7 +1,6 @@
 from typing import List, Dict, Iterable, Optional
 from pydantic import BaseModel, Field, Json
 
-
 class Var(BaseModel):
     name: str
     default: float
@@ -11,19 +10,40 @@ class Param(Var):
     iterable: bool
 
 class Expression(BaseModel):
+    """
+    {
+        "name": "T",
+        "value": "Noh * H + Nol * L",
+        "description": ""
+    }
+    """
     name: str
     value: str
     description: str = ""
 
+class Iterate(BaseModel):
+    """
+    {
+        "key": "",
+        "intervals": 10,
+        "start": 0,
+        "end": 1
+    }
+    """
+
+    key: str
+    intervals: int
+    start: float
+    end: float
+
 class Reaction(BaseModel):
     """
     {
-        "from": "Sf",
-        "to": "If",
-        "function": 
-            ["/", ["*", "beta", "F", "Sf", ["+", ["*", "If", "F"], ["*", "Il", "L"]]], "T"],
+        "from": "Sh",
+        "to": "Eh",
+        "function": "(p * H * Sh * (Ih * H + Il * L)) / T",
         "description": ""
-    },
+    }
     """
 
     sfrom: str
@@ -41,21 +61,18 @@ class Model(BaseModel):
     id: Optional[int]
     name: str
     compartments: List[Var]
-    expressions: List[Expression] = []  # List[Expression]
+    expressions: List[Expression] = []
     params: List[Param]
-    reactions: List[Reaction]  # List[Reaction]
-    preconditions: Optional[List[Dict]]
-
-
+    reactions: List[Reaction]
+    preconditions: List[Dict] = []
 
     class Config:
         orm_mode = True
 
-
 class Simulation(BaseModel):
     """
     "simulation" : {
-        "step" : 1,
+        "step" : 10,
         "days" : 365,
         "initial_conditions": {
             "Sl": 599800,
@@ -74,7 +91,7 @@ class Simulation(BaseModel):
         }
         "iterate": {
             "key": "",
-            "step": 1,
+            "intervals": 10,
             "start": 0,
             "end": 1
         }
@@ -85,16 +102,8 @@ class Simulation(BaseModel):
     days: float = 365.
     initial_conditions: Dict[str, float]
     params: Dict[str, float]
-    iterate: Optional[Dict]
+    iterate: Optional[Iterate]
 
     class Config:
         orm_mode = True
 
-
-class Payload(BaseModel):
-    schemaVersion: int
-    simulation: Simulation
-    model: Model
-
-    class Config:
-        orm_mode = True

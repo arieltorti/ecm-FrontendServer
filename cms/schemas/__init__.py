@@ -1,1 +1,1 @@
-from .simulation import Model, Simulation, Payload
+from .simulation import Model, Simulation

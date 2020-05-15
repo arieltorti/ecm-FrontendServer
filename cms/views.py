@@ -55,15 +55,15 @@ def simulate(model_id):
     
     simulationSchema = schemas.Simulation(**data)
     response_data = ""
+
+    columns, tspan, data = sim.simulate(simulationSchema)
     if simulationSchema.iterate:
-        pass
-        #response = []
-        #for result in model.animate():
-        #    df = pd.DataFrame(data=result, columns=model.compartments_names, index=model.tspan)
-        #    response.append(df.transpose().to_dict(orient="split"))
-        #response_data = json.dumps(response)
+        response = []
+        for result in data:
+            df = pd.DataFrame(data=result, columns=columns, index=tspan)
+            response.append(df.transpose().to_dict(orient="split"))
+        response_data = json.dumps(response)
     else:
-        columns, tspan, data = sim.simulate(simulationSchema)
         df = pd.DataFrame(data=data, columns=columns, index=tspan)
         response_data = df.transpose().to_json(orient="split")
 

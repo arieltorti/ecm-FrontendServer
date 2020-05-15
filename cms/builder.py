@@ -1,10 +1,12 @@
 from types import FunctionType
-from sympy import sympify
-from sympy import Symbol
+from sympy import (
+    sympify,
+    Symbol
+)
+from sympy.core.numbers import Float as FloatT
 from .schemas import Model, Simulation
 from scipy.integrate import odeint
 import numpy as np
-
 
 class Simulator:
 
@@ -30,37 +32,53 @@ class Simulator:
         self.__initializeFormulas(model.reactions)
 
     def simulate(self, simulation: Simulation):
-        self.__buildOdeModelFunction()
-        initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
-        params = {Symbol(c): simulation.params[c] for c in self.params}
+        tspan = np.arange(0, simulation.days, simulation.step)
+        odeModel = self.__buildOdeModelFunction()
+        initialConditions, variables = self.__preprocessVariables(simulation)
 
-        rargs = list(self.odeVariables)
+        print(self.odeVariables)
+
+        if simulation.iterate:
+            it = simulation.iterate
+            tsimulation = simulation.copy()
+            result = []
+            for value in np.linspace(it.start, it.end, it.intervals):
+                tsimulation.params[it.key] = value
+                tvariables = variables[:]
+                result.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, tspan))
+        else:
+            result = self.__singleSimulate(odeModel, initialConditions, variables, simulation.params, tspan)
+        return self.compartments.keys(), tspan, result
+
+    def __preprocessVariables(self, simulation):
+        initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
+        variables = list(self.odeVariables)
 
         # Replace variable to expression
-        for i in range(len(rargs)):
-            print(rargs)
-            rargs[i] = rargs[i].subs(self.expressions.items())
-        
-        # Replace initial condition values
-        for i in range(len(rargs)):
-            print(rargs)
-            rargs[i] = rargs[i].subs(initialConditions.items())
+        for i in range(len(variables)):
+            variables[i] = variables[i].subs(self.expressions)
 
-        # Replace param values
-        for i in range(len(rargs)):
-            print(rargs)
-            rargs[i] = rargs[i].subs(params.items())
+        # Replace initial condition and param values
+        for i in range(len(variables)):
+            variables[i] = variables[i].subs(initialConditions)
 
-        # TODO: validate all values replaced
+        return list(initialConditions.values()), variables
 
-        tspan = np.arange(0, simulation.days, simulation.step)
+    def __singleSimulate(self, odeModel, initialConditions, variables, params, tspan):
+        varParams = {Symbol(c): params[c] for c in self.params}
 
-        res = odeint(
-            self.__buildOdeModelFunction(), list(initialConditions.values()),
-            tspan, args=tuple(rargs)
-        )
+        # Replace initial condition and param values
+        for i in range(len(variables)):
+            variables[i] = variables[i].subs(varParams)
 
-        return self.compartments.keys(), tspan, res
+        # TODO: Validate that all values replaced
+        if (not any(isinstance(x, FloatT) for x in variables)):
+            missingVariables = tuple(r for r in variables if not isinstance(r, float))
+            raise ParsingError("simulate", f"Cannot solve symbols: {missingVariables}")
+
+        print(variables)
+
+        return odeint(odeModel, initialConditions, tspan, args=tuple(float(v) for v in variables))
 
     def __initializeFormulas(self, reactions):
         self.formulas = {x: 0 for x in self.compartments}
@@ -77,10 +95,9 @@ class Simulator:
         modelstr += f"    dz = [0]*{len(self.compartments)}\n"
         modelstr += f"    {', '.join(self.compartments.keys())} = z\n"
         for idx, (compartment, formula) in enumerate(self.formulas.items()):
-            modelstr += f"    dz[{idx}] = {formula}\n"
+            modelstr += f"    dz[{idx}] = {formula} # {compartment}\n"
         modelstr += "    return dz"
 
         print(modelstr)
         modelcode = compile(modelstr, f"<odeModel>", "exec")
         return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
-
