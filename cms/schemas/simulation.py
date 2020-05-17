@@ -1,5 +1,5 @@
 from typing import List, Dict, Iterable, Optional
-from pydantic import BaseModel, Field, Json
+from pydantic import BaseModel, Field, Json, validator, root_validator
 
 class Var(BaseModel):
     name: str
@@ -103,6 +103,28 @@ class Simulation(BaseModel):
     initial_conditions: Dict[str, float]
     params: Dict[str, float]
     iterate: Optional[Iterate]
+
+    @validator('days')
+    def days_gt_1(cls, days):
+        assert days > 0, "must be greather than zero"
+        return days
+
+    @validator('step')
+    def step_gt_1(cls, step):
+        assert step > 0, "must be greather than zero"
+        return step
+
+    @validator('initial_conditions')
+    def initial_conditions_gte_0(cls, initial_conditions):
+        for k, v in initial_conditions.items():
+            assert v >= 0, f"{k} can't be negative"
+        return initial_conditions
+
+    @root_validator
+    def check_passwords_match(cls, values):
+        days, step = values.get('days'), values.get('step')
+        assert step <= days, "steps <= days"
+        return values
 
     class Config:
         orm_mode = True

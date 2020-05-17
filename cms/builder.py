@@ -8,6 +8,9 @@ from .schemas import Model, Simulation
 from scipy.integrate import odeint
 import numpy as np
 
+class SimulatorError(Exception):
+    pass
+
 class Simulator:
 
     def __init__(self, model: Model):
@@ -48,31 +51,38 @@ class Simulator:
         return list(self.compartments.keys()), tspan, result
 
     def __preprocessVariables(self, simulation):
-        initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
+        initialConditions = {}
+        try:
+            initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
+        except KeyError as e:
+            raise SimulatorError("simulate", f"Missing initialization for compartment {e}")
         variables = list(self.odeVariables)
 
         # Replace variable to expression
         for i in range(len(variables)):
             variables[i] = variables[i].subs(self.expressions)
 
-        # Replace initial condition and param values
+        # Replace initial conditions
         for i in range(len(variables)):
             variables[i] = variables[i].subs(initialConditions)
 
         return list(initialConditions.values()), variables
 
     def __singleSimulate(self, odeModel, initialConditions, variables, params, tspan):
-        varParams = {Symbol(c): params[c] for c in self.params}
+        varParams = {}
+        try:
+            varParams = {Symbol(c): params[c] for c in self.params}
+        except KeyError as e:
+            raise SimulatorError("simulate", f"Missing parameter {e}")
 
-        # Replace initial condition and param values
+        # Replace param values
         for i in range(len(variables)):
             variables[i] = variables[i].subs(varParams)
 
         # Validates that all values replaced
-        if (not any(isinstance(x, FloatT) for x in variables)):
-            missingVariables = tuple(r for r in variables if not isinstance(r, float))
-            raise ParsingError("simulate", f"Cannot solve symbols: {missingVariables}")
-
+        if (not all(x.is_number for x in variables)):
+            missingVariables = list(r for r in variables if not isinstance(r, FloatT))
+            raise SimulatorError("simulate", f"Cannot solve symbols: {missingVariables}")
         return odeint(odeModel, initialConditions, tspan, args=tuple(float(v) for v in variables))
 
     def __initializeFormulas(self, reactions):

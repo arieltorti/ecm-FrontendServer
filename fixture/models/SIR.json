@@ -51,5 +51,14 @@
             "description": ""
         }
     ],
-    "preconditions": []
+    "preconditions": [
+        {
+            "expression": "alpha <= 1 && alpha >= 0",
+            "description" : "Valid range for alpha"
+        },
+        {
+            "expression": "gamma <= 1 & gamma >= 0",
+            "description" : "Valid range for gamma"
+        }
+    ]
 }
