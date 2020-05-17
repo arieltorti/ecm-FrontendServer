@@ -1,16 +1,29 @@
-Vue.component("simulation", {
+<template>
+  <div style="position: relative">
+    <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">Simulating</div>
+    <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">Error: {{ errMsg }}</div>
+    <div id="plotDiv" v-once></div>
+    <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
+      <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
+    </div>
+  </div>
+</template>
+<script>
+import * as Plotly from "plotly.js";
+
+export default {
   props: ["sim", "simCancel", "simState"],
-  data: function () {
+  data: function() {
     return {
       SIM_STATE: SIM_STATE,
       graphHistoricData: [],
       stats: {
         totalSteps: null,
-        currentStep: null,
+        currentStep: null
       },
       errMsg: "",
       abortSignal: null, // Stores the signal to abort the current request
-      playing: false,
+      playing: false
     };
   },
   computed: {
@@ -19,18 +32,18 @@ Vue.component("simulation", {
     }
   },
   watch: {
-    sim: function (_sim) {
+    sim: function(_sim) {
       _sim != null && this.simulate();
     },
-    simCancel: function (stop) {
+    simCancel: function(stop) {
       if (stop) {
         this.abortSignal.abort();
         this.$emit("sim-cancel");
       }
-    },
+    }
   },
   methods: {
-    handleError: function (err) {
+    handleError: function(err) {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         console.log("Request aborted");
         this.$emit("sim-cancel");
@@ -42,26 +55,26 @@ Vue.component("simulation", {
       }
     },
 
-    stop: function () {},
+    stop: function() {},
 
-    _play: function () {
+    _play: function() {
       Plotly.animate("plotDiv", null, {
         mode: "immediate",
         fromcurrent: true,
         transition: { duration: 300 },
-        frame: { duration: 500, redraw: false },
+        frame: { duration: 500, redraw: false }
       }).then(() => (this.playing = false));
     },
-    _pause: function () {
+    _pause: function() {
       Plotly.animate("plotDiv", [null], {
         mode: "immediate",
         fromcurrent: true,
         transition: { duration: 0 },
-        frame: { duration: 0, redraw: false },
+        frame: { duration: 0, redraw: false }
       });
     },
 
-    handleAnimClick: function () {
+    handleAnimClick: function() {
       if (this.playing) {
         this._pause();
       } else {
@@ -70,7 +83,7 @@ Vue.component("simulation", {
       this.playing = !this.playing;
     },
 
-    simulate: function () {
+    simulate: function() {
       if (this.sim == null) {
         return;
       }
@@ -89,32 +102,31 @@ Vue.component("simulation", {
       }
       this._simulate(simulation, this.sim.model.id)
         .then(() => this.dataFetchingDone())
-        .catch((err) => this.handleError(err));
-
+        .catch(err => this.handleError(err));
     },
-    _simulate: function (simulation, modelId) {
+    _simulate: function(simulation, modelId) {
       const controller = new AbortController();
       const signal = controller.signal;
       this.abortSignal = controller;
 
       const req = fetch(`/simulate/${modelId}`, {
         headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json"
         },
         method: "POST",
         body: JSON.stringify(simulation),
-        signal,
+        signal
       });
 
       return req
-        .then((resp) => {
+        .then(resp => {
           if (resp.status >= 400 && resp.status < 600) {
             throw resp;
           }
           return resp.json();
         })
-        .then((data) => {
+        .then(data => {
           if (this.isMultiple) {
             data.forEach((d, i) => {
               const graphData = makeGraphData(d);
@@ -130,13 +142,16 @@ Vue.component("simulation", {
     },
 
     /** Precisely rounds number based on the number of significant decimal places */
-    _preciseRound: function (number, presicion = 7) {
-      return Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) / Math.pow(10, presicion);
+    _preciseRound: function(number, presicion = 7) {
+      return (
+        Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) /
+        Math.pow(10, presicion)
+      );
     },
-    _getIndexAsString: function (i) {
+    _getIndexAsString: function(i) {
       return "" + this.graphHistoricData[i]._iterVal || i;
     },
-    dataFetchingDone: function () {
+    dataFetchingDone: function() {
       /**
        * We have a ton of boilerplate here just to configure the slider and animations
        * as we have to rebuild them all everytime the data changes. In the future we could
@@ -157,24 +172,24 @@ Vue.component("simulation", {
             {
               mode: "next",
               transition: { duration: 400, easing: "linear" },
-              frame: { duration: 800, redraw: true },
-            },
-          ],
+              frame: { duration: 800, redraw: true }
+            }
+          ]
         });
       }
 
       const slider = [
         {
           pad: { l: 130, t: 55 },
-          steps: sliderSteps,
-        },
+          steps: sliderSteps
+        }
       ];
 
       var frames = [];
       for (let i = 0; i < this.graphHistoricData.length; i++) {
         frames.push({
           name: this._getIndexAsString(i),
-          data: this.graphHistoricData[i],
+          data: this.graphHistoricData[i]
         });
       }
 
@@ -186,57 +201,12 @@ Vue.component("simulation", {
         data: data,
         layout: { ...graphLayout, sliders: slider },
         frames: frames,
-        config: plotConfig,
+        config: plotConfig
       });
-    },
-  },
-  // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly   
-  template: `<div style="position: relative">
-    <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">
-        Simulating
-    </div>
-    <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">
-    Error: {{ errMsg }}
-   </div>
-    <div id="plotDiv" v-once></div>
-    <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
-        <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
-    </div>
-
-  </div>`,
-});
-
-function escapeRegExp(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-/**
- * Returns a new simulation model where the selected variable value is replaced
- * by the new value.
- *
- * @param {*} model Simulation model string
- * @param {*} variable Variable name
- * @param {*} value New value
- */
-function _replaceModelVariableValue(model, variable, value) {
-  model.simulation.params[variable] = value;
-  return model;
-}
-
-/**
- * Returns a list of the names of all declared variables on the model
- *
- * @param {*} model Simulation model string
- */
-function _extractModelVariables(model) {
-  let out = [];
-  try {
-    out = JSON.parse(model).model.params.map(x => x.name);
-  } catch (e) {
-    console.error(e);
+    }
   }
-  return out;
-}
+  // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly
+};
 
 /**
  * Returns current date formatted as YYYYmmdd-HHMMss
@@ -271,13 +241,13 @@ function downloadLink(href) {
  * @param {*} plotData
  */
 function generateCSV(plotData) {
-  const csvHeader = "sampletimes," + plotData.data.map((x) => x.name).join(",");
+  const csvHeader = "sampletimes," + plotData.data.map(x => x.name).join(",");
   const sampleTimes = plotData.data[0].x;
-  const data = plotData.data.map((x) => x.y);
+  const data = plotData.data.map(x => x.y);
 
   let csv = csvHeader + "\r\n";
   for (let i = 0; i < sampleTimes.length; i++) {
-    csv += sampleTimes[i] + "," + data.map((x) => x[i]).join(",") + "\n";
+    csv += sampleTimes[i] + "," + data.map(x => x[i]).join(",") + "\n";
   }
 
   const CSVBlob = new Blob([csv], { type: "text/csv" });
@@ -287,9 +257,9 @@ function generateCSV(plotData) {
 const exportAsCSVBtn = {
   name: "Export as CSV",
   icon: Plotly.Icons.disk,
-  click: function (gd) {
+  click: function(gd) {
     generateCSV(gd);
-  },
+  }
 };
 
 const plotConfig = {
@@ -303,10 +273,10 @@ const plotConfig = {
       "zoomOut2d",
       "autoScale2d",
       "hoverClosestCartesian",
-      "hoverCompareCartesian",
-    ],
+      "hoverCompareCartesian"
+    ]
   ],
-  modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"],
+  modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"]
 };
 
 /**
@@ -322,9 +292,10 @@ function makeGraphData(data) {
     graphData.push({
       x: xAxis,
       y: data.data[i],
-      name: data.index[i],
+      name: data.index[i]
     });
   }
 
   return graphData;
 }
+</script>

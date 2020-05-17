@@ -1,13 +1,13 @@
 "use strict";
 
-const defaultIterConfig = {
+export const defaultIterConfig = {
   from: 0,
   to: 1,
   step: 0.05,
   iteratingVariable: null,
 };
 
-const SIM_STATE = {
+export const SIM_STATE = {
   DONE: 0,
   INPROGRESS: 1,
   CANCELED: 2,
@@ -15,8 +15,8 @@ const SIM_STATE = {
 };
 
 /** Name of the LocalStorage keys */
-const SIMULATION_CONFIG_KEY = "simulationConfig";
-const SIMULATION_ITER_CONFIG_KEY = "simulationIterConfig";
+export const SIMULATION_MODEL_KEY = "simulationModel";
+export const SIMULATION_CONFIG_KEY = "simulationConfig";
 
 /**
  * Finds the name of declared variables in the model.
@@ -24,11 +24,4 @@ const SIMULATION_ITER_CONFIG_KEY = "simulationIterConfig";
  *
  * TODO: Implement a parser and unparser instead of using Regex.
  */
-const VARIABLES_REGEX = new RegExp(/^(?!;).*\(\s*param\s+(\w+)\s+.*\)/, "gm");
-
-const graphLayout = {
-  yaxis: { fixedrange: true }, // Dont allow rectangle zooming
-  xaxis: {
-    title: "Days",
-  },
-};
+export const VARIABLES_REGEX = new RegExp(/^(?!;).*\(\s*param\s+(\w+)\s+.*\)/, "gm");

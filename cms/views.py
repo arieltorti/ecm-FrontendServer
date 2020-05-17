@@ -17,11 +17,6 @@ from . import schemas
 
 bp = Blueprint("cms", __name__, url_prefix="/")
 
-@bp.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(bp.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
 @bp.route("/", methods=["GET"])
 def home():
     return send_file("../dist/index.html")
