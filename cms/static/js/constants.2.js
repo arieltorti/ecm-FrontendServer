@@ -15,7 +15,6 @@ const SIM_STATE = {
 };
 
 /** Name of the LocalStorage keys */
-const SIMULATION_MODEL_KEY = "simulationModel";
 const SIMULATION_CONFIG_KEY = "simulationConfig";
 const SIMULATION_ITER_CONFIG_KEY = "simulationIterConfig";
 

@@ -18,7 +18,6 @@ const app = new Vue({
       SIM_STATE: SIM_STATE, // Declare enum variable so vue can access it on the template
 
       simulationState: SIM_STATE.DONE,
-      simulationModel: localStorage.getItem(SIMULATION_MODEL_KEY) || defaultSimulationModel,
       errorMsg: null,
       statusMsg: null,
       modelList: {},
@@ -46,10 +45,6 @@ const app = new Vue({
     },
   },
   watch: {
-    simulationModel: function (val) {
-      this.pendingChanges = true;
-      localStorage.setItem(SIMULATION_MODEL_KEY, val);
-    },
     configInterval: {
       handler(val) {
         this.pendingChanges = true;
@@ -114,10 +109,6 @@ const app = new Vue({
     setStatus: function (message) {
       this.errorMsg = null;
       this.statusMsg = message;
-    },
-
-    reset: function (event) {
-      this.simulationModel = defaultSimulationModel;
     },
 
     handleError: function (error) {
