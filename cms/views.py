@@ -42,6 +42,15 @@ def handle_error(error):
 def handle_error(error):
     return {"error": str(error)}, 400
 
+@bp.route("/api/models/", methods=["GET"])
+def list_models():
+    models = Model.query.all()
+    out = []
+    for m in models:
+        obj = schemas.Model.from_orm(m)
+        out.append(obj.dict())
+    return Response(json.dumps({"models": out}), mimetype="application/json")
+
 @bp.route("/simulate/<int:model_id>", methods=["POST"])
 def simulate(model_id):
     data = request.json
