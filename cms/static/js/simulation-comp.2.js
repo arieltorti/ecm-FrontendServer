@@ -8,7 +8,7 @@ Vue.component("simulation", {
         totalSteps: null,
         currentStep: null,
       },
-
+      errMsg: "",
       abortSignal: null, // Stores the signal to abort the current request
       playing: false,
     };
@@ -33,8 +33,12 @@ Vue.component("simulation", {
     handleError: function (err) {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         console.log("Request aborted");
+        this.$emit("sim-cancel");
       } else {
-        console.error(err);
+        err.json().then(e => {
+          this.errMsg = e.error;
+        });
+        this.$emit("sim-error");
       }
     },
 
@@ -191,10 +195,14 @@ Vue.component("simulation", {
     <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">
         Simulating
     </div>
+    <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">
+    Error: {{ errMsg }}
+   </div>
     <div id="plotDiv" v-once></div>
     <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
         <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
     </div>
+
   </div>`,
 });
 

@@ -135,7 +135,7 @@ const app = new Vue({
       this.simulationState = SIM_STATE.INPROGRESS;
     },
     handleSimError: function () {
-      // this.simulationState = SIM_STATE.INPROGRESS;
+      this.simulationState = SIM_STATE.FAILED;
     },
     handleSimDone: function () {
       this.simulationState = SIM_STATE.DONE;
