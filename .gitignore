@@ -1,3 +1,6 @@
 __pycache__
 compartments/
+node_modules/
+.vscode/
 *.db
+dist/
