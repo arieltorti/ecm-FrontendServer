@@ -46,6 +46,7 @@ class Simulator:
             tsimulation = simulation.copy()
             result = []
             for value in np.linspace(it.start, it.end, it.intervals):
+                self.__validatePreconditions(preconditions, tsimulation.params)
                 tsimulation.params[it.key] = value
                 tvariables = variables[:]
                 result.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, tspan))

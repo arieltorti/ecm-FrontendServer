@@ -155,3 +155,30 @@ def test_sim_precondition_error_1(client, simulation_schema):
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Precondition not satisisfied: (beta <= 1) & (beta > 0)"
+
+def test_sim_precondition_error_animate(client, simulation_schema):
+    model = Model(**simulation_schema("models/SIR.json"))
+    simSIR = {
+        "step":5,
+        "days":50,
+        "initial_conditions": {
+            "S":999600,
+            "I":400,
+            "R":0
+        },
+        "params": {
+            "beta":0,
+            "gamma":0.0714
+        },
+        "iterate": {
+            "key": "beta",
+            "intervals": 10,
+            "start": 0,
+            "end": 1
+        }
+    }
+    simulation = Simulation(**simSIR)
+    sim = Simulator(model)
+    with raises(SimulatorError) as e:
+        sim.simulate(simulation)
+    assert e.value.args[1] == "Precondition not satisisfied: (beta <= 1) & (beta > 0)"
