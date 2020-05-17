@@ -173,8 +173,8 @@ def test_sim_precondition_error_animate(client, simulation_schema):
         "iterate": {
             "key": "beta",
             "intervals": 10,
-            "start": 0,
-            "end": 1
+            "start": 0.2,
+            "end": 10
         }
     }
     simulation = Simulation(**simSIR)

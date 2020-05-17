@@ -71,3 +71,26 @@ def test_schema_simulation_invalid_initial_conditions(client, simulation_schema)
     }
     with raises(ValidationError) as e:
         simulation = Simulation(**simSIR)
+
+def test_schema_simulation_iterate_interval_negative(client, simulation_schema):
+    simSIR = {
+        "step":5,
+        "days":50,
+        "initial_conditions": {
+            "S":-999600,
+            "I":400,
+            "R":0
+        },
+        "params": {
+            "beta":1,
+            "gamma":0.0714
+        },
+        "iterate": {
+            "key": "beta",
+            "intervals": -10,
+            "start": 0,
+            "end": 10
+        }
+    }
+    with raises(ValidationError) as e:
+        simulation = Simulation(**simSIR)

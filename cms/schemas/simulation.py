@@ -40,6 +40,11 @@ class Iterate(BaseModel):
     start: float
     end: float
 
+    @validator('intervals')
+    def intervals_positive(cls, intervals):
+        assert intervals > 0, "must be greather than zero"
+        return intervals
+
 class Reaction(BaseModel):
     """
     {
@@ -92,7 +97,7 @@ class Simulation(BaseModel):
             "F": 8,
             "L": 1,
             "T": 3800000
-        }
+        },
         "iterate": {
             "key": "",
             "intervals": 10,

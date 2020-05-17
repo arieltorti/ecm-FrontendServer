@@ -9,7 +9,6 @@ from sympy.core.numbers import Float as FloatT
 from .schemas import Model, Simulation
 from scipy.integrate import odeint
 import numpy as np
-
 class SimulatorError(Exception):
     pass
 
@@ -46,9 +45,10 @@ class Simulator:
             tsimulation = simulation.copy()
             result = []
             for value in np.linspace(it.start, it.end, it.intervals):
-                self.__validatePreconditions(preconditions, tsimulation.params)
                 tsimulation.params[it.key] = value
                 tvariables = variables[:]
+                tpreconditions = preconditions.copy()
+                self.__validatePreconditions(tpreconditions, tsimulation.params)
                 result.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, tspan))
         else:
             self.__validatePreconditions(preconditions, simulation.params)
