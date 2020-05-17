@@ -36,18 +36,11 @@ def serve_styles(path):
 
 @bp.errorhandler(SimulatorError)
 def handle_error(error):
-    return {
-        'status_code': 400,
-        'status': error.args[1]
-    }
+    return {"error": error.args[1]}, 400
 
 @bp.errorhandler(schemas.ValidationError)
 def handle_error(error):
-    breakpoint()
-    return {
-        'status_code': 400,
-        'status': str(error)
-    }
+    return {"error": str(error)}, 400
 
 @bp.route("/simulate/<int:model_id>", methods=["POST"])
 def simulate(model_id):
