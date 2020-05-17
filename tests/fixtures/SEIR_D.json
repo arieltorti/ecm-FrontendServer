@@ -1,0 +1,127 @@
+{
+    "schemaVersion" : 1,
+    "simulation" : {
+        "step" : 1,
+        "days" : 365,
+        "initial_conditions": {
+            "S": 999600,
+            "E": 0,
+            "I": 400,
+            "R": 0
+        },
+        "params" : {
+            "beta": 0.3,
+            "gamma": 0.2,
+            "sigma": 0.14,
+            "F": 8,
+            "L": 1,
+            "Nof": 400000,
+            "Nol": 600000,
+            "D": 0
+        }
+    },
+    "model" : {
+        "id": 3,
+        "name" : "SEIR_D",
+        "compartments" :
+        [
+            {
+                "name": "S",
+                "default": 999600,
+                "description": ""
+            },
+            {
+                "name": "E",
+                "default": 0,
+                "description": ""
+            },
+            {
+                "name": "I",
+                "default": 400,
+                "description": ""
+            },
+            {
+                "name": "R",
+                "default": 0,
+                "description": ""
+            }
+        ],
+        "params" : [
+            {
+                "name": "beta",
+                "default": 0.3,
+                "description": ""
+            },
+            {
+                "name": "gamma",
+                "default": 0.2,
+                "description": ""
+            },
+            {
+                "name": "sigma",
+                "default": 0.14,
+                "description": ""
+            },
+            {
+                "name": "F",
+                "default": 8,
+                "description":""
+            },
+            {
+                "name": "L",
+                "default": 1,
+                "description":""
+            },
+            {
+                "name": "Nof",
+                "default": 400000,
+                "description":""
+            },
+            {
+                "name": "Nol",
+                "default": 600000,
+                "description":""
+            },
+            {
+                "name": "D",
+                "default": 0,
+                "description":""
+            }
+        ],
+        "expressions": [
+            {
+                "name": "Q",
+                "value" : ["/",
+                    ["+", ["*", "Nof", ["-", 1, "D"], "F"], ["*", ["+", "Nol", ["*", "Nof", "D"]], "L"]],
+                    ["+", ["*", "Nof", "F"], ["*", "Nol", "L"]]
+                ],
+                "description": ""
+            },
+            {
+                "name": "N",
+                "value": ["+","Nof","Nol"],
+                "description": ""
+            }
+        ],
+        "reactions": [
+            {
+                "from": "S",
+                "to": "E",
+                "function": ["/", ["*", "beta", "S", "I", "Q"], "N"],
+                "description": ""
+            },
+            {
+                "from": "E",
+                "to": "I",
+                "function": ["*", "sigma", "E"],
+                "description": ""
+            },
+            {
+                "from": "I",
+                "to": "R",
+                "function": ["*", "gamma", "I"],
+                "description": ""
+            }
+        ]
+    }
+}

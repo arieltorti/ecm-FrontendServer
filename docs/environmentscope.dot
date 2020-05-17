@@ -1,0 +1,16 @@
+digraph G {
+    node initialConditions[label="Initial Conditions\nS_0, I_0, R_0"]
+    node expressions[label="Expressions\nN"]
+    node compartments[label="Compartments\nS, I, R"]
+    node params[label="Params\nbeta, gamma"]
+    node reactions[label="Reactions"]
+    node specials[label="Specials\nt"]
+    initialConditions -> expressions
+    initialConditions -> reactions
+    compartments -> reactions
+    params -> expressions
+    params -> reactions
+    expressions -> expressions
+    specials -> reactions
+    expressions -> reactions
+}

@@ -1,0 +1,159 @@
+{
+    "schemaVersion" : 1,
+    "simulation" : {
+        "step" : 1,
+        "days" : 365,
+        "initial_conditions": {
+            "Sl": 599800,
+            "Sf": 399800,
+            "El": 0,
+            "Ef": 0,
+            "Il": 200,
+            "If": 200,
+            "Rl": 0,
+            "Rf": 0
+        },
+        "params" : {
+            "beta": 0.05,
+            "gamma": 0.2,
+            "sigma": 0.14,
+            "F": 8,
+            "L": 1,
+            "Nof": 400000,
+            "Nol": 600000
+        }
+    },
+    "model" : {
+        "id": "5",
+        "name" : "Splitted SEIR",
+        "compartments" :
+        [
+            {
+                "name": "Sl",
+                "default": 599800,
+                "description": ""
+            },
+            {
+                "name": "Sf",
+                "default": 399800,
+                "description": ""
+            },
+            {
+                "name": "El",
+                "default": 0,
+                "description": ""
+            },
+            {
+                "name": "Ef",
+                "default": 0,
+                "description": ""
+            },
+            {
+                "name": "Il",
+                "default": 200,
+                "description": ""
+            },
+            {
+                "name": "If",
+                "default": 200,
+                "description": ""
+            },
+            {
+                "name": "Rl",
+                "default": 0,
+                "description": ""
+            },
+            {
+                "name": "Rf",
+                "default": 0,
+                "description": ""
+            }
+        ],
+        "params" : [
+            {
+                "name": "beta",
+                "default": 0.05,
+                "description": ""
+            },
+            {
+                "name": "gamma",
+                "default": 0.2,
+                "description": ""
+            },
+            {
+                "name": "sigma",
+                "default": 0.14,
+                "description": ""
+            },
+            {
+                "name": "F",
+                "default": 8,
+                "description": ""
+            },
+            {
+                "name": "L",
+                "default": 1,
+                "description": ""
+            },
+            {
+                "name": "Nof",
+                "default": 400000,
+                "description": ""
+            },
+            {
+                "name": "Nol",
+                "default": 600000,
+                "description": ""
+            }
+        ],
+        "expressions": [
+            {
+                "name": "T",
+                "value": ["+", ["*", "Nof", "F"], ["*","Nol", "L"]],
+                "description": ""
+            }
+        ],
+        "reactions": [
+            {
+                "from": "Sf",
+                "to": "Ef",
+                "function":
+                ["/", ["*", "beta", "F", "Sf", ["+", ["*", "If", "F"], ["*", "Il", "L"]]], "T"],
+                "description": ""
+            },
+            {
+                "from": "Sl",
+                "to": "El",
+                "function":
+                ["/", ["*", "beta", "L", "Sl", ["+", ["*", "If", "F"], ["*", "Il", "L"]]], "T"],
+                "description": ""
+            },
+            {
+                "from": "Ef",
+                "to": "If",
+                "function":
+                    ["*", "sigma", "Ef"],
+                "description": ""
+            },
+            {
+                "from": "El",
+                "to": "Il",
+                "function": ["*", "sigma", "El"],
+                "description": ""
+            },
+            {
+                "from": "If",
+                "to": "Rf",
+                "function":
+                    ["*", "gamma", "If"],
+                "description": ""
+            },
+            {
+                "from": "Il",
+                "to": "Rl",
+                "function": ["*", "gamma", "Il"],
+                "description": ""
+            }
+        ]
+    }
+}

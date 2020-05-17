@@ -10,37 +10,41 @@ function getConfigInterval() {
 
 const app = new Vue({
   el: "#app",
+  beforeMount(){
+    this.fetchModels();
+  },
   data: function () {
     return {
       SIM_STATE: SIM_STATE, // Declare enum variable so vue can access it on the template
 
       simulationState: SIM_STATE.DONE,
-      simulationModel: localStorage.getItem(SIMULATION_MODEL_KEY) || defaultSimulationModel,
-      simulationConfig: localStorage.getItem(SIMULATION_CONFIG_KEY) || defaultConfigText,
       errorMsg: null,
       statusMsg: null,
-
+      modelList: {},
+      modelSelected: null,
+      simulation : {
+        step : 1,
+        days : 365,
+        initial_conditions : {},
+        params : {},
+        iterate : {key : null, start: 0, end: 1, intervals: 10},
+      },
       configInterval: getConfigInterval(),
-
       currentSimulation: null,
       simCancel: false,
       pendingChanges: true,
     };
   },
   computed: {
+    currentModel: function () {
+      return (this.modelSelected in this.modelList) ? 
+        this.modelList[this.modelSelected] : { params: [], compartments: []};
+    },
     modelVariables: function () {
-      return _extractModelVariables(this.simulationModel);
+      return Object.keys(this.simulation.params);
     },
   },
   watch: {
-    simulationModel: function (val) {
-      this.pendingChanges = true;
-      localStorage.setItem(SIMULATION_MODEL_KEY, val);
-    },
-    simulationConfig: function (val) {
-      this.pendingChanges = true;
-      localStorage.setItem(SIMULATION_CONFIG_KEY, val);
-    },
     configInterval: {
       handler(val) {
         this.pendingChanges = true;
@@ -51,14 +55,47 @@ const app = new Vue({
   },
 
   methods: {
-    buildSimulation(configInterval) {
-      this.configInterval = configInterval;
+    simulate: function() {
+      if (this.simulationState === SIM_STATE.INPROGRESS) {
+        this.stopSimulation();
+      } else {
+        this.buildSimulation();
+      }
+    },
+    paramUncheck: function(param) {
+      if (this.simulation.iterate.key == param) {
+        this.simulation.iterate.key = null;
+      }
+    },
+    modelChange: function($event) {
+      this.simulation.initial_conditions = {};
+      this.simulation.params = {};
+      this.currentModel.compartments.forEach(comp => {
+        this.simulation.initial_conditions[comp.name] = comp.default;
+      });
+      this.currentModel.params.forEach(param => {
+        this.simulation.params[param.name] = param.default;
+      });      
+    },
+    fetchModels: function () {
+      const req = fetch("/api/models/").then(resp => {
+        if (resp.status >= 400 && resp.status < 600) {
+          throw resp;
+        }
+        resp.json().then(json => {
+          json.models.forEach(element => {
+              this.modelList[element.id] = element;
+          });
+          this.modelSelected = 0;
+        });
+      });
+    },
+    buildSimulation: function () {
 
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
       this.currentSimulation = {
-        model: this.simulationModel,
-        config: this.simulationConfig,
-        intervalConfig: Vue.util.extend({}, configInterval),
+        model: this.currentModel,
+        simulation: this.simulation
       };
       setTimeout(() => {this.pendingChanges = false}, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account
     },
@@ -72,11 +109,6 @@ const app = new Vue({
     setStatus: function (message) {
       this.errorMsg = null;
       this.statusMsg = message;
-    },
-
-    reset: function (event) {
-      this.simulationModel = defaultSimulationModel;
-      this.simulationConfig = defaultConfigText;
     },
 
     handleError: function (error) {
@@ -94,7 +126,7 @@ const app = new Vue({
       this.simulationState = SIM_STATE.INPROGRESS;
     },
     handleSimError: function () {
-      // this.simulationState = SIM_STATE.INPROGRESS;
+      this.simulationState = SIM_STATE.FAILED;
     },
     handleSimDone: function () {
       this.simulationState = SIM_STATE.DONE;

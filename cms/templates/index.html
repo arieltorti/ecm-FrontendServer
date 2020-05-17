@@ -1,0 +1,108 @@
+{% raw %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+    <link rel="stylesheet" href="css/styles.2.css" />
+    <title>Simulation</title>
+  </head>
+
+  <body>
+    <div id="app" v-cloak>
+      <fieldset>
+        <legend>Choose a model:</legend>
+        <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
+          <option v-for="(model, key) in modelList" v-bind:value="key">{{ model.name }}</option>
+        </select>
+      </fieldset>
+      <fieldset v-if="modelSelected">
+        <legend>Model Details</legend>
+        <h3>Reactions</h3>
+        <div v-for="reaction in currentModel.reactions" class="reaction">
+          <div>{{reaction.sfrom}} -> {{reaction.sto}}: {{ reaction.function }} </div>
+        </div>
+        <template v-if="currentModel.expressions">
+          <h3>Where</h3>
+          <div v-for="expr in currentModel.expressions" class="expression">
+            <div>{{expr.name}} = {{ expr.value }} </div>
+          </div>
+        </template>
+      </fieldset>
+
+      <fieldset v-if="modelSelected">
+        <legend>Simulation parameters</legend>
+        <details>
+          <summary>General</summary>
+          <label for="days">Days:</label>
+          <input name="days" v-model.number="simulation.days" type="number"> 
+
+          <label for="step">Step:</label>
+          <input name="step" v-model.number="simulation.step" type="number"> 
+        </details>
+        <details>
+          <summary>Initial conditions</summary>
+          <div v-for="comp in currentModel.compartments">
+            <label :for="comp">{{ comp.name }}_0:</label>
+            <input v-model.number="simulation.initial_conditions[comp.name]" type="number"> 
+          </div>
+        </details>
+        <details v-if="modelSelected">
+          <summary>Params</summary>
+          <div v-for="param in currentModel.params">
+            <span>{{ param.name }}</span>
+            <template v-if="param.iterable">
+              <label for="param">with range:</label>
+              <input type="radio"
+                    v-model="simulation.iterate.key"
+                    id="param"
+                    :value="param.name"
+                    @click="paramUncheck(param.name)">
+            </template>
+            <div v-if="simulation.iterate.key == param.name">
+              <label :for="param + 'Start'">Start:</label>
+              <input v-model.number="simulation.iterate.start" :id="param + 'Start'" type="number">
+              <label :for="param + 'End'">End:</label>
+              <input v-model.number="simulation.iterate.end" :id="param + 'End'" type="number">
+              <label :for="param + 'Intervals'">Intervals:</label>
+              <input v-model.number="simulation.iterate.intervals" :id="param + 'Intervals'" type="number">
+            </div>
+            <div v-else>
+              <label :for="param">Value:</label>
+              <input v-model.number="simulation.params[param.name]" type="number" :id="param">
+            </div>
+          </div>
+        </details>
+      </fieldset>
+  
+      <fieldset v-if="modelSelected">
+        <legend>Simulation</legend>
+        <button style="margin: 1em; padding: 0.4em 0.8em; font-size: 1.15em;" @click = "simulate">Simulate</button>
+
+        <simulation
+          :sim="currentSimulation"
+          :sim-cancel="simCancel"
+          :sim-state="simulationState"
+          @sim-start="handleSimStart"
+          @sim-error="handleSimError"
+          @sim-done="handleSimDone"
+          @sim-cancel="handleSimCancel"
+        ></simulation>
+      </fieldset>
+
+    </div>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="js/simulation-comp.2.js"></script>
+    <script src="js/iter-controls-comp.2.js"></script>
+    <script src="js/error-msg-comp.2.js"></script>
+    <script src="js/constants.2.js"></script>
+    <script src="js/main.2.js"></script>
+  </body>
+</html>
+
+{% endraw %}

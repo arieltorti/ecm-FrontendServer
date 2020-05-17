@@ -8,10 +8,15 @@ Vue.component("simulation", {
         totalSteps: null,
         currentStep: null,
       },
-
+      errMsg: "",
       abortSignal: null, // Stores the signal to abort the current request
       playing: false,
     };
+  },
+  computed: {
+    isMultiple: function() {
+      return this.sim && this.sim.simulation.iterate.key != null;
+    }
   },
   watch: {
     sim: function (_sim) {
@@ -28,8 +33,12 @@ Vue.component("simulation", {
     handleError: function (err) {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         console.log("Request aborted");
+        this.$emit("sim-cancel");
       } else {
-        console.error(err);
+        err.json().then(e => {
+          this.errMsg = e.error;
+        });
+        this.$emit("sim-error");
       }
     },
 
@@ -70,56 +79,31 @@ Vue.component("simulation", {
       this.$emit("sim-start");
       this.graphHistoricData = [];
 
-      if (this.sim.intervalConfig.iteratingVariable != null) {
-        if (this.sim.intervalConfig.step === 0) {
+      const simulation = JSON.parse(JSON.stringify(this.sim.simulation));
+      if (this.isMultiple) {
+        if (this.sim.simulation.iterate.intervals === 0) {
           return;
         }
-
-        // If we selected an interating variable send as many request as needed chaining them
-        // to avoid overloading the server.
-        let promiseChain = Promise.resolve();
-
-        this.stats.totalSteps = Math.floor(
-          1 + (this.sim.intervalConfig.to - this.sim.intervalConfig.from) / this.sim.intervalConfig.step
-        );
-        this.stats.currentStep = 0;
-
-        for (
-          let from = this.sim.intervalConfig.from;
-          from <= this.sim.intervalConfig.to;
-          from = this._preciseRound(from + this.sim.intervalConfig.step)
-        ) {
-          promiseChain = promiseChain.then(() => {
-            this.stats.currentStep += 1;
-            return this._simulate(
-              this.sim.config,
-              _replaceModelVariableValue(this.sim.model, this.sim.intervalConfig.iteratingVariable, from),
-              from
-            );
-          });
-        }
-
-        promiseChain.then(() => this.dataFetchingDone()).catch((err) => this.handleError(err));
       } else {
-        this.stats.totalSteps = this.stats.currentStep = 1;
-        this._simulate(this.sim.config, this.sim.model)
-          .then(() => this.dataFetchingDone())
-          .catch((err) => this.handleError(err));
+        delete simulation.iterate;
       }
+      this._simulate(simulation, this.sim.model.id)
+        .then(() => this.dataFetchingDone())
+        .catch((err) => this.handleError(err));
+
     },
-    _simulate: function (config, model, iterVarValue) {
-      const formData = new FormData();
-
-      formData.append("config", config);
-      formData.append("model", model);
-
+    _simulate: function (simulation, modelId) {
       const controller = new AbortController();
       const signal = controller.signal;
       this.abortSignal = controller;
 
-      const req = fetch("/api/compute", {
+      const req = fetch(`/simulate/${modelId}`, {
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
         method: "POST",
-        body: formData,
+        body: JSON.stringify(simulation),
         signal,
       });
 
@@ -131,9 +115,17 @@ Vue.component("simulation", {
           return resp.json();
         })
         .then((data) => {
-          const graphData = makeGraphData(data);
-          graphData._iterVal = iterVarValue;
-          this.graphHistoricData.push(graphData);
+          if (this.isMultiple) {
+            data.forEach((d, i) => {
+              const graphData = makeGraphData(d);
+              graphData._iterVal = i;
+              this.graphHistoricData.push(graphData);
+            });
+          } else {
+            const graphData = makeGraphData(data);
+            graphData._iterVal = 0;
+            this.graphHistoricData.push(graphData);
+          }
         });
     },
 
@@ -190,7 +182,6 @@ Vue.component("simulation", {
       // to the initial frame. We deeply copy the initial data object to avoid this issue.
       const data = JSON.parse(JSON.stringify(this.graphHistoricData[0]));
 
-      debugger;
       Plotly.newPlot("plotDiv", {
         data: data,
         layout: { ...graphLayout, sliders: slider },
@@ -202,12 +193,16 @@ Vue.component("simulation", {
   // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly   
   template: `<div style="position: relative">
     <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">
-        Simulating {{ stats.currentStep }} / {{ stats.totalSteps }}
+        Simulating
     </div>
+    <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">
+    Error: {{ errMsg }}
+   </div>
     <div id="plotDiv" v-once></div>
-    <div v-if="simState === SIM_STATE.DONE && (sim && sim.intervalConfig.iteratingVariable)" id="plotAnimDiv">
+    <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
         <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
     </div>
+
   </div>`,
 });
 
@@ -224,11 +219,8 @@ function escapeRegExp(str) {
  * @param {*} value New value
  */
 function _replaceModelVariableValue(model, variable, value) {
-  const singleVariableRegex = new RegExp(
-    `^(?!;)(.*\\(\\s*param\\s+${escapeRegExp(variable)}\\s+)(.*)\s*(\\))`,
-    "gm"
-  );
-  return model.replace(singleVariableRegex, `$1${value}$3`);
+  model.simulation.params[variable] = value;
+  return model;
 }
 
 /**
@@ -237,14 +229,13 @@ function _replaceModelVariableValue(model, variable, value) {
  * @param {*} model Simulation model string
  */
 function _extractModelVariables(model) {
-  // We could use matchAll, but as we're not using a transpiler and someone may use this on IE11
-  // we'll do it the old way instead.
-  let match;
-  const variables = [];
-  while ((match = VARIABLES_REGEX.exec(model)) != null) {
-    variables.push(match[1]);
+  let out = [];
+  try {
+    out = JSON.parse(model).model.params.map(x => x.name);
+  } catch (e) {
+    console.error(e);
   }
-  return variables;
+  return out;
 }
 
 /**
@@ -324,14 +315,14 @@ const plotConfig = {
  * @param {*} data
  */
 function makeGraphData(data) {
-  const xAxis = data.SampleTimes;
+  const xAxis = data.columns;
   const graphData = [];
 
-  for (let i = 0; i < data.ChannelData.length; i++) {
+  for (let i = 0; i < data.data.length; i++) {
     graphData.push({
       x: xAxis,
-      y: data.ChannelData[i],
-      name: data.ObservableNames[i],
+      y: data.data[i],
+      name: data.index[i],
     });
   }
 

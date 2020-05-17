@@ -1,0 +1,184 @@
+{
+    "name": "SEIR-HLD",
+    "compartments": [
+        {
+            "name": "Sl",
+            "default": 599800.0,
+            "description": ""
+        },
+        {
+            "name": "Sh",
+            "default": 399800.0,
+            "description": ""
+        },
+        {
+            "name": "El",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "Eh",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "Il",
+            "default": 200.0,
+            "description": ""
+        },
+        {
+            "name": "Ih",
+            "default": 200.0,
+            "description": ""
+        },
+        {
+            "name": "Rl",
+            "default": 0.0,
+            "description": ""
+        },
+        {
+            "name": "Rh",
+            "default": 0.0,
+            "description": ""
+        }
+    ],
+    "params": [
+        {
+            "name": "p",
+            "default": 0.1818,
+            "description": "",
+            "iterable": true
+        },
+        {
+            "name": "gamma",
+            "default": 0.0714,
+            "description": "",
+            "iterable": true
+        },
+        {
+            "name": "sigma",
+            "default": 0.14,
+            "description": "",
+            "iterable": true
+        },
+        {
+            "name": "H",
+            "default": 10.0,
+            "description": "",
+            "iterable": true
+        },
+        {
+            "name": "L",
+            "default": 1.0,
+            "description": "",
+            "iterable": true
+        },
+        {
+            "name": "Noh",
+            "default": 400000.0,
+            "description": "",
+            "iterable": false
+        },
+        {
+            "name": "Nol",
+            "default": 600000.0,
+            "description": "",
+            "iterable": false
+        },
+        {
+            "name": "D",
+            "default": 0.0,
+            "description": "",
+            "iterable": true
+        }
+    ],
+    "expressions": [
+        {
+            "name": "N",
+            "value": "Sl_0 + Sh_0 + El_0 + Eh_0 + Il_0 + Ih_0 + Rl_0 + Rh_0",
+            "description": "Total population."
+        },
+        {
+            "name": "Q",
+            "value": "(Noh * (1 - D) * H + (Nol + Noh * D) * L) / T",
+            "description": ""
+        },
+        {
+            "name": "T",
+            "value": "Noh * H + Nol * L",
+            "description": ""
+        }
+    ],
+    "reactions": [
+        {
+            "from": "Sh",
+            "to": "Eh",
+            "function": "(Q * p * H * Sh * (Ih * H + Il * L)) / T",
+            "description": ""
+        },
+        {
+            "from": "Sl",
+            "to": "El",
+            "function": "(Q * p * L * Sl * (Ih * H + Il * L)) / T",
+            "description": ""
+        },
+        {
+            "from": "Eh",
+            "to": "Ih",
+            "function": "sigma * Eh",
+            "description": ""
+        },
+        {
+            "from": "El",
+            "to": "Il",
+            "function": "sigma * El",
+            "description": ""
+        },
+        {
+            "from": "Ih",
+            "to": "Rh",
+            "function": "gamma * Ih",
+            "description": ""
+        },
+        {
+            "from": "Il",
+            "to": "Rl",
+            "function": "gamma * Il",
+            "description": ""
+        }
+    ],
+    "preconditions": [
+        {
+            "predicate": "(p <= 1) & (p > 0)",
+            "description" : "Valid range for p"
+        },
+        {
+            "predicate": "(gamma <= 1) & (gamma > 0)",
+            "description" : "Valid range for gamma"
+        },
+        {
+            "predicate": "(sigma <= 1) & (sigma > 0)",
+            "description" : "Valid range for sigma"
+        },
+        {
+            "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
+            "description": "Noh + Nol must be the total population"
+        },
+        {
+            "predicate": "(Noh <= Sh_0 + Eh_0 + Ih_0 + Rh_0) & (Noh >= Sh_0 + Eh_0 + Ih_0 + Rh_0)",
+            "description": "Noh consistency"
+        },
+        {
+            "predicate": "(Nol <= Sl_0 + El_0 + Il_0 + Rl_0) & (Nol >= Sl_0 + El_0 + Il_0 + Rl_0)",
+            "description": "Nol consistency"
+        },
+        {
+            "predicate": "(H >= L) & (L >= 0)",
+            "description":"H and L consistency"
+        },
+        {
+            "predicate": "(D >= 0) & (D <= 1)",
+            "description": "D consistency"
+        }
+    ]
+}

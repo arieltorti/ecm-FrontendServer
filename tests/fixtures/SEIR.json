@@ -1,0 +1,88 @@
+{
+    "schemaVersion" : 1,
+    "simulation" : {
+        "step" : 1,
+        "days" : 365,
+        "initial_conditions": {
+            "S": 999600,
+            "E": 0,
+            "I": 400,
+            "R": 0
+        },
+        "params" : {
+            "beta": 0.3,
+            "gamma": 0.2,
+            "sigma":0.14,
+            "N": 1000000
+        }
+    },
+    "model" : {
+        "id": 1,
+        "name" : "SEIR",
+        "compartments" :
+        [
+            {
+                "name": "S",
+                "description": "",
+                "default": 999600
+            },
+            {
+                "name": "E",
+                "description": "",
+                "default": 0
+            },
+            {
+                "name": "I",
+                "description": "",
+                "default": 400
+            },
+            {
+                "name": "R",
+                "description": "",
+                "default": 0
+            }
+        ],
+        "params" : [
+            {
+                "name": "beta",
+                "description": "",
+                "default": 0.3
+            },
+            {
+                "name": "gamma",
+                "description": "",
+                "default": 0.2
+            },
+            {
+                "name": "sigma",
+                "description": "",
+                "default": 0.14
+            },
+            {
+                "name": "N",
+                "description": "",
+                "default": 1000000
+            }
+        ],
+        "reactions": [
+            {
+                "from": "S",
+                "to": "E",
+                "function": ["/", ["*", "beta", "S", "I"], "N"],
+                "description": ""
+            },
+            {
+                "from": "E",
+                "to": "I",
+                "function": ["*", "sigma", "E"],
+                "description": ""
+            },
+            {
+                "from": "I",
+                "to": "R",
+                "function": ["*", "gamma", "I"],
+                "description": ""
+            }
+        ]
+    }
+}
