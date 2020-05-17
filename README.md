@@ -1,18 +1,12 @@
-SIR Simulation Flask
-====================================
-
-Simple server to serve a frontend to the simulation engine build in Flask and VueJS.
+# Simulation engine
 
 ## Requirements
-
-> full list at `requirements.txt`.
 
 - Python 3
 - Flask
 - scientific python stack (matplotlib, pandas, etc) compilation headers.
 
 ## Installing on ubuntu
-
 
 ```shell
 
@@ -50,5 +44,13 @@ $ source cms-venv/bin/activate  # skip if already activated
 ```
 
 > The included output is just an example.
+
+## Maintainers
+
+See `MAINTANERS`.
+
+## License
+
+Software distributed under GPL-V3, full license text in `LICENSE`.
 
 You can now access http://127.0.0.1:5000 and run a simulation.
