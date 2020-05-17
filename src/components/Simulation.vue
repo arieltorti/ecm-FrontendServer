@@ -9,6 +9,7 @@
   </div>
 </template>
 <script>
+import { SIM_STATE, graphLayout } from "../constants.js";
 import * as Plotly from "plotly.js";
 
 export default {

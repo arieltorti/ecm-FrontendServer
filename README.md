@@ -45,6 +45,14 @@ $ source cms-venv/bin/activate  # skip if already activated
 
 > The included output is just an example.
 
+## Frontend development setup
+
+(cms-venv) $ nodeenv -pn latest
+(cms-venv) $ npm install
+(cms-venv) $ npm run build
+
+> Remember to do a build and `git add dist` before making a tag.
+
 ## Maintainers
 
 See `MAINTANERS`.
@@ -54,3 +62,4 @@ See `MAINTANERS`.
 Software distributed under GPL-V3, full license text in `LICENSE`.
 
 You can now access http://127.0.0.1:5000 and run a simulation.
+

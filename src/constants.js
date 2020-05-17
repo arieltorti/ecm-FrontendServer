@@ -18,10 +18,9 @@ export const SIM_STATE = {
 export const SIMULATION_MODEL_KEY = "simulationModel";
 export const SIMULATION_CONFIG_KEY = "simulationConfig";
 
-/**
- * Finds the name of declared variables in the model.
- * The declarations must be of the form (param <VAR> <VALUE>), ignoring additional whitespaces
- *
- * TODO: Implement a parser and unparser instead of using Regex.
- */
-export const VARIABLES_REGEX = new RegExp(/^(?!;).*\(\s*param\s+(\w+)\s+.*\)/, "gm");
+export const graphLayout = {
+  yaxis: { fixedrange: true }, // Dont allow rectangle zooming
+  xaxis: {
+    title: "Days",
+  },
+};
