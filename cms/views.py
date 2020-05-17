@@ -2,8 +2,7 @@ import os
 import json
 import pandas as pd
 from werkzeug.exceptions import BadRequest
-from .builder import Simulator
-
+from .builder import Simulator, SimulatorError
 from flask import (
     Blueprint,
     request,
@@ -35,14 +34,20 @@ def serve_javascript(path):
 def serve_styles(path):
     return send_from_directory("static/css", path)
 
-@bp.route("/api/models/", methods=["GET"])
-def list_models():
-    models = Model.query.all()
-    out = []
-    for m in models:
-        obj = schemas.Model.from_orm(m)
-        out.append(obj.dict())
-    return Response(json.dumps({"models": out}), mimetype="application/json")
+@bp.errorhandler(SimulatorError)
+def handle_error(error):
+    return {
+        'status_code': 400,
+        'status': error.args[1]
+    }
+
+@bp.errorhandler(schemas.ValidationError)
+def handle_error(error):
+    breakpoint()
+    return {
+        'status_code': 400,
+        'status': str(error)
+    }
 
 @bp.route("/simulate/<int:model_id>", methods=["POST"])
 def simulate(model_id):
