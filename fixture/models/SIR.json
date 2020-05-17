@@ -53,11 +53,15 @@
     ],
     "preconditions": [
         {
-            "expression": "alpha <= 1 && alpha >= 0",
-            "description" : "Valid range for alpha"
+            "predicate": "(I_0 >= 1) & (S_0 >= 1)",
+            "description" : "Initial infected and suceptible can't be zero"
         },
         {
-            "expression": "gamma <= 1 & gamma >= 0",
+            "predicate": "(beta <= 1) & (beta > 0)",
+            "description" : "Valid range for beta"
+        },
+        {
+            "predicate": "(gamma <= 1) & (gamma > 0)",
             "description" : "Valid range for gamma"
         }
     ]

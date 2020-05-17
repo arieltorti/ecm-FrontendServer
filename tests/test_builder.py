@@ -81,3 +81,77 @@ def test_sim_missing_parameter(client, simulation_schema):
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Missing parameter 'gamma'"
+
+def test_sim_model_cannot_solve_symbols(client, simulation_schema):
+    modelData = simulation_schema("models/SIR.json")
+    modelData["expressions"] = [
+        { "name": "N", "value": "S+1" },
+        { "name": "S", "value": "N+1" }
+    ]
+
+    model = Model(**modelData)
+    simSIR = {
+        "step":5,
+        "days":50,
+        "initial_conditions": {
+            "S":999600,
+            "I":400,
+            "R":0
+        },
+        "params": {
+            "beta":1,
+            "gamma":0.0714
+        }
+    }
+    simulation = Simulation(**simSIR)
+    sim = Simulator(model)
+    with raises(SimulatorError) as e:
+        sim.simulate(simulation)
+    assert e.value.args[1] == "Cannot solve symbols: [N + 2]"
+
+def test_sim_model_cannot_solve_preconditions(client, simulation_schema):
+    modelData = simulation_schema("models/SIR.json")
+    modelData["preconditions"] = [
+        { "predicate": "(omega + N) > 2" }
+    ]
+
+    model = Model(**modelData)
+    simSIR = {
+        "step":5,
+        "days":50,
+        "initial_conditions": {
+            "S":999600,
+            "I":400,
+            "R":0
+        },
+        "params": {
+            "beta":1,
+            "gamma":0.0714
+        }
+    }
+    simulation = Simulation(**simSIR)
+    sim = Simulator(model)
+    with raises(SimulatorError) as e:
+        sim.simulate(simulation)
+    assert e.value.args[1] == "Cannot solve precondition [(omega + N) > 2]: omega + 1000000.0 > 2"
+
+def test_sim_precondition_error_1(client, simulation_schema):
+    model = Model(**simulation_schema("models/SIR.json"))
+    simSIR = {
+        "step":5,
+        "days":50,
+        "initial_conditions": {
+            "S":999600,
+            "I":400,
+            "R":0
+        },
+        "params": {
+            "beta":-1,
+            "gamma":0.0714
+        }
+    }
+    simulation = Simulation(**simSIR)
+    sim = Simulator(model)
+    with raises(SimulatorError) as e:
+        sim.simulate(simulation)
+    assert e.value.args[1] == "Precondition not satisisfied: (beta <= 1) & (beta > 0)"

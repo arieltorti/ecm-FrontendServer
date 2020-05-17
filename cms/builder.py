@@ -1,7 +1,9 @@
 from types import FunctionType
 from sympy import (
     sympify,
-    Symbol
+    Symbol,
+    true as BTrue,
+    false as BFalse
 )
 from sympy.core.numbers import Float as FloatT
 from .schemas import Model, Simulation
@@ -26,6 +28,7 @@ class Simulator:
         # TODO: Check recursion of expressions
         self.expressions = {e.name: sympify(e.value, self.expressionEnv) for e in model.expressions}
         self.compartments = {c.name: Symbol(c.name) for c in model.compartments}
+        self.preconditions = {p.predicate : sympify(p.predicate, self.expressionEnv) for p in model.preconditions}
 
         # initialize reaction environment variables
         self.reactionEnv = self.expressionEnv.copy()
@@ -37,7 +40,7 @@ class Simulator:
     def simulate(self, simulation: Simulation):
         tspan = np.arange(0, simulation.days, simulation.step)
         odeModel = self.__buildOdeModelFunction()
-        initialConditions, variables = self.__preprocessVariables(simulation)
+        preconditions, initialConditions, variables = self.__preprocessVariables(simulation)
         if simulation.iterate:
             it = simulation.iterate
             tsimulation = simulation.copy()
@@ -47,39 +50,61 @@ class Simulator:
                 tvariables = variables[:]
                 result.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, tspan))
         else:
+            self.__validatePreconditions(preconditions, simulation.params)
             result = self.__singleSimulate(odeModel, initialConditions, variables, simulation.params, tspan)
         return list(self.compartments.keys()), tspan, result
 
     def __preprocessVariables(self, simulation):
-        initialConditions = {}
-        try:
-            initialConditions = {Symbol(f"{c}_0"): simulation.initial_conditions[c] for c in self.compartments}
-        except KeyError as e:
-            raise SimulatorError("simulate", f"Missing initialization for compartment {e}")
+        initialConditions = self.__initialConditions(simulation.initial_conditions)
+
+        preconditions = self.preconditions.copy()
         variables = list(self.odeVariables)
 
-        # Replace variable to expression
+        # Replace variable to expression and initial conditions
         for i in range(len(variables)):
-            variables[i] = variables[i].subs(self.expressions)
+            variables[i] = variables[i].subs(self.expressions) \
+                                       .subs(initialConditions)
 
-        # Replace initial conditions
-        for i in range(len(variables)):
-            variables[i] = variables[i].subs(initialConditions)
+        for name, predExpr in preconditions.items():
+            preconditions[name] = preconditions[name].subs(self.expressions) \
+                                                     .subs(initialConditions)
 
-        return list(initialConditions.values()), variables
+        return preconditions, list(initialConditions.values()), variables
 
-    def __singleSimulate(self, odeModel, initialConditions, variables, params, tspan):
+    def __validatePreconditions(self, preconditions, params):
+        varParams = self.__varParams(params)
+        # Replace param values
+        for name in preconditions:
+            preconditions[name] = preconditions[name].subs(varParams)
+            if (preconditions[name] not in [BTrue, BFalse]):
+                raise SimulatorError("simulate", f"Cannot solve precondition [{name}]: {preconditions[name]}")
+            if (preconditions[name] == BFalse):
+                raise SimulatorError("simulate", f"Precondition not satisisfied: {name}")
+
+    def __initialConditions(self, initial_conditions):
+        initialConditions = {}
+        try:
+            initialConditions = {Symbol(f"{c}_0"): initial_conditions[c] for c in self.compartments}
+        except KeyError as e:
+            raise SimulatorError("simulate", f"Missing initialization for compartment {e}")
+        return initialConditions
+
+    def __varParams(self, params):
         varParams = {}
         try:
             varParams = {Symbol(c): params[c] for c in self.params}
         except KeyError as e:
             raise SimulatorError("simulate", f"Missing parameter {e}")
+        return varParams
+
+    def __singleSimulate(self, odeModel, initialConditions, variables, params, tspan):
+        varParams = self.__varParams(params)
 
         # Replace param values
         for i in range(len(variables)):
             variables[i] = variables[i].subs(varParams)
 
-        # Validates that all values replaced
+        # Validates that all values were replaced
         if (not all(x.is_number for x in variables)):
             missingVariables = list(r for r in variables if not isinstance(r, FloatT))
             raise SimulatorError("simulate", f"Cannot solve symbols: {missingVariables}")

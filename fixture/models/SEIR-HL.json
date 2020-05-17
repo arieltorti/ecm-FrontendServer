@@ -44,6 +44,11 @@
     ],
     "expressions": [
         {
+            "name": "N",
+            "value": "Sl_0 + Sh_0 + El_0 + Eh_0 + Il_0 + Ih_0 + Rl_0 + Rh_0",
+            "description": "Total population."
+        },
+        {
             "name": "T",
             "value": "Noh * H + Nol * L",
             "description": ""
@@ -131,5 +136,34 @@
             "description": ""
         }
     ],
-    "preconditions": []
+    "preconditions": [
+        {
+            "predicate": "(p <= 1) & (p > 0)",
+            "description" : "Valid range for p"
+        },
+        {
+            "predicate": "(gamma <= 1) & (gamma > 0)",
+            "description" : "Valid range for gamma"
+        },
+        {
+            "predicate": "(sigma <= 1) & (sigma > 0)",
+            "description" : "Valid range for sigma"
+        },
+        {
+            "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
+            "description": "Noh + Nol must be the total population"
+        },
+        {
+            "predicate": "(Noh <= Sh_0 + Eh_0 + Ih_0 + Rh_0) & (Noh >= Sh_0 + Eh_0 + Ih_0 + Rh_0)",
+            "description": "Noh consistency"
+        },
+        {
+            "predicate": "(Nol <= Sl_0 + El_0 + Il_0 + Rl_0) & (Nol >= Sl_0 + El_0 + Il_0 + Rl_0)",
+            "description": "Nol consistency"
+        },
+        {
+            "predicate": "(H >= L) & (L >= 0)",
+            "description":"H and L consistency"
+        }
+    ]
 }

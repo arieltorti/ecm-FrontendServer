@@ -87,5 +87,26 @@
             "description": ""
         }
     ],
-    "preconditions": []
+    "preconditions": [
+        {
+            "predicate": "(I_0 >= 1) & (S_0 >= 1)",
+            "description" : "Initial infected and suceptible can't be zero"
+        },
+        {
+            "predicate": "(beta <= 1) & (beta > 0)",
+            "description" : "Valid range for beta"
+        },
+        {
+            "predicate": "(gamma <= 1) & (gamma > 0)",
+            "description" : "Valid range for gamma"
+        },
+        {
+            "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
+            "description": "Noh + Nol must be the total population"
+        },
+        {
+            "predicate": "(D >= 0) & (D <= 1)",
+            "description": "D consistency"
+        }
+    ]
 }

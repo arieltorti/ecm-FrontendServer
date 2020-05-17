@@ -9,6 +9,10 @@ class Var(BaseModel):
 class Param(Var):
     iterable: bool
 
+class Precondition(BaseModel):
+    predicate: str
+    description: str = ""
+
 class Expression(BaseModel):
     """
     {
@@ -64,7 +68,7 @@ class Model(BaseModel):
     expressions: List[Expression] = []
     params: List[Param]
     reactions: List[Reaction]
-    preconditions: List[Dict] = []
+    preconditions: List[Precondition] = []
 
     class Config:
         orm_mode = True
