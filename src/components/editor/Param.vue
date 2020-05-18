@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4>{{ param.name }}</h4>
+    <strong>{{ param.name }}</strong>
     <div v-if="param.iterable">
       <label for="param">with range:</label>
       <input

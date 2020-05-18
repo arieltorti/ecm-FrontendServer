@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label :for="comp"><h4>{{ comp.name }}_0:</h4></label>
+    <label :for="comp"><strong>{{ comp.name }}_0:</strong></label>
     <input v-model.number="simulation.initial_conditions[comp.name]" type="number" />
   </div>
 </template>
