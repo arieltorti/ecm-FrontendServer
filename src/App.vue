@@ -3,18 +3,18 @@
     <fieldset>
       <legend>Choose a model:</legend>
       <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
-        <option v-for="(model, key) in modelList" :key="key">{{ model.name }}</option>
+        <option v-for="(model, key) in modelList" :key="key" :value="key" >{{ model.name }}</option>
       </select>
     </fieldset>
     <fieldset v-if="modelSelected">
       <legend>Model Details</legend>
       <h3>Reactions</h3>
-      <div v-for="reaction in currentModel.reactions" :key="reaction" class="reaction">
+      <div v-for="reaction in currentModel.reactions" :key="reaction.name" class="reaction">
         <div>{{reaction.sfrom}} -> {{reaction.sto}}: {{ reaction.function }}</div>
       </div>
       <div v-if="currentModel.expressions">
         <h3>Where</h3>
-        <div v-for="expr in currentModel.expressions" :key="expr" class="expression">
+        <div v-for="expr in currentModel.expressions" :key="expr.name" class="expression">
           <div>{{expr.name}} = {{ expr.value }}</div>
         </div>
       </div>
@@ -32,14 +32,14 @@
       </details>
       <details>
         <summary>Initial conditions</summary>
-        <div v-for="comp in currentModel.compartments" :key="comp">
+        <div v-for="comp in currentModel.compartments" :key="comp.name">
           <label :for="comp">{{ comp.name }}_0:</label>
           <input v-model.number="simulation.initial_conditions[comp.name]" type="number" />
         </div>
       </details>
       <details v-if="modelSelected">
         <summary>Params</summary>
-        <div v-for="param in currentModel.params" :key="param">
+        <div v-for="param in currentModel.params" :key="param.name">
           <span>{{ param.name }}</span>
           <div v-if="param.iterable">
             <label for="param">with range:</label>
@@ -95,7 +95,6 @@
 import Simulation from "./components/Simulation.vue";
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
 export default {
-  el: "#app",
   beforeMount() {
     this.fetchModels();
   },
@@ -107,7 +106,7 @@ export default {
       errorMsg: null,
       statusMsg: null,
       modelList: {},
-      modelSelected: null,
+      modelSelected: 1,
       simulation: {
         step: 1,
         days: 365,
@@ -123,8 +122,10 @@ export default {
   components: { Simulation },
   computed: {
     currentModel: function() {
-      return this.modelSelected in this.modelList
-        ? this.modelList[this.modelSelected]
+      const models = this.modelList;
+      const selected = this.modelSelected;
+      return selected in models
+        ? models[selected]
         : { params: [], compartments: [] };
     },
     modelVariables: function() {
@@ -189,7 +190,7 @@ export default {
       this.simCancel = true;
     },
     setError: function(message) {
-      this.errorMsg = "[ERROR]: " + message;
+      this.errorMsg = `[ERROR]: ${message}`;
       this.statusMsg = null;
     },
     setStatus: function(message) {
@@ -230,7 +231,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }

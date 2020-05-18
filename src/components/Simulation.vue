@@ -150,7 +150,7 @@ export default {
       );
     },
     _getIndexAsString: function(i) {
-      return "" + this.graphHistoricData[i]._iterVal || i;
+      return `${this.graphHistoricData[i]._iterVal || i}`;
     },
     dataFetchingDone: function() {
       /**
@@ -214,7 +214,7 @@ export default {
  */
 function getCurrentDate() {
   function pad(string) {
-    return ("0" + string).slice(0, 2);
+    return (`0${string}`).slice(0, 2);
   }
 
   const now = new Date();
@@ -242,13 +242,13 @@ function downloadLink(href) {
  * @param {*} plotData
  */
 function generateCSV(plotData) {
-  const csvHeader = "sampletimes," + plotData.data.map(x => x.name).join(",");
+  const csvHeader = `sampletimes,${plotData.data.map(x => x.name).join(",")}`;
   const sampleTimes = plotData.data[0].x;
   const data = plotData.data.map(x => x.y);
 
   let csv = csvHeader + "\r\n";
   for (let i = 0; i < sampleTimes.length; i++) {
-    csv += sampleTimes[i] + "," + data.map(x => x[i]).join(",") + "\n";
+    csv += `${sampleTimes[i]}, ${data.map(x => x[i]).join(",")}\n`;
   }
 
   const CSVBlob = new Blob([csv], { type: "text/csv" });
