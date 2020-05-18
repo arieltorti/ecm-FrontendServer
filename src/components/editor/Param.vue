@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span>{{ param.name }}</span>
+    <h4>{{ param.name }}</h4>
     <div v-if="param.iterable">
       <label for="param">with range:</label>
       <input
@@ -27,6 +27,13 @@
 </template>
 <script>
 export default {
-  props: ["param", "simulation"]
+  props: ["param", "simulation"],
+  methods: {
+    paramUncheck: function(val) {
+      if (this.simulation.iterate.key == val) {
+        this.simulation.iterate.key = null;
+      }
+    }
+  }
 };
 </script>

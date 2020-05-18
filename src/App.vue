@@ -2,46 +2,13 @@
   <div id="app" v-cloak>
     <fieldset>
       <legend>Choose a model:</legend>
-      <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
-        <option
-          v-for="(model, key) in modelList"
-          :key="key"
-          :value="key"
-          :selected="modelSelected == key"
-        >{{ model.name }}</option>
+      <select name="model" id="model" v-model="modelSelected">
+        <option v-for="(model, key) in modelList" :key="key" :value="key">{{ model.name }}</option>
       </select>
     </fieldset>
     <CurrentModel :modelSelected="modelSelected" :currentModel="currentModel" />
 
-    <fieldset v-if="modelSelected">
-      <legend>Simulation parameters</legend>
-      <details>
-        <summary>General</summary>
-        <label for="days">Days:</label>
-        <input name="days" v-model.number="simulation.days" type="number" />
-
-        <label for="step">Step:</label>
-        <input name="step" v-model.number="simulation.step" type="number" />
-      </details>
-      <details>
-        <summary>Initial conditions</summary>
-        <Condition
-          v-for="comp in currentModel.compartments"
-          :key="comp.name"
-          :comp="comp"
-          :simulation="simulation"
-        />
-      </details>
-      <details v-if="modelSelected">
-        <summary>Params</summary>
-        <Param
-          v-for="param in currentModel.params"
-          :key="param.name"
-          :param="param"
-          :simulation="simulation"
-        />
-      </details>
-    </fieldset>
+    <Editor v-if="modelSelected" :model="currentModel" :simulation="simulation" />
 
     <fieldset v-if="modelSelected">
       <legend>Simulation</legend>
@@ -64,9 +31,8 @@
 </template>
 
 <script>
+import Editor from "./components/Editor.vue";
 import Simulation from "./components/Simulation.vue";
-import Param from "./components/Param.vue";
-import Condition from "./components/Condition.vue";
 import CurrentModel from "./components/CurrentModel.vue";
 
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
@@ -82,6 +48,7 @@ export default {
       errorMsg: null,
       statusMsg: null,
       modelList: {},
+      currentModel: {},
       modelSelected: 1,
       simulation: {
         step: 1,
@@ -95,15 +62,8 @@ export default {
       pendingChanges: true
     };
   },
-  components: { Simulation, Param, Condition, CurrentModel },
+  components: { Simulation, Editor, CurrentModel },
   computed: {
-    currentModel: function() {
-      const models = this.modelList;
-      const selected = this.modelSelected;
-      return selected in models
-        ? models[selected]
-        : { params: [], compartments: [] };
-    },
     modelVariables: function() {
       return Object.keys(this.simulation.params);
     }
@@ -112,6 +72,24 @@ export default {
     simulationModel: function(val) {
       this.pendingChanges = true;
       localStorage.setItem(SIMULATION_MODEL_KEY, val);
+    },
+    modelSelected: function(val) {
+      const current =
+        val in this.modelList
+          ? this.modelList[val]
+          : { params: [], compartments: [] };
+      const simulation = this.simulation;
+
+      current.compartments.forEach(comp => {
+        simulation.initial_conditions[comp.name] = comp.default;
+      });
+      current.params.forEach(param => {
+        simulation.params[param.name] = param.default;
+      });
+      this.simulation = simulation;
+      this.currentModel = current;
+
+      return current;
     }
   },
 
@@ -123,21 +101,7 @@ export default {
         this.buildSimulation();
       }
     },
-    paramUncheck: function(param) {
-      if (this.simulation.iterate.key == param) {
-        this.simulation.iterate.key = null;
-      }
-    },
-    modelChange: function() {
-      this.simulation.initial_conditions = {};
-      this.simulation.params = {};
-      this.currentModel.compartments.forEach(comp => {
-        this.simulation.initial_conditions[comp.name] = comp.default;
-      });
-      this.currentModel.params.forEach(param => {
-        this.simulation.params[param.name] = param.default;
-      });
-    },
+
     fetchModels: function() {
       const req = fetch("/api/models/");
       req.then(resp => {
