@@ -14,7 +14,7 @@ HTTP_400_BAD_REQUEST = 400
 app = Flask(__name__, static_url_path="")
 app.register_blueprint(bp)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cms-fudepan.db"
-
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # Configure logging.

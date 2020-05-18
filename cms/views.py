@@ -9,30 +9,21 @@ from flask import (
     send_from_directory,
     render_template,
     Response,
-    send_from_directory
+    send_from_directory,
+    send_file
 )
 from .models import Model
 from . import schemas
 
 bp = Blueprint("cms", __name__, url_prefix="/")
 
-@bp.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(bp.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
 @bp.route("/", methods=["GET"])
 def home():
-    models = Model.query.all()
-    return render_template("index.html", models=models)
+    return send_file("../dist/index.html")
 
-@bp.route("/js/<path:path>")
+@bp.route("/static/<path:path>")
 def serve_javascript(path):
-    return send_from_directory("static/js", path)
-
-@bp.route("/css/<path:path>")
-def serve_styles(path):
-    return send_from_directory("static/css", path)
+    return send_from_directory("../dist/", path)
 
 @bp.errorhandler(SimulatorError)
 def handle_error(error):
