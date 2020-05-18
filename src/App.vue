@@ -3,22 +3,15 @@
     <fieldset>
       <legend>Choose a model:</legend>
       <select name="model" id="model" v-model="modelSelected" @change="modelChange($event)">
-        <option v-for="(model, key) in modelList" :key="key" :value="key" >{{ model.name }}</option>
+        <option
+          v-for="(model, key) in modelList"
+          :key="key"
+          :value="key"
+          :selected="modelSelected == key"
+        >{{ model.name }}</option>
       </select>
     </fieldset>
-    <fieldset v-if="modelSelected">
-      <legend>Model Details</legend>
-      <h3>Reactions</h3>
-      <div v-for="reaction in currentModel.reactions" :key="reaction.name" class="reaction">
-        <div>{{reaction.sfrom}} -> {{reaction.sto}}: {{ reaction.function }}</div>
-      </div>
-      <div v-if="currentModel.expressions">
-        <h3>Where</h3>
-        <div v-for="expr in currentModel.expressions" :key="expr.name" class="expression">
-          <div>{{expr.name}} = {{ expr.value }}</div>
-        </div>
-      </div>
-    </fieldset>
+    <CurrentModel :modelSelected="modelSelected" :currentModel="currentModel" />
 
     <fieldset v-if="modelSelected">
       <legend>Simulation parameters</legend>
@@ -32,42 +25,21 @@
       </details>
       <details>
         <summary>Initial conditions</summary>
-        <div v-for="comp in currentModel.compartments" :key="comp.name">
-          <label :for="comp">{{ comp.name }}_0:</label>
-          <input v-model.number="simulation.initial_conditions[comp.name]" type="number" />
-        </div>
+        <Condition
+          v-for="comp in currentModel.compartments"
+          :key="comp.name"
+          :comp="comp"
+          :simulation="simulation"
+        />
       </details>
       <details v-if="modelSelected">
         <summary>Params</summary>
-        <div v-for="param in currentModel.params" :key="param.name">
-          <span>{{ param.name }}</span>
-          <div v-if="param.iterable">
-            <label for="param">with range:</label>
-            <input
-              type="radio"
-              v-model="simulation.iterate.key"
-              id="param"
-              :value="param.name"
-              @click="paramUncheck(param.name)"
-            />
-          </div>
-          <div v-if="simulation.iterate.key == param.name">
-            <label :for="param + 'Start'">Start:</label>
-            <input v-model.number="simulation.iterate.start" :id="param + 'Start'" type="number" />
-            <label :for="param + 'End'">End:</label>
-            <input v-model.number="simulation.iterate.end" :id="param + 'End'" type="number" />
-            <label :for="param + 'Intervals'">Intervals:</label>
-            <input
-              v-model.number="simulation.iterate.intervals"
-              :id="param + 'Intervals'"
-              type="number"
-            />
-          </div>
-          <div v-else>
-            <label :for="param">Value:</label>
-            <input v-model.number="simulation.params[param.name]" type="number" :id="param" />
-          </div>
-        </div>
+        <Param
+          v-for="param in currentModel.params"
+          :key="param.name"
+          :param="param"
+          :simulation="simulation"
+        />
       </details>
     </fieldset>
 
@@ -78,7 +50,7 @@
         @click="simulate"
       >Simulate</button>
 
-      <simulation
+      <Simulation
         :sim="currentSimulation"
         :sim-cancel="simCancel"
         :sim-state="simulationState"
@@ -86,13 +58,17 @@
         @sim-error="handleSimError"
         @sim-done="handleSimDone"
         @sim-cancel="handleSimCancel"
-      ></simulation>
+      />
     </fieldset>
   </div>
 </template>
 
 <script>
 import Simulation from "./components/Simulation.vue";
+import Param from "./components/Param.vue";
+import Condition from "./components/Condition.vue";
+import CurrentModel from "./components/CurrentModel.vue";
+
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
 export default {
   beforeMount() {
@@ -119,7 +95,7 @@ export default {
       pendingChanges: true
     };
   },
-  components: { Simulation },
+  components: { Simulation, Param, Condition, CurrentModel },
   computed: {
     currentModel: function() {
       const models = this.modelList;
