@@ -47,9 +47,11 @@ $ source cms-venv/bin/activate  # skip if already activated
 
 ## Frontend development setup
 
+```shell
 (cms-venv) $ nodeenv -pn latest
 (cms-venv) $ npm install
 (cms-venv) $ npm run build
+```
 
 > Remember to do a build and `git add dist` before making a tag.
 
