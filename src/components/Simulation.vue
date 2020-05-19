@@ -252,29 +252,22 @@ function downloadLink(href) {
  * @param {*} isMultiple
  */
 function generateCSV(plotData, isMultiple = false) {
-  let csv;
+  let csv = `sampletimes,${plotData[0].map((x) => x.name).join(',')}\n`;
   if (isMultiple) {
-    const csvHeader = "iteration,sampletimes," + plotData[0].map((x) => x.name).join(",");
-    csv = csvHeader + "\r\n";
-
-    for (let t = 0; t < plotData.length; t++) {
-      const sampleTimes = plotData[t][0].x;
-      const data = plotData[t].map((x) => x.y);
-      for (let i = 0; i < sampleTimes.length; i++) {
-        csv += `${plotData[t]._iterVal},${sampleTimes[i]},${data.map((x) => x[i]).join(',')}\n`;
-      }
-    }
-  } else {
-    const csvHeader = "sampletimes," + plotData.map((x) => x.name).join(",");
-    const sampleTimes = plotData[0][0].x;
-    const data = plotData[0].map((x) => x.y);
-  
-    csv = csvHeader + "\r\n";
-    for (let i = 0; i < sampleTimes.length; i++) {
-      csv += `${sampleTimes[i]},${data.map((x) => x[i]).join(',')}\n`;
-    }
-  
+    csv = `iteration,${csv}`;
   }
+
+  plotData.forEach(frame => {
+    const sampleTimes = frame[0].x;
+    const data = frame.map((x) => x.y);
+    sampleTimes.forEach((sample, i) => {
+      let row = `${sample},${data.map((x) => x[i]).join(',')}\n`;
+      if (isMultiple) {
+        row =`${frame._iterVal},${row}`;
+      }
+      csv += row;
+    });
+  });
   const CSVBlob = new Blob([csv], { type: "text/csv" });
   downloadLink(window.URL.createObjectURL(CSVBlob));
 }
