@@ -2,7 +2,10 @@
   <div style="position: relative">
     <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">Simulating</div>
     <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">Error: {{ errMsg }}</div>
-    <div id="plotDiv" v-once></div>
+    <div v-bind:class="{ hidden: isNotDone }">
+      <div id="plotDiv" v-once></div>
+      <button id="downloadCSV" @click="downloadCSV">Download CSV</button>
+    </div>
     <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
       <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
     </div>
@@ -30,6 +33,9 @@ export default {
   computed: {
     isMultiple: function() {
       return this.sim && this.sim.simulation.iterate.key != null;
+    },
+    isNotDone: function() {
+      return this.simState !== SIM_STATE.DONE;
     }
   },
   watch: {
@@ -44,6 +50,9 @@ export default {
     }
   },
   methods: {
+    downloadCSV: function() {
+      generateCSV(this.graphHistoricData, this.isMultiple);
+    },
     handleError: function(err) {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         console.log("Request aborted");
@@ -127,15 +136,15 @@ export default {
           }
           return resp.json();
         })
-        .then(data => {
-          if (this.isMultiple) {
-            data.forEach((d, i) => {
+        .then(response => {
+          if (response.type === "multiple") {
+            response.frames.forEach((d, i) => {
               const graphData = makeGraphData(d);
-              graphData._iterVal = i;
+              graphData._iterVal = response.param.values[i];
               this.graphHistoricData.push(graphData);
             });
           } else {
-            const graphData = makeGraphData(data);
+            const graphData = makeGraphData(response.frame);
             graphData._iterVal = 0;
             this.graphHistoricData.push(graphData);
           }
@@ -240,33 +249,39 @@ function downloadLink(href) {
  * Generates transposed CSV content
  *
  * @param {*} plotData
+ * @param {*} isMultiple
  */
-function generateCSV(plotData) {
-  const csvHeader = `sampletimes,${plotData.data.map(x => x.name).join(",")}`;
-  const sampleTimes = plotData.data[0].x;
-  const data = plotData.data.map(x => x.y);
+function generateCSV(plotData, isMultiple = false) {
+  let csv;
+  if (isMultiple) {
+    const csvHeader = "iteration,sampletimes," + plotData[0].map((x) => x.name).join(",");
+    csv = csvHeader + "\r\n";
 
-  let csv = csvHeader + "\r\n";
-  for (let i = 0; i < sampleTimes.length; i++) {
-    csv += `${sampleTimes[i]}, ${data.map(x => x[i]).join(",")}\n`;
+    for (let t = 0; t < plotData.length; t++) {
+      const sampleTimes = plotData[t][0].x;
+      const data = plotData[t].map((x) => x.y);
+      for (let i = 0; i < sampleTimes.length; i++) {
+        csv += `${plotData[t]._iterVal},${sampleTimes[i]},${data.map((x) => x[i]).join(',')}\n`;
+      }
+    }
+  } else {
+    const csvHeader = "sampletimes," + plotData.map((x) => x.name).join(",");
+    const sampleTimes = plotData[0][0].x;
+    const data = plotData[0].map((x) => x.y);
+  
+    csv = csvHeader + "\r\n";
+    for (let i = 0; i < sampleTimes.length; i++) {
+      csv += `${sampleTimes[i]},${data.map((x) => x[i]).join(',')}\n`;
+    }
+  
   }
-
   const CSVBlob = new Blob([csv], { type: "text/csv" });
   downloadLink(window.URL.createObjectURL(CSVBlob));
 }
 
-const exportAsCSVBtn = {
-  name: "Export as CSV",
-  icon: Plotly.Icons.disk,
-  click: function(gd) {
-    generateCSV(gd);
-  }
-};
-
 const plotConfig = {
   displaylogo: false,
   modeBarButtons: [
-    [exportAsCSVBtn],
     [
       "toImage",
       "zoom2d",

@@ -11,7 +11,8 @@ export const SIM_STATE = {
   DONE: 0,
   INPROGRESS: 1,
   CANCELED: 2,
-  FAILED: 3
+  FAILED: 3,
+  NONE: 4
 };
 
 /** Name of the LocalStorage keys */

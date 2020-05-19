@@ -42,7 +42,7 @@ class Iterate(BaseModel):
 
     @validator('intervals')
     def intervals_positive(cls, intervals):
-        assert intervals > 0, "must be greather than zero"
+        assert intervals > 0, "intervals must be greather than zero"
         return intervals
 
 class Reaction(BaseModel):
@@ -129,7 +129,7 @@ class Simulation(BaseModel):
             assert v >= 0, f"{k} can't be negative"
         return initial_conditions
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def check_passwords_match(cls, values):
         days, step = values.get('days'), values.get('step')
         assert step <= days, "steps <= days"

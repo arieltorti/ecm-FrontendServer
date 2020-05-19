@@ -27,18 +27,16 @@ def test_sim_basic(client, simulation_schema):
     }
     simulation = Simulation(**simSIR)
     sim = Simulator(model)
-    columns, tspan, data = sim.simulate(simulation)
+    result = sim.simulate(simulation)
 
-    assert columns == ["S","I","R"]
-    assert len(tspan) == 10
-    assert any(lambda t: expectedt[t] == approx(tspan[t], 0.001) for t in range(10))
-    assert len(data[0]) == 3
-    assert any(lambda t: expectedData[0][t] == approx(data[0][t], 0.001) for t in range(10))
-    assert any(lambda t: expectedData[1][t] == approx(data[1][t], 0.001) for t in range(10))
-    assert any(lambda t: expectedData[2][t] == approx(data[2][t], 0.001) for t in range(10))
-
-
-    #assert e.value.args[1] == "Missing initialization for compartment 'R'"
+    assert result.compartments == ["S","I","R"]
+    assert len(result.timeline) == 10
+    assert any(lambda t: expectedt[t] == approx(result.timeline[t], 0.001) for t in range(10))
+    assert len(result.frames) == 1
+    assert len(result.frames[0][0]) == 3
+    assert any(lambda t: expectedData[0][t] == approx(result.frames[0][0][t], 0.001) for t in range(10))
+    assert any(lambda t: expectedData[1][t] == approx(result.frames[0][1][t], 0.001) for t in range(10))
+    assert any(lambda t: expectedData[2][t] == approx(result.frames[0][2][t], 0.001) for t in range(10))
 
 def test_sim_missing_compartment(client, simulation_schema):
     model = Model(**simulation_schema("models/SIR.json"))

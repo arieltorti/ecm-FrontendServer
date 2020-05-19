@@ -52,17 +52,22 @@ def simulate(model_id):
         raise BadRequest(description="No input data")
     
     simulationSchema = schemas.Simulation(**data)
-    response_data = ""
+    response = {}
 
-    columns, tspan, data = sim.simulate(simulationSchema)
-    if simulationSchema.iterate:
-        response = []
-        for result in data:
-            df = pd.DataFrame(data=result, columns=columns, index=tspan)
-            response.append(df.transpose().to_dict(orient="split"))
-        response_data = json.dumps(response)
+    result = sim.simulate(simulationSchema)
+    if result.isIterated:
+        response["type"] = "multiple"
+        response["param"] = {
+            "name": result.param,
+            "values": list(result.paramValues)
+        }
+        response["frames"] = []
+        for frame in result.frames:
+            df = pd.DataFrame(data=frame, columns=result.compartments, index=result.timeline)
+            response["frames"].append(df.transpose().to_dict(orient="split"))
     else:
-        df = pd.DataFrame(data=data, columns=columns, index=tspan)
-        response_data = df.transpose().to_json(orient="split")
+        response["type"] = "simple"
+        df = pd.DataFrame(data=result.frames[0], columns=result.compartments, index=result.timeline)
+        response["frame"] = df.transpose().to_dict(orient="split")
 
-    return Response(response_data, mimetype="application/json")
+    return Response(json.dumps(response), mimetype="application/json")

@@ -9,8 +9,21 @@ from sympy.core.numbers import Float as FloatT
 from .schemas import Model, Simulation
 from scipy.integrate import odeint
 import numpy as np
+
 class SimulatorError(Exception):
     pass
+
+class SimulationResult:
+    def __init__(self, compartments, timeline, frames, param = None, paramValues = []):
+        self.compartments = compartments
+        self.timeline = timeline
+        self.frames = frames
+        self.param = param
+        self.paramValues = paramValues
+
+    @property
+    def isIterated(self):
+        return self.param is not None
 
 class Simulator:
 
@@ -31,29 +44,31 @@ class Simulator:
 
         # initialize reaction environment variables
         self.reactionEnv = self.expressionEnv.copy()
-        self.reactionEnv = dict(self.expressionEnv, **self.compartments) 
+        self.reactionEnv = dict(self.expressionEnv, **self.compartments)
         self.reactionEnv["t"] = Symbol("t")
 
         self.__initializeFormulas(model.reactions)
 
     def simulate(self, simulation: Simulation):
-        tspan = np.arange(0, simulation.days, simulation.step)
+        timeline = np.arange(0, simulation.days, simulation.step)
         odeModel = self.__buildOdeModelFunction()
         preconditions, initialConditions, variables = self.__preprocessVariables(simulation)
+        result = SimulationResult(list(self.compartments.keys()), timeline, [])
         if simulation.iterate:
             it = simulation.iterate
+            result.paramValues = np.linspace(it.start, it.end, it.intervals)
+            result.param = it.key
             tsimulation = simulation.copy()
-            result = []
-            for value in np.linspace(it.start, it.end, it.intervals):
+            for value in result.paramValues:
                 tsimulation.params[it.key] = value
                 tvariables = variables[:]
                 tpreconditions = preconditions.copy()
                 self.__validatePreconditions(tpreconditions, tsimulation.params)
-                result.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, tspan))
+                result.frames.append(self.__singleSimulate(odeModel, initialConditions, tvariables, tsimulation.params, timeline))
         else:
             self.__validatePreconditions(preconditions, simulation.params)
-            result = self.__singleSimulate(odeModel, initialConditions, variables, simulation.params, tspan)
-        return list(self.compartments.keys()), tspan, result
+            result.frames.append(self.__singleSimulate(odeModel, initialConditions, variables, simulation.params, timeline))
+        return result
 
     def __preprocessVariables(self, simulation):
         initialConditions = self.__initialConditions(simulation.initial_conditions)

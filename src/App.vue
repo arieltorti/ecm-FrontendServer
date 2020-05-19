@@ -13,7 +13,7 @@
     <fieldset v-if="modelSelected">
       <legend>Simulation</legend>
       <button
-        style="margin: 1em; padding: 0.4em 0.8em; font-size: 1.15em;"
+        :disabled="simulationState === SIM_STATE.INPROGRESS"
         @click="simulate"
       >Simulate</button>
 
@@ -44,7 +44,7 @@ export default {
     return {
       SIM_STATE: SIM_STATE, // Declare enum variable so vue can access it on the template
 
-      simulationState: SIM_STATE.DONE,
+      simulationState: SIM_STATE.NONE,
       errorMsg: null,
       statusMsg: null,
       modelList: {},
@@ -74,6 +74,7 @@ export default {
       localStorage.setItem(SIMULATION_MODEL_KEY, val);
     },
     modelSelected: function(val) {
+      this.simulationState = SIM_STATE.NONE;
       const current =
         val in this.modelList
           ? this.modelList[val]
@@ -237,5 +238,9 @@ export default {
 .interval-config input {
   display: inline-block !important;
   width: 6em;
+}
+
+.hidden {
+  display: none;
 }
 </style>
