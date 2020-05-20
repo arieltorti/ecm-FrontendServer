@@ -140,7 +140,7 @@ export default {
           if (response.type === "multiple") {
             response.frames.forEach((d, i) => {
               const graphData = makeGraphData(d);
-              graphData._iterVal = response.param.values[i];
+              graphData._iterVal = Math.round(response.param.values[i]*100)/100;
               this.graphHistoricData.push(graphData);
             });
           } else {
