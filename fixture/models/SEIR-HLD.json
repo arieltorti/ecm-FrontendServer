@@ -153,11 +153,11 @@
             "description" : "Valid range for p"
         },
         {
-            "predicate": "(gamma <= 1) & (gamma > 0)",
+            "predicate": "gamma > 0",
             "description" : "Valid range for gamma"
         },
         {
-            "predicate": "(sigma <= 1) & (sigma > 0)",
+            "predicate": "sigma > 0",
             "description" : "Valid range for sigma"
         },
         {
