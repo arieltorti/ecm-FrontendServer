@@ -57,11 +57,11 @@
             "description" : "Initial infected and suceptible can't be zero"
         },
         {
-            "predicate": "beta > 0",
+            "predicate": "beta >= 0",
             "description" : "Valid range for beta"
         },
         {
-            "predicate": "gamma > 0",
+            "predicate": "gamma >= 0",
             "description" : "Valid range for gamma"
         }
     ]
