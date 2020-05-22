@@ -5,12 +5,12 @@ class SimulatorError(Exception):
     pass
 
 class SimulationResult:
-    def __init__(self, compartments, timeline, frames, param = None, paramValues = []):
+    def __init__(self, compartments, timeline, frames = None, param = None, paramValues = None):
         self.compartments = compartments
         self.timeline = timeline
-        self.frames = frames
-        self.param = param
-        self.paramValues = paramValues
+        self.frames = frames is not None or []
+        self.param = param is not None or []
+        self.paramValues = paramValues is not None or []
 
     @property
     def isIterated(self):

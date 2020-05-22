@@ -19,7 +19,7 @@ class Simulator:
         timeline = np.arange(0, simulation.days, simulation.step)
         odeModel = self.__buildOdeModelFunction()
         preconditions, initialConditions, variables = self.__preprocessVariables(simulation)
-        result = SimulationResult(list(self.context.compartments.keys()), timeline, [])
+        result = SimulationResult(list(self.context.compartments.keys()), timeline)
         if simulation.iterate:
             it = simulation.iterate
             result.paramValues = np.linspace(it.start, it.end, it.intervals)

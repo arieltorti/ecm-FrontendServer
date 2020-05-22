@@ -39,7 +39,7 @@ def modelExtendedLatex(model: Model):
         out["compartments"][idx]["initLatex"] = latex(Symbol(normZero(compartment.latex or compartment.name)))
 
     ## update observables latex
-    if (simulator.expressions):
+    if (simulator.observables):
         for idx, (name, observable) in enumerate(simulator.observables.items()):
             out["observables"][idx]["nameLatex"] = "%s" % latex(Symbol(name),symbol_names=symbols)
             out["observables"][idx]["valueLatex"] = latex(observable,symbol_names =symbols)
