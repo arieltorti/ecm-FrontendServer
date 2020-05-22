@@ -1,5 +1,5 @@
 from cms.schemas import Model, Simulation
-from cms.builder import Simulator, SimulatorError, modelExtendedDict
+from cms.simulator import ModelContext, Simulator, SimulatorError, modelExtendedLatex, computeExtraColumns
 import json
 from pytest import approx, raises
 
@@ -26,7 +26,8 @@ def test_sim_basic(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    context = ModelContext(model)
+    sim = Simulator(ModelContext(model))
     result = sim.simulate(simulation)
 
     assert result.compartments == ["S","I","R"]
@@ -54,7 +55,7 @@ def test_sim_missing_compartment(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    sim = Simulator(ModelContext(model))
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Missing initialization for compartment 'R'"
@@ -75,7 +76,7 @@ def test_sim_missing_parameter(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    sim = Simulator(ModelContext(model))
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Missing parameter 'gamma'"
@@ -102,7 +103,7 @@ def test_sim_model_cannot_solve_symbols(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    sim = Simulator(ModelContext(model))
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Cannot solve symbols: [N + 2]"
@@ -128,7 +129,7 @@ def test_sim_model_cannot_solve_preconditions(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    sim = Simulator(ModelContext(model))
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Cannot solve precondition [(omega + N) > 2]: omega + 1000000.0 > 2"
@@ -149,7 +150,7 @@ def test_sim_precondition_error_1(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    sim = Simulator(ModelContext(model))
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Precondition not satisisfied: beta >= 0"
@@ -176,14 +177,14 @@ def test_sim_precondition_error_animate(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(model)
+    sim = Simulator(ModelContext(model))
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Precondition not satisisfied: beta >= 0"
 
 def test_sim_to_latex(client, simulation_schema):
     model = Model(**simulation_schema("models/SIR-HL.json"))
-    modelDict = modelExtendedDict(model)
+    modelDict = modelExtendedLatex(model)
     
     assert modelDict["compartments"][0]["nameLatex"] == "S_{l}"
     assert modelDict["compartments"][0]["initLatex"] == "S_{l0}"
@@ -193,3 +194,31 @@ def test_sim_to_latex(client, simulation_schema):
         'valueLatex': '- \\frac{L S_l p \\left(H I_h + I_l L\\right)}{T}'
     }
 
+def test_process_observables(client, simulation_schema):
+    model = Model(**simulation_schema("models/SIR-HL.json"))
+    simSIR = {
+        "step":1,
+        "days":365,
+        "initial_conditions": {
+            "Sl":599800,
+            "Sh":399800,
+            "Il":200,
+            "Ih":200,
+            "Rl":0,
+            "Rh":0
+        },
+        "params": {
+            "p":0.1818,
+            "gamma":0.0714,
+            "H":10,
+            "L":1,
+            "Noh":400000,
+            "Nol":600000
+        }
+    }
+    simulation = Simulation(**simSIR)
+    context = ModelContext(model)
+    sim = Simulator(context)
+    result = sim.simulate(simulation)
+    computeExtraColumns(context, result)
+    assert True

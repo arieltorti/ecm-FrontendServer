@@ -1,4 +1,3 @@
-import re
 from types import FunctionType
 from sympy import (
     sympify,
@@ -7,9 +6,8 @@ from sympy import (
     false as BFalse
 )
 from sympy.parsing.sympy_parser import parse_expr
-from sympy.printing.latex import latex
 from sympy.core.numbers import Float as FloatT
-from .schemas import Model, Simulation
+from cms.schemas import Model, Simulation
 from scipy.integrate import odeint
 import numpy as np
 
@@ -28,8 +26,7 @@ class SimulationResult:
     def isIterated(self):
         return self.param is not None
 
-class Simulator:
-
+class ModelContext:
     def __init__(self, model: Model):
         self.params = {p.name: Symbol(p.name) for p in model.params}
         
@@ -49,14 +46,29 @@ class Simulator:
         self.reactionEnv = self.expressionEnv.copy()
         self.reactionEnv.update(self.compartments)
         self.reactionEnv["t"] = Symbol("t")
+        self.observables = {o.name: sympify(o.value, self.reactionEnv) for o in model.observables}
 
         self.__initializeFormulas(model.reactions)
+
+    def __initializeFormulas(self, reactions):
+        self.formulas = {x: 0 for x in self.compartments}
+        self.odeVariables = set({})
+        for reaction in reactions:
+            funcExpr = sympify(reaction.function, self.reactionEnv)
+            self.odeVariables = self.odeVariables.union(funcExpr.free_symbols)
+            self.formulas[reaction.sfrom] -= funcExpr
+            self.formulas[reaction.sto] += funcExpr
+        self.odeVariables = tuple(self.odeVariables.difference(set(self.compartments.values())))
+
+class Simulator:
+    def __init__(self, context: ModelContext):
+        self.context = context
 
     def simulate(self, simulation: Simulation):
         timeline = np.arange(0, simulation.days, simulation.step)
         odeModel = self.__buildOdeModelFunction()
         preconditions, initialConditions, variables = self.__preprocessVariables(simulation)
-        result = SimulationResult(list(self.compartments.keys()), timeline, [])
+        result = SimulationResult(list(self.context.compartments.keys()), timeline, [])
         if simulation.iterate:
             it = simulation.iterate
             result.paramValues = np.linspace(it.start, it.end, it.intervals)
@@ -76,16 +88,16 @@ class Simulator:
     def __preprocessVariables(self, simulation):
         initialConditions = self.__initialConditions(simulation.initial_conditions)
 
-        preconditions = self.preconditions.copy()
-        variables = list(self.odeVariables)
+        preconditions = self.context.preconditions.copy()
+        variables = list(self.context.odeVariables)
 
         # Replace variable to expression and initial conditions
         for i in range(len(variables)):
-            variables[i] = variables[i].subs(self.expressions) \
+            variables[i] = variables[i].subs(self.context.expressions) \
                                        .subs(initialConditions)
 
         for name, predExpr in preconditions.items():
-            preconditions[name] = preconditions[name].subs(self.expressions) \
+            preconditions[name] = preconditions[name].subs(self.context.expressions) \
                                                      .subs(initialConditions)
 
         return preconditions, list(initialConditions.values()), variables
@@ -103,7 +115,7 @@ class Simulator:
     def __initialConditions(self, initial_conditions):
         initialConditions = {}
         try:
-            initialConditions = {Symbol(f"{c}_0"): initial_conditions[c] for c in self.compartments}
+            initialConditions = {Symbol(f"{c}_0"): initial_conditions[c] for c in self.context.compartments}
         except KeyError as e:
             raise SimulatorError("simulate", f"Missing initialization for compartment {e}")
         return initialConditions
@@ -111,7 +123,7 @@ class Simulator:
     def __varParams(self, params):
         varParams = {}
         try:
-            varParams = {Symbol(c): params[c] for c in self.params}
+            varParams = {Symbol(c): params[c] for c in self.context.params}
         except KeyError as e:
             raise SimulatorError("simulate", f"Missing parameter {e}")
         return varParams
@@ -129,64 +141,36 @@ class Simulator:
             raise SimulatorError("simulate", f"Cannot solve symbols: {missingVariables}")
         return odeint(odeModel, initialConditions, tspan, args=tuple(float(v) for v in variables))
 
-    def __initializeFormulas(self, reactions):
-        self.formulas = {x: 0 for x in self.compartments}
-        self.odeVariables = set({})
-        for reaction in reactions:
-            funcExpr = sympify(reaction.function, self.reactionEnv)
-            self.odeVariables = self.odeVariables.union(funcExpr.free_symbols)
-            self.formulas[reaction.sfrom] -= funcExpr
-            self.formulas[reaction.sto] += funcExpr
-        self.odeVariables = tuple(self.odeVariables.difference(set(self.compartments.values())))
-
     def __buildOdeModelFunction(self):
-        modelstr = f"def ode_model(z, t, {', '.join(str(s) for s in self.odeVariables)}):\n"
-        modelstr += f"    dz = [0]*{len(self.compartments)}\n"
-        modelstr += f"    {', '.join(self.compartments.keys())} = z\n"
-        for idx, (compartment, formula) in enumerate(self.formulas.items()):
+        modelstr = f"def ode_model(z, t, {', '.join(str(s) for s in self.context.odeVariables)}):\n"
+        modelstr += f"    dz = [0]*{len(self.context.compartments)}\n"
+        modelstr += f"    {', '.join(self.context.compartments.keys())} = z\n"
+        for idx, (compartment, formula) in enumerate(self.context.formulas.items()):
             modelstr += f"    dz[{idx}] = {formula} # {compartment}\n"
         modelstr += "    return dz"
         modelcode = compile(modelstr, f"<odeModel>", "exec")
         return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
 
-def normZero(var):
-    out = f"{var}_0"
-    expr = re.compile(r"(?P<start>.*)_(?P<suffix>\w|\{\w+\})$")
-    match = expr.match(var)
-    if match:
-        out = f"{match.group('start')}_{{{match.group('suffix')}0}}"
-    return out
 
-def modelExtendedDict(model: Model):
-    simulator = Simulator(model)
-    out = model.dict()
+def __buildFunctionNP(compartments, name, expr):
+    # todo: support other environment variables. Only compartments are allowed in this version.
+    fstr = "def observable(row):\n"
+    fstr += f"    {', '.join(str(s) for s in compartments)}, *others = row\n"
+    fstr += f"    return {expr}"
+    fstrcode = compile(fstr, f"<{name}>", "exec")
+    return FunctionType(fstrcode.co_consts[0], globals(), name)
 
-    symbols = {Symbol(x.name): x.latex for x in model.compartments if x.latex}
-    symbols.update({Symbol(x.name): x.latex for x in model.params if x.latex})
-    symbols.update({Symbol(x.name): x.latex for x in model.expressions if x.latex})
-    symbols.update({Symbol(f"{c.name}_0"): normZero(c.latex) for c in model.compartments if c.latex})
-
-    ## generate equations latex
-    out["equations"] = []
-    for compartment, formula in simulator.formulas.items():
-        out["equations"].append({
-            "nameLatex": "\\frac{d %s}{d t}" % latex(Symbol(compartment), symbol_names=symbols),
-            "valueLatex": latex(formula,symbol_names=symbols)
-        })
-
-    ## update params latex
-    for idx, param in enumerate(model.params):
-        out["params"][idx]["nameLatex"] = latex(Symbol(param.latex or param.name))
-
-    ## update compartments latex
-    for idx, compartment in enumerate(model.compartments):
-        out["compartments"][idx]["nameLatex"] = latex(Symbol(compartment.latex or compartment.name))
-        out["compartments"][idx]["initLatex"] = latex(Symbol(normZero(compartment.latex or compartment.name)))
-
-    ## update expressions latex
-    if (simulator.expressions):
-        for idx, (name, expression) in enumerate(simulator.expressions.items()):
-            out["expressions"][idx]["nameLatex"] = "%s" % latex(Symbol(name),symbol_names=symbols)
-            out["expressions"][idx]["valueLatex"] = latex(expression,symbol_names =symbols)
-
-    return out
+def computeExtraColumns(context: ModelContext, result: SimulationResult):
+    if len(context.observables) > 0:
+        functions = [__buildFunctionNP(result.compartments, n, o) for n,o in context.observables.items()]
+        obsSize = len(context.observables)
+        compSize = len(result.compartments)
+        for findex, frame in enumerate(result.frames):
+            shape = list(frame.shape)
+            shape[1] += obsSize
+            newFrame = np.zeros(tuple(shape))
+            newFrame[:,:-obsSize] = frame
+            for idx, function in enumerate(functions):
+                newFrame[:, compSize + idx] = np.apply_along_axis(function, 1, newFrame)
+            result.frames[findex] = newFrame
+        result.compartments += list(context.observables.keys())

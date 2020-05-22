@@ -19,6 +19,7 @@ class Model(Base):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
     compartments = db.Column(db.JSON)
+    observables = db.Column(db.JSON)
     params = db.Column(db.JSON)
     expressions = db.Column(db.JSON)
     reactions = db.Column(db.JSON)

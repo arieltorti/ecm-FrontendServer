@@ -17,6 +17,7 @@
             "description": ""
         }
     ],
+    "observables": [],
     "expressions": [
         {
             "name": "Q",
@@ -56,12 +57,14 @@
         },
         {
             "name": "Noh",
+            "latex": "N_h",
             "default": 400000.0,
             "description": "",
             "iterable": false
         },
         {
             "name": "Nol",
+            "latex": "N_l",
             "default": 600000.0,
             "description": "",
             "iterable": false

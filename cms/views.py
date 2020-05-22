@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 from werkzeug.exceptions import BadRequest
-from .builder import Simulator, SimulatorError, modelExtendedDict
+from .simulator import ModelContext, Simulator, SimulatorError, modelExtendedLatex, computeExtraColumns
 from flask import (
     Blueprint,
     request,
@@ -39,7 +39,7 @@ def list_models():
     out = []
     for m in models:
         obj = schemas.Model.from_orm(m)
-        out.append(modelExtendedDict(obj))
+        out.append(modelExtendedLatex(obj))
     return Response(json.dumps({"models": out}), mimetype="application/json")
 
 @bp.route("/simulate/<int:model_id>", methods=["POST"])
@@ -47,7 +47,8 @@ def simulate(model_id):
     data = request.json
     model = Model.query.get(model_id)
     modelSchema = schemas.Model.from_orm(model)
-    sim = Simulator(modelSchema)
+    context = ModelContext(modelSchema)
+    sim = Simulator(context)
     if not data:
         raise BadRequest(description="No input data")
     
@@ -55,6 +56,7 @@ def simulate(model_id):
     response = {}
 
     result = sim.simulate(simulationSchema)
+    computeExtraColumns(context, result)
     if result.isIterated:
         response["type"] = "multiple"
         response["param"] = {
