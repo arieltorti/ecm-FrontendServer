@@ -47,12 +47,12 @@
         {
             "name": "I",
             "value": "Il + Ih",
-            "description": "Infected population"
+            "description": "Infectious population"
         },
         {
             "name": "R",
             "value": "Rl + Rh",
-            "description": "Resistant population"
+            "description": "Recovered population"
         }
     ],
     "params": [

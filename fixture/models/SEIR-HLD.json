@@ -111,17 +111,17 @@
         {
             "name": "E",
             "value": "El + Eh",
-            "description": "Infected population"
+            "description": "Exposed population"
         },
         {
             "name": "I",
             "value": "Il + Ih",
-            "description": "Infected population"
+            "description": "Infectious population"
         },
         {
             "name": "R",
             "value": "Rl + Rh",
-            "description": "Resistant population"
+            "description": "Recovered population"
         }
     ],
     "expressions": [
