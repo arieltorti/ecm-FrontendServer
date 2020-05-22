@@ -39,6 +39,7 @@ import CurrentModel from "./components/CurrentModel.vue";
 
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
 export default {
+  title: 'Compartment Simulator',
   beforeMount() {
     this.fetchModels();
   },

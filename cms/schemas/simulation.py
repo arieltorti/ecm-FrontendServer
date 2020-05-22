@@ -57,12 +57,12 @@ class Simulation(BaseModel):
 
     @validator('days')
     def days_gt_1(cls, days):
-        assert days > 0, "must be greather than zero"
+        assert days > 0, "days must be greather than zero"
         return days
 
     @validator('step')
     def step_gt_1(cls, step):
-        assert step > 0, "must be greather than zero"
+        assert step > 0, "step must be greather than zero"
         return step
 
     @validator('initial_conditions')

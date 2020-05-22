@@ -3,8 +3,8 @@
     <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">Simulating</div>
     <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">Error: {{ errMsg }}</div>
     <div v-bind:class="{ hidden: isNotDone }">
-      <div id="plotDiv" v-once></div>
       <button id="downloadCSV" @click="downloadCSV">Download CSV</button>
+      <div id="plotDiv" v-once></div>
     </div>
     <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
       <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
@@ -172,7 +172,8 @@ export default {
         graphData.push({
           x: xAxis,
           y: data.data[i],
-          name: data.index[i]
+          name: data.index[i],
+          hoverinfo:'x+y'
         });
       }
 

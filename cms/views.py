@@ -21,6 +21,10 @@ bp = Blueprint("cms", __name__, url_prefix="/")
 def home():
     return send_file("../dist/index.html")
 
+@bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory("../dist/", "favicon.ico", mimetype='image/vnd.microsoft.icon')
+
 @bp.route("/static/<path:path>")
 def serve_javascript(path):
     return send_from_directory("../dist/", path)
@@ -31,7 +35,7 @@ def handle_error(error):
 
 @bp.errorhandler(schemas.ValidationError)
 def handle_error(error):
-    return {"error": str(error)}, 400
+    return {"error": "\n".join(e["msg"] for e in error.errors())}, 400
 
 @bp.route("/api/models/", methods=["GET"])
 def list_models():

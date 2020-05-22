@@ -38,7 +38,7 @@ export default {
     },
     observables: function() {
       let out = "";
-      if (this.currentModel.observables) {
+      if (this.currentModel.observables.length > 0) {
         out += "\\begin{aligned}";
         this.currentModel.observables.forEach(expr => {
           out += `${expr.nameLatex} = & ${expr.valueLatex}\\\\`;
