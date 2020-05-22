@@ -55,7 +55,6 @@ export default {
     },
     handleError: function(err) {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
-        console.log("Request aborted");
         this.$emit("sim-cancel");
       } else {
         err.json().then(e => {
@@ -98,7 +97,6 @@ export default {
         return;
       }
 
-      console.log("Simulating", this.sim);
       this.$emit("sim-start");
       this.graphHistoricData = [];
 
@@ -139,18 +137,42 @@ export default {
         .then(response => {
           if (response.type === "multiple") {
             response.frames.forEach((d, i) => {
-              const graphData = makeGraphData(d);
-              graphData._iterVal = Math.round(response.param.values[i]*100)/100;
+              const graphData = this.makeGraphData(d);
+              graphData._iterVal = this._preciseRound(response.param.values[i],2);
               this.graphHistoricData.push(graphData);
             });
           } else {
-            const graphData = makeGraphData(response.frame);
+            const graphData = this.makeGraphData(response.frame);
+
             graphData._iterVal = 0;
             this.graphHistoricData.push(graphData);
           }
         });
     },
+    /**
+     * Extract graph data from JSON request output
+     * @param {*} data
+     */
+    makeGraphData(data) {
+      this.sim.model.compartments.forEach(function(c) {
+        const idx = data.index.findIndex(e => e == c.name);
+        if (idx >= 0)
+          data.index[idx] = `$${c.nameLatex}$`;
+      });
 
+      const xAxis = data.columns;
+      const graphData = [];
+
+      for (let i = 0; i < data.data.length; i++) {
+        graphData.push({
+          x: xAxis,
+          y: data.data[i],
+          name: data.index[i]
+        });
+      }
+
+      return graphData;
+    },
     /** Precisely rounds number based on the number of significant decimal places */
     _preciseRound: function(number, presicion = 7) {
       return (
@@ -287,24 +309,4 @@ const plotConfig = {
   ],
   modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"]
 };
-
-/**
- * Extract graph data from JSON request output
- *
- * @param {*} data
- */
-function makeGraphData(data) {
-  const xAxis = data.columns;
-  const graphData = [];
-
-  for (let i = 0; i < data.data.length; i++) {
-    graphData.push({
-      x: xAxis,
-      y: data.data[i],
-      name: data.index[i]
-    });
-  }
-
-  return graphData;
-}
 </script>

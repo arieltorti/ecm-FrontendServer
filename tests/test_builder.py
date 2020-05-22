@@ -1,5 +1,5 @@
 from cms.schemas import Model, Simulation
-from cms.builder import Simulator, SimulatorError
+from cms.builder import Simulator, SimulatorError, modelExtendedDict
 import json
 from pytest import approx, raises
 
@@ -180,3 +180,16 @@ def test_sim_precondition_error_animate(client, simulation_schema):
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
     assert e.value.args[1] == "Precondition not satisisfied: beta >= 0"
+
+def test_sim_to_latex(client, simulation_schema):
+    model = Model(**simulation_schema("models/SIR-HL.json"))
+    modelDict = modelExtendedDict(model)
+    
+    assert modelDict["compartments"][0]["nameLatex"] == "S_{l}"
+    assert modelDict["compartments"][0]["initLatex"] == "S_{l0}"
+    assert modelDict["params"][1]["nameLatex"] == "\\gamma"
+    assert modelDict["equations"][0] == {
+        'nameLatex': '\\frac{d S_l}{d t}', 
+        'valueLatex': '- \\frac{L S_l p \\left(H I_h + I_l L\\right)}{T}'
+    }
+

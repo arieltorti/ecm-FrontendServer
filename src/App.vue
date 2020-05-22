@@ -6,7 +6,9 @@
         <option v-for="(model, key) in modelList" :key="key" :value="key">{{ model.name }}</option>
       </select>
     </fieldset>
-    <CurrentModel :modelSelected="modelSelected" :currentModel="currentModel" />
+    <fieldset v-if="modelSelected">
+      <CurrentModel :currentModel="currentModel" />
+    </fieldset>
 
     <Editor v-if="modelSelected" :model="currentModel" :simulation="simulation" />
 
@@ -39,6 +41,11 @@ import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
 export default {
   beforeMount() {
     this.fetchModels();
+  },
+  mounted() {
+    let mathjax = document.createElement('script')
+    mathjax.setAttribute('src', 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG')
+    document.head.appendChild(mathjax)
   },
   data: function() {
     return {

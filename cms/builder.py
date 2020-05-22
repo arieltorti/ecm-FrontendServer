@@ -1,3 +1,4 @@
+import re
 from types import FunctionType
 from sympy import (
     sympify,
@@ -5,6 +6,8 @@ from sympy import (
     true as BTrue,
     false as BFalse
 )
+from sympy.parsing.sympy_parser import parse_expr
+from sympy.printing.latex import latex
 from sympy.core.numbers import Float as FloatT
 from .schemas import Model, Simulation
 from scipy.integrate import odeint
@@ -33,18 +36,18 @@ class Simulator:
         # initialize expression environment variables
         self.expressionEnv = self.params.copy()
         compartmentsInit = {f"{c.name}_0": Symbol(f"{c.name}_0") for c in model.compartments}
-        self.expressionEnv = dict(self.expressionEnv, **compartmentsInit)
+        self.expressionEnv.update(compartmentsInit)
         expressionsVars = {e.name: Symbol(e.name) for e in model.expressions}
-        self.expressionEnv = dict(self.expressionEnv, **expressionsVars)
+        self.expressionEnv.update(expressionsVars)
 
         # TODO: Check recursion of expressions
         self.expressions = {e.name: sympify(e.value, self.expressionEnv) for e in model.expressions}
         self.compartments = {c.name: Symbol(c.name) for c in model.compartments}
-        self.preconditions = {p.predicate : sympify(p.predicate, self.expressionEnv) for p in model.preconditions}
+        self.preconditions = {p.predicate: sympify(p.predicate, self.expressionEnv) for p in model.preconditions}
 
         # initialize reaction environment variables
         self.reactionEnv = self.expressionEnv.copy()
-        self.reactionEnv = dict(self.expressionEnv, **self.compartments)
+        self.reactionEnv.update(self.compartments)
         self.reactionEnv["t"] = Symbol("t")
 
         self.__initializeFormulas(model.reactions)
@@ -145,3 +148,45 @@ class Simulator:
         modelstr += "    return dz"
         modelcode = compile(modelstr, f"<odeModel>", "exec")
         return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
+
+def normZero(var):
+    out = f"{var}_0"
+    expr = re.compile(r"(?P<start>.*)_(?P<suffix>\w|\{\w+\})$")
+    match = expr.match(var)
+    if match:
+        out = f"{match.group('start')}_{{{match.group('suffix')}0}}"
+    return out
+
+def modelExtendedDict(model: Model):
+    simulator = Simulator(model)
+    out = model.dict()
+
+    symbols = {Symbol(x.name): x.latex for x in model.compartments if x.latex}
+    symbols.update({Symbol(x.name): x.latex for x in model.params if x.latex})
+    symbols.update({Symbol(x.name): x.latex for x in model.expressions if x.latex})
+    symbols.update({Symbol(f"{c.name}_0"): normZero(c.latex) for c in model.compartments if c.latex})
+
+    ## generate equations latex
+    out["equations"] = []
+    for compartment, formula in simulator.formulas.items():
+        out["equations"].append({
+            "nameLatex": "\\frac{d %s}{d t}" % latex(Symbol(compartment), symbol_names=symbols),
+            "valueLatex": latex(formula,symbol_names=symbols)
+        })
+
+    ## update params latex
+    for idx, param in enumerate(model.params):
+        out["params"][idx]["nameLatex"] = latex(Symbol(param.latex or param.name))
+
+    ## update compartments latex
+    for idx, compartment in enumerate(model.compartments):
+        out["compartments"][idx]["nameLatex"] = latex(Symbol(compartment.latex or compartment.name))
+        out["compartments"][idx]["initLatex"] = latex(Symbol(normZero(compartment.latex or compartment.name)))
+
+    ## update expressions latex
+    if (simulator.expressions):
+        for idx, (name, expression) in enumerate(simulator.expressions.items()):
+            out["expressions"][idx]["nameLatex"] = "%s" % latex(Symbol(name),symbol_names=symbols)
+            out["expressions"][idx]["valueLatex"] = latex(expression,symbol_names =symbols)
+
+    return out

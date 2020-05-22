@@ -1,8 +1,10 @@
 from typing import List, Dict, Iterable, Optional
 from pydantic import BaseModel, Field, Json, validator, root_validator
+from sympy import Symbol, sympify
 
 class Var(BaseModel):
     name: str
+    latex: Optional[str]
     default: float
     description: str = ""
 
@@ -22,6 +24,7 @@ class Expression(BaseModel):
     }
     """
     name: str
+    latex: Optional[str]
     value: str
     description: str = ""
 

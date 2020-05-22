@@ -1,6 +1,8 @@
 <template>
   <div>
-    <strong>{{ param.name }}</strong>
+    <strong>
+      <span v-katex="param.nameLatex"></span>:
+    </strong>
     <div v-if="param.iterable">
       <label for="param">with range:</label>
       <input

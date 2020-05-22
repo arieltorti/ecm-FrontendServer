@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 from werkzeug.exceptions import BadRequest
-from .builder import Simulator, SimulatorError
+from .builder import Simulator, SimulatorError, modelExtendedDict
 from flask import (
     Blueprint,
     request,
@@ -39,7 +39,7 @@ def list_models():
     out = []
     for m in models:
         obj = schemas.Model.from_orm(m)
-        out.append(obj.dict())
+        out.append(modelExtendedDict(obj))
     return Response(json.dumps({"models": out}), mimetype="application/json")
 
 @bp.route("/simulate/<int:model_id>", methods=["POST"])
