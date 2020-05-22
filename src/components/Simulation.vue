@@ -159,6 +159,11 @@ export default {
         if (idx >= 0)
           data.index[idx] = `$${c.nameLatex}$`;
       });
+      this.sim.model.observables.forEach(function(c) {
+        const idx = data.index.findIndex(e => e == c.name);
+        if (idx >= 0)
+          data.index[idx] = `$${c.nameLatex}$`;
+      });
 
       const xAxis = data.columns;
       const graphData = [];

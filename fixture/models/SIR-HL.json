@@ -55,7 +55,6 @@
             "description": "Resistant population"
         }
     ],
-    "observables": [],
     "expressions": [
         {
             "name": "N",
