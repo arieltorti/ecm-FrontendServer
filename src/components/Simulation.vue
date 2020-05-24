@@ -1,7 +1,11 @@
 <template>
   <div style="position: relative">
-    <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">Simulating</div>
-    <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">Error: {{ errMsg }}</div>
+    <div class="progress" v-if="simState === SIM_STATE.INPROGRESS">
+      Simulating
+    </div>
+    <div class="errorMsg" v-if="simState === SIM_STATE.FAILED">
+      Error: {{ errMsg }}
+    </div>
     <div v-bind:class="{ hidden: isNotDone }">
       <button id="downloadCSV" @click="downloadCSV">Download CSV</button>
       <div id="plotDiv" v-once></div>
@@ -12,7 +16,7 @@
   </div>
 </template>
 <script>
-import { SIM_STATE, graphLayout } from "../constants.js";
+import { SIM_STATE, graphLayout, toImageButton } from "../constants.js";
 import * as Plotly from "plotly.js";
 
 export default {
@@ -23,11 +27,11 @@ export default {
       graphHistoricData: [],
       stats: {
         totalSteps: null,
-        currentStep: null
+        currentStep: null,
       },
       errMsg: "",
       abortSignal: null, // Stores the signal to abort the current request
-      playing: false
+      playing: false,
     };
   },
   computed: {
@@ -36,7 +40,7 @@ export default {
     },
     isNotDone: function() {
       return this.simState !== SIM_STATE.DONE;
-    }
+    },
   },
   watch: {
     sim: function(_sim) {
@@ -47,7 +51,7 @@ export default {
         this.abortSignal.abort();
         this.$emit("sim-cancel");
       }
-    }
+    },
   },
   methods: {
     downloadCSV: function() {
@@ -57,7 +61,7 @@ export default {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         this.$emit("sim-cancel");
       } else {
-        err.json().then(e => {
+        err.json().then((e) => {
           this.errMsg = e.error;
         });
         this.$emit("sim-error");
@@ -71,7 +75,7 @@ export default {
         mode: "immediate",
         fromcurrent: true,
         transition: { duration: 300 },
-        frame: { duration: 500, redraw: false }
+        frame: { duration: 500, redraw: false },
       }).then(() => (this.playing = false));
     },
     _pause: function() {
@@ -79,7 +83,7 @@ export default {
         mode: "immediate",
         fromcurrent: true,
         transition: { duration: 0 },
-        frame: { duration: 0, redraw: false }
+        frame: { duration: 0, redraw: false },
       });
     },
 
@@ -110,7 +114,7 @@ export default {
       }
       this._simulate(simulation, this.sim.model.id)
         .then(() => this.dataFetchingDone())
-        .catch(err => this.handleError(err));
+        .catch((err) => this.handleError(err));
     },
     _simulate: function(simulation, modelId) {
       const controller = new AbortController();
@@ -120,25 +124,28 @@ export default {
       const req = fetch(`/simulate/${modelId}`, {
         headers: {
           Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         method: "POST",
         body: JSON.stringify(simulation),
-        signal
+        signal,
       });
 
       return req
-        .then(resp => {
+        .then((resp) => {
           if (resp.status >= 400 && resp.status < 600) {
             throw resp;
           }
           return resp.json();
         })
-        .then(response => {
+        .then((response) => {
           if (response.type === "multiple") {
             response.frames.forEach((d, i) => {
               const graphData = this.makeGraphData(d);
-              graphData._iterVal = this._preciseRound(response.param.values[i],2);
+              graphData._iterVal = this._preciseRound(
+                response.param.values[i],
+                2
+              );
               this.graphHistoricData.push(graphData);
             });
           } else {
@@ -155,14 +162,12 @@ export default {
      */
     makeGraphData(data) {
       this.sim.model.compartments.forEach(function(c) {
-        const idx = data.index.findIndex(e => e == c.name);
-        if (idx >= 0)
-          data.index[idx] = `$${c.nameLatex}$`;
+        const idx = data.index.findIndex((e) => e == c.name);
+        if (idx >= 0) data.index[idx] = `$${c.nameLatex}$`;
       });
       this.sim.model.observables.forEach(function(c) {
-        const idx = data.index.findIndex(e => e == c.name);
-        if (idx >= 0)
-          data.index[idx] = `$${c.nameLatex}$`;
+        const idx = data.index.findIndex((e) => e == c.name);
+        if (idx >= 0) data.index[idx] = `$${c.nameLatex}$`;
       });
 
       const xAxis = data.columns;
@@ -173,7 +178,7 @@ export default {
           x: xAxis,
           y: data.data[i],
           name: data.index[i],
-          hoverinfo:'x+y'
+          hoverinfo: "x+y",
         });
       }
 
@@ -210,24 +215,24 @@ export default {
             {
               mode: "next",
               transition: { duration: 400, easing: "linear" },
-              frame: { duration: 800, redraw: true }
-            }
-          ]
+              frame: { duration: 800, redraw: true },
+            },
+          ],
         });
       }
 
       const slider = [
         {
           pad: { l: 130, t: 55 },
-          steps: sliderSteps
-        }
+          steps: sliderSteps,
+        },
       ];
 
       var frames = [];
       for (let i = 0; i < this.graphHistoricData.length; i++) {
         frames.push({
           name: this._getIndexAsString(i),
-          data: this.graphHistoricData[i]
+          data: this.graphHistoricData[i],
         });
       }
 
@@ -239,11 +244,10 @@ export default {
         data: data,
         layout: { ...graphLayout, sliders: slider },
         frames: frames,
-        config: plotConfig
+        config: plotConfig,
       });
-    }
-  }
-  // We use v-once on the #plotDiv element to avoid vue re-rendering it and disrupting plotly
+    },
+  },
 };
 
 /**
@@ -251,7 +255,7 @@ export default {
  */
 function getCurrentDate() {
   function pad(string) {
-    return (`0${string}`).slice(0, 2);
+    return `0${string}`.slice(0, 2);
   }
 
   const now = new Date();
@@ -280,18 +284,18 @@ function downloadLink(href) {
  * @param {*} isMultiple
  */
 function generateCSV(plotData, isMultiple = false) {
-  let csv = `sampletimes,${plotData[0].map((x) => x.name).join(',')}\n`;
+  let csv = `sampletimes,${plotData[0].map((x) => x.name).join(",")}\n`;
   if (isMultiple) {
     csv = `iteration,${csv}`;
   }
 
-  plotData.forEach(frame => {
+  plotData.forEach((frame) => {
     const sampleTimes = frame[0].x;
     const data = frame.map((x) => x.y);
     sampleTimes.forEach((sample, i) => {
-      let row = `${sample},${data.map((x) => x[i]).join(',')}\n`;
+      let row = `${sample},${data.map((x) => x[i]).join(",")}\n`;
       if (isMultiple) {
-        row =`${frame._iterVal},${row}`;
+        row = `${frame._iterVal},${row}`;
       }
       csv += row;
     });
@@ -304,15 +308,15 @@ const plotConfig = {
   displaylogo: false,
   modeBarButtons: [
     [
-      "toImage",
+      toImageButton,
       "zoom2d",
       "zoomIn2d",
       "zoomOut2d",
       "autoScale2d",
       "hoverClosestCartesian",
-      "hoverCompareCartesian"
-    ]
+      "hoverCompareCartesian",
+    ],
   ],
-  modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"]
+  modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"],
 };
 </script>
