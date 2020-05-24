@@ -1,5 +1,5 @@
 <template>
-  <div id="app" v-cloak>
+  <div>
     <fieldset>
       <legend>Choose a model:</legend>
       <select name="model" id="model" v-model="modelSelected">
@@ -39,14 +39,8 @@ import CurrentModel from "./components/CurrentModel.vue";
 
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
 export default {
-  title: 'Compartment Simulator',
   beforeMount() {
     this.fetchModels();
-  },
-  mounted() {
-    let mathjax = document.createElement('script')
-    mathjax.setAttribute('src', 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG')
-    document.head.appendChild(mathjax)
   },
   data: function() {
     return {
