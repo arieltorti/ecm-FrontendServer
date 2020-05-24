@@ -1,30 +1,5 @@
-from typing import List, Dict, Iterable, Optional
-from pydantic import BaseModel, Field, Json, validator, root_validator
-
-class Var(BaseModel):
-    name: str
-    default: float
-    description: str = ""
-
-class Param(Var):
-    iterable: bool
-
-class Precondition(BaseModel):
-    predicate: str
-    description: str = ""
-
-class Expression(BaseModel):
-    """
-    {
-        "name": "T",
-        "value": "Noh * H + Nol * L",
-        "description": ""
-    }
-    """
-    name: str
-    value: str
-    description: str = ""
-
+from typing import Dict, Optional
+from pydantic import BaseModel, validator, root_validator
 class Iterate(BaseModel):
     """
     {
@@ -44,39 +19,6 @@ class Iterate(BaseModel):
     def intervals_positive(cls, intervals):
         assert intervals > 0, "intervals must be greather than zero"
         return intervals
-
-class Reaction(BaseModel):
-    """
-    {
-        "from": "Sh",
-        "to": "Eh",
-        "function": "(p * H * Sh * (Ih * H + Il * L)) / T",
-        "description": ""
-    }
-    """
-
-    sfrom: str
-    sto: str
-    function: str
-    description: str = ""
-
-    class Config:
-        fields = {
-        'sfrom': 'from',
-        'sto':'to'
-        }
-
-class Model(BaseModel):
-    id: Optional[int]
-    name: str
-    compartments: List[Var]
-    expressions: List[Expression] = []
-    params: List[Param]
-    reactions: List[Reaction]
-    preconditions: List[Precondition] = []
-
-    class Config:
-        orm_mode = True
 
 class Simulation(BaseModel):
     """
@@ -115,12 +57,12 @@ class Simulation(BaseModel):
 
     @validator('days')
     def days_gt_1(cls, days):
-        assert days > 0, "must be greather than zero"
+        assert days > 0, "days must be greather than zero"
         return days
 
     @validator('step')
     def step_gt_1(cls, step):
-        assert step > 0, "must be greather than zero"
+        assert step > 0, "step must be greather than zero"
         return step
 
     @validator('initial_conditions')

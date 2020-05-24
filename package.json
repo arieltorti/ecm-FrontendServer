@@ -11,7 +11,10 @@
   "dependencies": {
     "core-js": "^3.6.4",
     "plotly.js": "^1.54.1",
-    "vue": "^2.6.11"
+    "css-loader": "^3.5.3",
+    "katex": "^0.11.1",
+    "vue": "^2.6.11",
+    "vue-katex": "^0.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",

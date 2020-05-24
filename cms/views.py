@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 from werkzeug.exceptions import BadRequest
-from .builder import Simulator, SimulatorError
+from .simulator import ModelContext, Simulator, SimulatorError, modelExtendedLatex, computeExtraColumns
 from flask import (
     Blueprint,
     request,
@@ -21,6 +21,10 @@ bp = Blueprint("cms", __name__, url_prefix="/")
 def home():
     return send_file("../dist/index.html")
 
+@bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory("../dist/", "favicon.ico", mimetype='image/vnd.microsoft.icon')
+
 @bp.route("/static/<path:path>")
 def serve_javascript(path):
     return send_from_directory("../dist/", path)
@@ -31,7 +35,7 @@ def handle_error(error):
 
 @bp.errorhandler(schemas.ValidationError)
 def handle_error(error):
-    return {"error": str(error)}, 400
+    return {"error": "\n".join(e["msg"] for e in error.errors())}, 400
 
 @bp.route("/api/models/", methods=["GET"])
 def list_models():
@@ -39,7 +43,7 @@ def list_models():
     out = []
     for m in models:
         obj = schemas.Model.from_orm(m)
-        out.append(obj.dict())
+        out.append(modelExtendedLatex(obj))
     return Response(json.dumps({"models": out}), mimetype="application/json")
 
 @bp.route("/simulate/<int:model_id>", methods=["POST"])
@@ -47,7 +51,8 @@ def simulate(model_id):
     data = request.json
     model = Model.query.get(model_id)
     modelSchema = schemas.Model.from_orm(model)
-    sim = Simulator(modelSchema)
+    context = ModelContext(modelSchema)
+    sim = Simulator(context)
     if not data:
         raise BadRequest(description="No input data")
     
@@ -55,6 +60,7 @@ def simulate(model_id):
     response = {}
 
     result = sim.simulate(simulationSchema)
+    computeExtraColumns(context, result)
     if result.isIterated:
         response["type"] = "multiple"
         response["param"] = {

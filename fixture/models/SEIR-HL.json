@@ -3,43 +3,73 @@
     "compartments": [
         {
             "name": "Sl",
+            "latex": "S_l",
             "default": 599800.0,
             "description": ""
         },
         {
             "name": "Sh",
+            "latex": "S_h",
             "default": 399800.0,
             "description": ""
         },
         {
             "name": "El",
+            "latex": "E_l",
             "default": 0.0,
             "description": ""
         },
         {
             "name": "Eh",
+            "latex": "E_h",
             "default": 0.0,
             "description": ""
         },
         {
             "name": "Il",
+            "latex": "I_l",
             "default": 200.0,
             "description": ""
         },
         {
             "name": "Ih",
+            "latex": "I_h",
             "default": 200.0,
             "description": ""
         },
         {
             "name": "Rl",
+            "latex": "R_l",
             "default": 0.0,
             "description": ""
         },
         {
             "name": "Rh",
+            "latex": "R_h",
             "default": 0.0,
             "description": ""
+        }
+    ],
+    "observables": [
+        {
+            "name": "S",
+            "value": "Sl + Sh",
+            "description": "Suceptible population"
+        },
+        {
+            "name": "E",
+            "value": "El + Eh",
+            "description": "Exposed population"
+        },
+        {
+            "name": "I",
+            "value": "Il + Ih",
+            "description": "Infectious population"
+        },
+        {
+            "name": "R",
+            "value": "Rl + Rh",
+            "description": "Recovered population"
         }
     ],
     "expressions": [
@@ -87,12 +117,14 @@
         },
         {
             "name": "Noh",
+            "latex":"N_h",
             "default": 400000.0,
             "description": "",
             "iterable": false
         },
         {
             "name": "Nol",
+            "latex":"N_l",
             "default": 600000.0,
             "description": "",
             "iterable": false

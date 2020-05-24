@@ -1,20 +1,53 @@
 <template>
-  <fieldset v-if="modelSelected">
+  <div>
     <legend>Model Details</legend>
-    <h3>Reactions</h3>
-    <div v-for="reaction in currentModel.reactions" :key="reaction.name" class="reaction">
-      <div>{{reaction.sfrom}} -> {{reaction.sto}}: {{ reaction.function }}</div>
-    </div>
+    <h4>Equations</h4>
+    <div v-katex:display="equations"></div>
     <div v-if="currentModel.expressions">
-      <h3>Where</h3>
-      <div v-for="expr in currentModel.expressions" :key="expr.name" class="expression">
-        <div>{{expr.name}} = {{ expr.value }}</div>
-      </div>
+      <h4>Where</h4>
+      <div v-katex:display="expressions"></div>
+      <div v-katex:display="observables"></div>
     </div>
-  </fieldset>
+  </div>
 </template>
+
 <script>
 export default {
-  props: ["currentModel", "modelSelected"]
+  computed: {
+    equations: function() {
+      let out = "";
+      if (this.currentModel.equations) {
+        out += "\\begin{aligned}";
+        this.currentModel.equations.forEach(eq => {
+          out += `${eq.nameLatex} = & ${eq.valueLatex}\\\\`;
+        });
+        out += "\\end{aligned}";
+      }
+      return out;
+    },
+    expressions: function() {
+      let out = "";
+      if (this.currentModel.expressions) {
+        out += "\\begin{aligned}";
+        this.currentModel.expressions.forEach(expr => {
+          out += `${expr.nameLatex} = & ${expr.valueLatex}\\\\`;
+        });
+        out += "\\end{aligned}";
+      }
+      return out;
+    },
+    observables: function() {
+      let out = "";
+      if (this.currentModel.observables.length > 0) {
+        out += "\\begin{aligned}";
+        this.currentModel.observables.forEach(expr => {
+          out += `${expr.nameLatex} = & ${expr.valueLatex}\\\\`;
+        });
+        out += "\\end{aligned}";
+      }
+      return out;
+    }
+  },  
+  props: ["currentModel"]
 };
 </script>
