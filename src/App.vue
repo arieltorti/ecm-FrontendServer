@@ -1,23 +1,31 @@
 <template>
-  <div id="app" v-cloak>
+  <div>
     <fieldset>
       <legend>Choose a model:</legend>
       <select name="model" id="model" v-model="modelSelected">
-        <option v-for="(model, key) in modelList" :key="key" :value="key">{{ model.name }}</option>
+        <option v-for="(model, key) in modelList" :key="key" :value="key">{{
+          model.name
+        }}</option>
       </select>
     </fieldset>
     <fieldset v-if="modelSelected">
       <CurrentModel :currentModel="currentModel" />
     </fieldset>
 
-    <Editor v-if="modelSelected" :model="currentModel" :simulation="simulation" />
+    <Editor
+      v-if="modelSelected"
+      :model="currentModel"
+      :simulation="simulation"
+    />
 
     <fieldset v-if="modelSelected">
       <legend>Simulation</legend>
       <button
         :disabled="simulationState === SIM_STATE.INPROGRESS"
         @click="simulate"
-      >Simulate</button>
+      >
+        Simulate
+      </button>
 
       <Simulation
         :sim="currentSimulation"
@@ -36,17 +44,23 @@
 import Editor from "./components/Editor.vue";
 import Simulation from "./components/Simulation.vue";
 import CurrentModel from "./components/CurrentModel.vue";
-
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
+
+function cloneSimulation(simulation) {
+  const newSimulation = Object.assign({}, simulation);
+  newSimulation.initial_conditions = Object.assign(
+    {},
+    simulation.initial_conditions
+  );
+  newSimulation.params = Object.assign({}, simulation.params);
+  newSimulation.iterate = Object.assign({}, simulation.iterate);
+
+  return newSimulation;
+}
+
 export default {
-  title: 'Compartment Simulator',
   beforeMount() {
     this.fetchModels();
-  },
-  mounted() {
-    let mathjax = document.createElement('script')
-    mathjax.setAttribute('src', 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG')
-    document.head.appendChild(mathjax)
   },
   data: function() {
     return {
@@ -63,18 +77,18 @@ export default {
         days: 365,
         initial_conditions: {},
         params: {},
-        iterate: { key: null, start: 0, end: 1, intervals: 10 }
+        iterate: { key: null, start: 0, end: 1, intervals: 10 },
       },
       currentSimulation: null,
       simCancel: false,
-      pendingChanges: true
+      pendingChanges: true,
     };
   },
   components: { Simulation, Editor, CurrentModel },
   computed: {
     modelVariables: function() {
       return Object.keys(this.simulation.params);
-    }
+    },
   },
   watch: {
     simulationModel: function(val) {
@@ -89,17 +103,17 @@ export default {
           : { params: [], compartments: [] };
       const simulation = this.simulation;
 
-      current.compartments.forEach(comp => {
+      current.compartments.forEach((comp) => {
         simulation.initial_conditions[comp.name] = comp.default;
       });
-      current.params.forEach(param => {
+      current.params.forEach((param) => {
         simulation.params[param.name] = param.default;
       });
       this.simulation = simulation;
       this.currentModel = current;
 
       return current;
-    }
+    },
   },
 
   methods: {
@@ -113,12 +127,12 @@ export default {
 
     fetchModels: function() {
       const req = fetch("/api/models/");
-      req.then(resp => {
+      req.then((resp) => {
         if (resp.status >= 400 && resp.status < 600) {
           throw resp;
         }
-        resp.json().then(json => {
-          json.models.forEach(element => {
+        resp.json().then((json) => {
+          json.models.forEach((element) => {
             this.modelList[element.id] = element;
           });
           this.modelSelected = 0;
@@ -128,8 +142,8 @@ export default {
     buildSimulation: function() {
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
       this.currentSimulation = {
-        model: this.currentModel,
-        simulation: this.simulation
+        model: Object.assign({}, this.currentModel),
+        simulation: cloneSimulation(this.simulation),
       };
       setTimeout(() => {
         this.pendingChanges = false;
@@ -170,8 +184,8 @@ export default {
     handleSimCancel: function() {
       this.simulationState = SIM_STATE.CANCELED;
       this.simCancel = false;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="css">
