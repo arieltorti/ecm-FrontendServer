@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "core-js": "^3.6.4",
-    "plotly.js": "^1.54.1",
     "css-loader": "^3.5.3",
+    "html2canvas": "^1.0.0-rc.5",
     "katex": "^0.11.1",
+    "plotly.js": "^1.54.1",
     "vue": "^2.6.11",
     "vue-katex": "^0.4.0"
   },
@@ -23,6 +24,8 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

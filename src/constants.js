@@ -1,5 +1,4 @@
 "use strict";
-import * as Plotly from "plotly.js";
 
 export const defaultIterConfig = {
   from: 0,
@@ -24,29 +23,5 @@ export const graphLayout = {
   yaxis: { fixedrange: true }, // Dont allow rectangle zooming
   xaxis: {
     title: "Days",
-  },
-};
-
-export const toImageButton = {
-  name: "toImage",
-  title: "Download plot as a png",
-  icon: Plotly.Icons.camera,
-  click: function(gd) {
-    // Remove slider before creating the image
-    const oldSlider = gd.layout.sliders;
-    gd.layout.sliders = null;
-
-    var toImageButtonOptions = gd._context.toImageButtonOptions;
-    var opts = { format: toImageButtonOptions.format || "png" };
-
-    ["filename", "width", "height", "scale"].forEach(function(key) {
-      if (key in toImageButtonOptions) {
-        opts[key] = toImageButtonOptions[key];
-      }
-    });
-
-    Plotly.downloadImage(gd, opts).then(() => {
-      gd.layout.sliders = oldSlider;
-    });
   },
 };

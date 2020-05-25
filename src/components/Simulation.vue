@@ -8,15 +8,28 @@
     </div>
     <div v-bind:class="{ hidden: isNotDone }">
       <button id="downloadCSV" @click="downloadCSV">Download CSV</button>
-      <div id="plotDiv" v-once></div>
+      <div id="imageDiv">
+        <div id="plotDiv" v-once></div>
+        <div id="simulationInfo" v-katex:display="simulationInfo"></div>
+      </div>
     </div>
-    <div v-if="simState === SIM_STATE.DONE && isMultiple" id="plotAnimDiv">
+    <div
+      v-if="simState === SIM_STATE.DONE && isMultiple"
+      id="plotAnimDiv"
+      class="data-html2canvas-ignore"
+    >
       <button @click="handleAnimClick">{{ playing ? "| |" : "▶" }}</button>
     </div>
   </div>
 </template>
 <script>
-import { SIM_STATE, graphLayout, toImageButton } from "../constants.js";
+import { SIM_STATE, graphLayout } from "../constants";
+import {
+  getImageButton,
+  extractSimulationInfo,
+} from "../plotlyExtras/toImageButton";
+import html2canvas from "html2canvas";
+
 import * as Plotly from "plotly.js";
 
 export default {
@@ -32,7 +45,11 @@ export default {
       errMsg: "",
       abortSignal: null, // Stores the signal to abort the current request
       playing: false,
+      simulationInfo: "",
     };
+  },
+  mounted: function() {
+    this.plotConfig = plotConfig(this.saveToImage);
   },
   computed: {
     isMultiple: function() {
@@ -44,7 +61,9 @@ export default {
   },
   watch: {
     sim: function(_sim) {
-      _sim != null && this.simulate();
+      if (_sim != null) {
+        this.simulate();
+      }
     },
     simCancel: function(stop) {
       if (stop) {
@@ -69,6 +88,40 @@ export default {
     },
 
     stop: function() {},
+
+    saveToImage: function() {
+      this.simulationInfo = extractSimulationInfo(this.sim);
+      const imageDiv = document.getElementById("imageDiv");
+      const simulationInfo = document.getElementById("simulationInfo");
+
+      this.$nextTick(() => {
+        html2canvas(imageDiv, {
+          scrollX: -window.scrollX,
+          scrollY: -window.scrollY,
+          height: imageDiv.offsetHeight + simulationInfo.offsetHeight,
+          onclone: (document) => {
+            const simulationInfo = document.getElementById("simulationInfo");
+            simulationInfo.style.position = "initial";
+            simulationInfo.style.display = "block";
+
+            const sliderContainer = document.getElementsByClassName(
+              "slider-container"
+            );
+            if (sliderContainer.length !== 0) {
+              const sliderHeight = sliderContainer[0].getBoundingClientRect()
+                .height;
+              sliderContainer[0].style.display = "none";
+
+              simulationInfo.style.marginTop = `-${sliderHeight}px`;
+            }
+          },
+        }).then((canvas) => {
+          const imgString = canvas.toDataURL("image/png", 1);
+          this.simulationInfo = "";
+          downloadLink(imgString, "png");
+        });
+      });
+    },
 
     _play: function() {
       Plotly.animate("plotDiv", null, {
@@ -103,6 +156,7 @@ export default {
 
       this.$emit("sim-start");
       this.graphHistoricData = [];
+      this.simulationInfo = "";
 
       const simulation = JSON.parse(JSON.stringify(this.sim.simulation));
       if (this.isMultiple) {
@@ -242,9 +296,12 @@ export default {
 
       Plotly.newPlot("plotDiv", {
         data: data,
-        layout: { ...graphLayout, sliders: slider },
+        layout: {
+          ...graphLayout,
+          sliders: slider,
+        },
         frames: frames,
-        config: plotConfig,
+        config: this.plotConfig,
       });
     },
   },
@@ -267,10 +324,10 @@ function getCurrentDate() {
   return `${now.getUTCFullYear()}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
-function downloadLink(href) {
+function downloadLink(href, type = "csv") {
   const linkEl = document.createElement("a");
   linkEl.setAttribute("href", href);
-  linkEl.setAttribute("download", `sim-${getCurrentDate()}.csv`);
+  linkEl.setAttribute("download", `sim-${getCurrentDate()}.${type}`);
 
   document.body.appendChild(linkEl);
   linkEl.click();
@@ -304,19 +361,31 @@ function generateCSV(plotData, isMultiple = false) {
   downloadLink(window.URL.createObjectURL(CSVBlob));
 }
 
-const plotConfig = {
-  displaylogo: false,
-  modeBarButtons: [
-    [
-      toImageButton,
-      "zoom2d",
-      "zoomIn2d",
-      "zoomOut2d",
-      "autoScale2d",
-      "hoverClosestCartesian",
-      "hoverCompareCartesian",
+function plotConfig(toImageButton) {
+  return {
+    displaylogo: false,
+    modeBarButtons: [
+      [
+        getImageButton(toImageButton),
+        "zoom2d",
+        "zoomIn2d",
+        "zoomOut2d",
+        "autoScale2d",
+        "hoverClosestCartesian",
+        "hoverCompareCartesian",
+      ],
     ],
-  ],
-  modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"],
-};
+    modeBarButtonsToRemove: ["pan2d", "resetScale2d", "sendDataToCloud"],
+  };
+}
 </script>
+
+<style lang="sass" scoped>
+
+#imageDiv
+  position: relative
+  #simulationInfo
+    position: absolute
+    left: -10000px
+    top: -10000px
+</style>
