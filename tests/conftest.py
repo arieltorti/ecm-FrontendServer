@@ -2,7 +2,7 @@
 import json
 import pytest
 from pathlib import Path
-import cms
+import ecm
 
 FIXTURE_DIR = Path(__file__).parent.parent / "fixture"
 
@@ -19,4 +19,4 @@ def simulation_schema():
 
 @pytest.fixture
 def app():
-    return cms.app
+    return ecm.app

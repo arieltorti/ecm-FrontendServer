@@ -12,8 +12,33 @@ import numpy as np
 from .base import ModelContext, SimulationResult, SimulatorError
 
 class Simulator:
+<<<<<<< HEAD:cms/simulator/simulator.py
     def __init__(self, context: ModelContext):
         self.context = context
+=======
+
+    def __init__(self, model: Model):
+        self.params = {p.name: Symbol(p.name) for p in model.params}
+
+        # initialize expression environment variables
+        self.expressionEnv = self.params.copy()
+        compartmentsInit = {f"{c.name}_0": Symbol(f"{c.name}_0") for c in model.compartments}
+        self.expressionEnv = dict(self.expressionEnv, **compartmentsInit)
+        expressionsVars = {e.name: Symbol(e.name) for e in model.expressions}
+        self.expressionEnv = dict(self.expressionEnv, **expressionsVars)
+
+        # TODO: Check recursion of expressions
+        self.expressions = {e.name: sympify(e.value, self.expressionEnv) for e in model.expressions}
+        self.compartments = {c.name: Symbol(c.name) for c in model.compartments}
+        self.preconditions = {p.predicate : sympify(p.predicate, self.expressionEnv) for p in model.preconditions}
+
+        # initialize reaction environment variables
+        self.reactionEnv = self.expressionEnv.copy()
+        self.reactionEnv = dict(self.expressionEnv, **self.compartments)
+        self.reactionEnv["t"] = Symbol("t")
+
+        self.__initializeFormulas(model.reactions)
+>>>>>>> Rename ALL THE THINGS:ecm/builder.py
 
     def simulate(self, simulation: Simulation):
         timeline = np.arange(0, simulation.days, simulation.step)

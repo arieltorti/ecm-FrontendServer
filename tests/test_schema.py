@@ -1,4 +1,4 @@
-from cms.schemas import Model, Simulation
+from ecm.schemas import Model, Simulation
 import json
 from pytest import approx, raises
 from pydantic import ValidationError
@@ -18,8 +18,8 @@ def test_schema_simulation_invalid_step(client, simulation_schema):
             "gamma":0.0714
         }
     }
-    with raises(ValidationError) as e:
-        simulation = Simulation(**simSIR)
+    with raises(ValidationError):
+        Simulation(**simSIR)
 
 def test_schema_simulation_invalid_days(client, simulation_schema):
     simSIR = {
@@ -35,8 +35,8 @@ def test_schema_simulation_invalid_days(client, simulation_schema):
             "gamma":0.0714
         }
     }
-    with raises(ValidationError) as e:
-        simulation = Simulation(**simSIR)
+    with raises(ValidationError):
+        Simulation(**simSIR)
 
 def test_schema_simulation_invalid_step_gt_days(client, simulation_schema):
     simSIR = {
@@ -52,8 +52,8 @@ def test_schema_simulation_invalid_step_gt_days(client, simulation_schema):
             "gamma":0.0714
         }
     }
-    with raises(ValidationError) as e:
-        simulation = Simulation(**simSIR)
+    with raises(ValidationError):
+        Simulation(**simSIR)
 
 def test_schema_simulation_invalid_initial_conditions(client, simulation_schema):
     simSIR = {
@@ -69,8 +69,8 @@ def test_schema_simulation_invalid_initial_conditions(client, simulation_schema)
             "gamma":0.0714
         }
     }
-    with raises(ValidationError) as e:
-        simulation = Simulation(**simSIR)
+    with raises(ValidationError):
+        Simulation(**simSIR)
 
 def test_schema_simulation_iterate_interval_negative(client, simulation_schema):
     simSIR = {
@@ -92,8 +92,8 @@ def test_schema_simulation_iterate_interval_negative(client, simulation_schema):
             "end": 10
         }
     }
-    with raises(ValidationError) as e:
-        simulation = Simulation(**simSIR)
+    with raises(ValidationError):
+        Simulation(**simSIR)
 
 
 

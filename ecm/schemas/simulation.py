@@ -1,5 +1,6 @@
 from typing import Dict, Optional
 from pydantic import BaseModel, validator, root_validator
+
 class Iterate(BaseModel):
     """
     {
@@ -79,4 +80,3 @@ class Simulation(BaseModel):
 
     class Config:
         orm_mode = True
-

@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-engine = db.create_engine("sqlite:///cms/cms-fudepan.db")
+engine = db.create_engine("sqlite:///ecm/ecm-fudepan.db")
 
 fixture_path = "./fixture/models"
 

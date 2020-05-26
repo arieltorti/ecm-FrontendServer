@@ -1,6 +1,6 @@
 {
 	"FrameworkVersion": "1.0.176.23",
-	"BuildDescription": "clorton (CMS/Main/framework)",
+	"BuildDescription": "clorton (ecm/Main/framework)",
 	"Runs": 1,
 	"Samples": 365,
 	"ObservableNames": [
