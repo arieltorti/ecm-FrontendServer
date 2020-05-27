@@ -15,7 +15,7 @@ $ sudo apt build-dep python3-numpy
 $ python3 --version
 Python 3.7.5  # 3.8 recommended
 
-$ git clone git@github.com:maks500/ecm-FrontendServer.git
+$ git clone git@github.com:maks500/CMS-FrontendServer.git
 
 $ cd ecm-FrontendServer
 
