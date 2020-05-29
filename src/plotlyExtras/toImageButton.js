@@ -1,7 +1,19 @@
 "use strict";
 import * as Plotly from "plotly.js";
 
-export function extractSimulationInfo(sim) {
+function getCurrentSliderStepValue(plotlyInstance) {
+  if (
+    plotlyInstance.layout.sliders != null &&
+    plotlyInstance.layout.sliders.length
+  ) {
+    const slider = plotlyInstance.layout.sliders[0];
+    const activeStep = slider.active || 0;
+    return slider.steps[activeStep].label;
+  }
+  return null;
+}
+
+export function extractSimulationInfo(sim, plotlyInstance) {
   function getLatexValue(name) {
     const matchingVar = variablePool.find((el) => el.name === name);
 
@@ -20,11 +32,16 @@ export function extractSimulationInfo(sim) {
     ...model.params,
   ];
 
+  const params = Object.assign({}, simulation.params);
+  if (simulation.iterate && simulation.iterate.key) {
+    params[simulation.iterate.key] = getCurrentSliderStepValue(plotlyInstance);
+  }
+
   let text = String.raw`\text{Model: ${model.name} - Days: ${simulation.days}} \\
 \begin{array}{c}`;
 
   text += String.raw`\begin{array}{cc}`;
-  for (const [key, value] of Object.entries(simulation.params || {})) {
+  for (const [key, value] of Object.entries(params || {})) {
     const latexName = getLatexValue(key);
     if (latexName != null) {
       text += String.raw`${latexName} & ${value} \\`;

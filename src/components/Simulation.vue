@@ -9,7 +9,7 @@
     <div v-bind:class="{ hidden: isNotDone }">
       <button id="downloadCSV" @click="downloadCSV">Download CSV</button>
       <div id="imageDiv">
-        <div id="plotDiv" v-once></div>
+        <div id="plotDiv" ref="plotlyInstance" v-once></div>
         <div id="simulationInfo" v-katex:display="simulationInfo"></div>
       </div>
     </div>
@@ -90,7 +90,7 @@ export default {
     stop: function() {},
 
     saveToImage: function() {
-      this.simulationInfo = extractSimulationInfo(this.sim);
+      this.simulationInfo = extractSimulationInfo(this.sim, this.$refs.plotlyInstance);
       const imageDiv = document.getElementById("imageDiv");
       const simulationInfo = document.getElementById("simulationInfo");
 
