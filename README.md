@@ -1,4 +1,4 @@
-# Simulation engine
+# Epidemiology Compartments Modelling
 
 ## Requirements
 
@@ -17,13 +17,13 @@ Python 3.7.5  # 3.8 recommended
 
 $ git clone git@github.com:maks500/CMS-FrontendServer.git
 
-$ cd CMS-FrontendServer
+$ cd ecm-FrontendServer
 
-$ python3 -m venv cms-venv
+$ python3 -m venv ecm-venv
 
-$ source cms-venv/bin/activate
+$ source ecm-venv/bin/activate
 
-(cms-venv) $ pip install -r requirements.txt  # notice the name of the "venv" between parens.
+(ecm-venv) $ pip install -r requirements.txt  # notice the name of the "venv" between parens.
 
 ```
 
@@ -31,9 +31,9 @@ $ source cms-venv/bin/activate
 
 ```shell
 
-$ source cms-venv/bin/activate  # skip if already activated
+$ source ecm-venv/bin/activate  # skip if already activated
 
-(cms-venv) $ flask run
+(ecm-venv) $ flask run
  * Environment: development
  * Debug mode: on
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
@@ -48,9 +48,9 @@ $ source cms-venv/bin/activate  # skip if already activated
 ## Frontend development setup
 
 ```shell
-(cms-venv) $ nodeenv -pn latest
-(cms-venv) $ npm install
-(cms-venv) $ npm run build
+(ecm-venv) $ nodeenv -pn latest
+(ecm-venv) $ npm install
+(ecm-venv) $ npm run build
 ```
 
 > Remember to do a build and `git add dist` before making a tag.

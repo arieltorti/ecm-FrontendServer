@@ -6,7 +6,7 @@ from sympy import (
     false as BFalse,
     Float as FloatT
 )
-from cms.schemas import Simulation
+from ecm.schemas import Simulation
 from scipy.integrate import odeint
 import numpy as np
 from .base import ModelContext, SimulationResult, SimulatorError

@@ -1,4 +1,4 @@
-from cms.schemas import Model
+from ecm.schemas import Model
 from .simulator import ModelContext
 import re
 from sympy import Symbol

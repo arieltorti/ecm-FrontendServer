@@ -15,7 +15,7 @@ from flask import (
 from .models import Model
 from . import schemas
 
-bp = Blueprint("cms", __name__, url_prefix="/")
+bp = Blueprint("ecm", __name__, url_prefix="/")
 
 @bp.route("/", methods=["GET"])
 def home():
@@ -55,7 +55,7 @@ def simulate(model_id):
     sim = Simulator(context)
     if not data:
         raise BadRequest(description="No input data")
-    
+
     simulationSchema = schemas.Simulation(**data)
     response = {}
 

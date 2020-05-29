@@ -1,5 +1,5 @@
-from cms.schemas import Model, Simulation
-from cms.simulator import ModelContext, Simulator, SimulatorError, modelExtendedLatex, computeExtraColumns
+from ecm.schemas import Model, Simulation
+from ecm.simulator import ModelContext, Simulator, SimulatorError, modelExtendedLatex, computeExtraColumns
 import json
 from pytest import approx, raises
 

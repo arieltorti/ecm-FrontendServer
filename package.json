@@ -1,5 +1,5 @@
 {
-  "name": "cms-web-client",
+  "name": "ecm-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {

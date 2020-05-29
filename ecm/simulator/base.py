@@ -1,5 +1,5 @@
 from sympy import sympify, Symbol
-from cms.schemas import Model
+from ecm.schemas import Model
 
 class SimulatorError(Exception):
     pass
