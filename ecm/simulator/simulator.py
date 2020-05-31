@@ -37,6 +37,9 @@ class Simulator:
         return result
 
     def __preprocessVariables(self, simulation):
+        #TODO: refactor this, is ugly
+        ModelContext.unfoldExpression(self.context.expressions)
+
         initialConditions = self.__initialConditions(simulation.initial_conditions)
 
         preconditions = self.context.preconditions.copy()
