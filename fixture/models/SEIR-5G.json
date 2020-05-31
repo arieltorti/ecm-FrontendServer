@@ -322,6 +322,30 @@
         {
             "predicate": "(Ng1 + Ng2 + Ng3 + Ng4 + Ng5 >= N) & (Ng1 + Ng2 + Ng3 + Ng4 + Ng5 <= N)",
             "description": "Ng1 + Ng2 + Ng3 + Ng4 + Ng5 must be the total population"
+        },
+        {
+            "predicate": "(Ng1 <= Sg1_0 + Eg1_0 + Ig1_0 + Rg1_0) & (Ng1 >= Sg1_0 + Eg1_0 + Ig1_0 + Rg1_0)",
+            "description": "Ng1 consistency"
+        },
+        {
+            "predicate": "(Ng2 <= Sg2_0 + Eg2_0 + Ig2_0 + Rg2_0) & (Ng2 >= Sg2_0 + Eg2_0 + Ig2_0 + Rg2_0)",
+            "description": "Ng2 consistency"
+        },
+        {
+            "predicate": "(Ng3 <= Sg3_0 + Eg3_0 + Ig3_0 + Rg3_0) & (Ng3 >= Sg3_0 + Eg3_0 + Ig3_0 + Rg3_0)",
+            "description": "Ng3 consistency"
+        },
+        {
+            "predicate": "(Ng4 <= Sg4_0 + Eg4_0 + Ig4_0 + Rg4_0) & (Ng4 >= Sg4_0 + Eg4_0 + Ig4_0 + Rg4_0)",
+            "description": "Ng4 consistency"
+        },
+        {
+            "predicate": "(Ng5 <= Sg5_0 + Eg5_0 + Ig5_0 + Rg5_0) & (Ng5 >= Sg5_0 + Eg5_0 + Ig5_0 + Rg5_0)",
+            "description": "Ng5 consistency"
+        },
+        {
+            "predicate": "(Cg5 >= 0) & (Cg4 >= 0) & (Cg3 >= 0) & (Cg2 >= 0) & (Cg1 >= 0)",
+            "description":"C_{G_i} consistency"
         }
     ]
 }
