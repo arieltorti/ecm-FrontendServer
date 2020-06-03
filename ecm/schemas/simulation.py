@@ -1,5 +1,7 @@
 from typing import Dict, Optional
 from pydantic import BaseModel, validator, root_validator
+
+
 class Iterate(BaseModel):
     """
     {
@@ -15,10 +17,11 @@ class Iterate(BaseModel):
     start: float
     end: float
 
-    @validator('intervals')
+    @validator("intervals")
     def intervals_positive(cls, intervals):
         assert intervals > 0, "intervals must be greather than zero"
         return intervals
+
 
 class Simulation(BaseModel):
     """
@@ -49,23 +52,23 @@ class Simulation(BaseModel):
     }
     """
 
-    step: float = 1.
-    days: float = 365.
+    step: float = 1.0
+    days: float = 365.0
     initial_conditions: Dict[str, float]
     params: Dict[str, float]
     iterate: Optional[Iterate]
 
-    @validator('days')
+    @validator("days")
     def days_gt_1(cls, days):
         assert days > 0, "days must be greather than zero"
         return days
 
-    @validator('step')
+    @validator("step")
     def step_gt_1(cls, step):
         assert step > 0, "step must be greather than zero"
         return step
 
-    @validator('initial_conditions')
+    @validator("initial_conditions")
     def initial_conditions_gte_0(cls, initial_conditions):
         for k, v in initial_conditions.items():
             assert v >= 0, f"{k} can't be negative"
@@ -73,10 +76,9 @@ class Simulation(BaseModel):
 
     @root_validator(skip_on_failure=True)
     def check_passwords_match(cls, values):
-        days, step = values.get('days'), values.get('step')
+        days, step = values.get("days"), values.get("step")
         assert step <= days, "steps <= days"
         return values
 
     class Config:
         orm_mode = True
-

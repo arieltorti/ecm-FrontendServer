@@ -1,3 +1,5 @@
 include *.js *.txt *.md
 exclude webpack.config.js
+exclude vue.config.js
+recursive-exclude tests *
 recursive-include dist *
