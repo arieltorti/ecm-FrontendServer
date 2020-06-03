@@ -1,0 +1,3 @@
+include *.js *.txt *.md
+exclude webpack.config.js
+recursive-include dist *

@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app -t 60 --log-file -
+web: gunicorn ecm.wsgi:app -t 60 --log-file -

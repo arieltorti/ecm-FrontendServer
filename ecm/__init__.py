@@ -8,13 +8,19 @@ from flask import Flask
 from pathlib import Path
 from .views import bp
 from .models import db
+from .cli import load_data, create_db
 
-HTTP_400_BAD_REQUEST = 400
+BASE_DIR = Path(".")  # The folder right above this file.
 
 app = Flask(__name__, static_url_path="")
 app.register_blueprint(bp)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ecm-fudepan.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["BASE_DIR"] = BASE_DIR
+
+app.cli.add_command(load_data)
+app.cli.add_command(create_db)
+
 db.init_app(app)
 
 # Configure logging.
@@ -26,4 +32,5 @@ handler.setLevel(logging.DEBUG)
 handler.formatter = logging.Formatter(
     fmt=u"%(asctime)s level=%(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%SZ",
 )
+
 app.logger.addHandler(handler)
