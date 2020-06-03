@@ -347,5 +347,45 @@
             "predicate": "(Cg5 >= 0) & (Cg4 >= 0) & (Cg3 >= 0) & (Cg2 >= 0) & (Cg1 >= 0)",
             "description":"C_{G_i} consistency"
         }
-    ]
+    ],
+    "template": {
+        "groups": [
+            {
+                "name": "G1",
+                "parameters": ["Cg1", "Ng1"],
+                "compartments": ["Sg1", "Eg1", "Ig1", "Rg1"],
+                "visible": false
+            },
+            {
+                "name": "G2",
+                "parameters": ["Cg2", "Ng2"],
+                "compartments": ["Sg2", "Eg2", "Ig2", "Rg2"],
+                "visible": false 
+            },
+            {
+                "name": "G3",
+                "parameters": ["Cg3", "Ng3"],
+                "compartments": ["Sg3", "Eg3", "Ig3", "Rg3"],
+                "visible": false
+            },
+            {
+                "name": "G4",
+                "parameters": ["Cg4", "Ng4"],
+                "compartments": ["Sg4", "Eg4", "Ig4", "Rg4"],
+                "visible": false
+            },
+            {
+                "name": "G5",
+                "parameters": ["Cg5", "Ng5"],
+                "compartments": ["Sg5", "Eg5", "Ig5", "Rg5"],
+                "visible": false
+            },
+            {
+                "name": "Global",
+                "parameters": [],
+                "compartments": ["S", "E", "I", "R"],
+                "visible": false
+            }
+        ]
+    }
 }

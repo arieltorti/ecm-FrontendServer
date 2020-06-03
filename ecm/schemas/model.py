@@ -1,5 +1,5 @@
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel
 from sympy import Symbol, sympify
 
@@ -59,6 +59,7 @@ class Model(BaseModel):
     params: List[Param]
     reactions: List[Reaction]
     preconditions: List[Precondition] = []
+    template: Optional[Dict]
 
     class Config:
         orm_mode = True
