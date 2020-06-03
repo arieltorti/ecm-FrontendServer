@@ -33,6 +33,8 @@ $ source ecm-venv/bin/activate
 
 $ source ecm-venv/bin/activate  # skip if already activated
 
+$ export FLASK_APP=ecm.app
+
 (ecm-venv) $ flask run
  * Environment: development
  * Debug mode: on
@@ -64,4 +66,3 @@ See `MAINTANERS`.
 Software distributed under GPL-V3, full license text in `LICENSE`.
 
 You can now access http://127.0.0.1:5000 and run a simulation.
-

@@ -40,7 +40,10 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
+    "ignorePatterns": ["tests", "**/vendor/*.js"],
+
     "rules": {}
+
   },
   "browserslist": [
     "> 1%",

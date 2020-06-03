@@ -4,3 +4,4 @@ node_modules/
 .vscode/
 *.db
 dist/
+*.egg-info
