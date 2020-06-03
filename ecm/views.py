@@ -17,19 +17,19 @@ bp = Blueprint("ecm", __name__, url_prefix="/")
 
 @bp.route("/", methods=["GET"])
 def home():
-    return send_file("../dist/index.html")
+    return send_file("../static/index.html")
 
 
 @bp.route("/favicon.ico")
 def favicon():
     return send_from_directory(
-        "../dist/", "favicon.ico", mimetype="image/vnd.microsoft.icon"
+        "../static/", "favicon.ico", mimetype="image/vnd.microsoft.icon"
     )
 
 
 @bp.route("/static/<path:path>")
 def serve_javascript(path):
-    return send_from_directory("../dist/", path)
+    return send_from_directory("../static/", path)
 
 
 @bp.errorhandler(SimulatorError)
