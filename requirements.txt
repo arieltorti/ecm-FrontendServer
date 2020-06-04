@@ -9,3 +9,6 @@ sqlalchemy
 flask-sqlalchemy
 pydantic
 sympy
+
+black
+flake8

@@ -1,0 +1,15 @@
+[Unit]
+Description=Epidemiology Compartments Modelling
+#Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=miturburu
+Group=miturburu
+WorkingDirectory=/opt/venv
+ExecStart=/opt/venv/bin/gunicorn \
+          -c /opt/ecm/gunicorn_config.py \
+          ecm.wsgi:app
+
+[Install]
+WantedBy=multi-user.target
