@@ -30,6 +30,8 @@ jobs:
         # exit-zero treats all errors as warnings.
         flake8 . --count --exit-zero --statistics
         npm run lint
+    - name: test
+      run: pytest
     - name: bundle
       run: |
         python setup.py develop

@@ -129,5 +129,5 @@ class Simulator:
         for idx, (compartment, formula) in enumerate(self.context.formulas.items()):
             modelstr += f"    dz[{idx}] = {formula} # {compartment}\n"
         modelstr += "    return dz"
-        modelcode = compile(modelstr, f"<odeModel>", "exec")
+        modelcode = compile(modelstr, "<odeModel>", "exec")
         return FunctionType(modelcode.co_consts[0], globals(), "ode_model")
