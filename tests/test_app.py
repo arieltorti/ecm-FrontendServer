@@ -9,7 +9,7 @@ def test_simulate_endpoint(app):
     mimetype = "application/json"
     url = "/simulate/2"
     with app.test_client() as client:
-        app.config['WTF_CSRF_ENABLED'] = False
+        app.config["WTF_CSRF_ENABLED"] = False
 
         response = client.post(url, json=simSIR, content_type=mimetype)
         assert response.json

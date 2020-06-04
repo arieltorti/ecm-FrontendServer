@@ -25,6 +25,8 @@ $ source ecm-venv/bin/activate
 
 (ecm-venv) $ pip install -r requirements.txt  # notice the name of the "venv" between parens.
 
+(ecm-venv) $ pre-commit install  # install static analysis git hooks
+
 ```
 
 ## Running

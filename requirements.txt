@@ -12,3 +12,4 @@ sympy
 
 black
 flake8
+pre-commit
