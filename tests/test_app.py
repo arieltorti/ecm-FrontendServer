@@ -1,4 +1,3 @@
-
 def test_simulate_endpoint(client):
     simSIR = {
         "step": 5,
