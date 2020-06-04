@@ -4,7 +4,7 @@ from pytest import raises
 from pydantic import ValidationError
 
 
-def test_schema_simulation_invalid_step(client, simulation_schema):
+def test_schema_simulation_invalid_step():
     simSIR = {
         "step": -5,
         "days": 50,
@@ -15,7 +15,7 @@ def test_schema_simulation_invalid_step(client, simulation_schema):
         Simulation(**simSIR)
 
 
-def test_schema_simulation_invalid_days(client, simulation_schema):
+def test_schema_simulation_invalid_days():
     simSIR = {
         "step": 5,
         "days": -1,
@@ -26,7 +26,7 @@ def test_schema_simulation_invalid_days(client, simulation_schema):
         Simulation(**simSIR)
 
 
-def test_schema_simulation_invalid_step_gt_days(client, simulation_schema):
+def test_schema_simulation_invalid_step_gt_days():
     simSIR = {
         "step": 500,
         "days": 50,
@@ -37,7 +37,7 @@ def test_schema_simulation_invalid_step_gt_days(client, simulation_schema):
         Simulation(**simSIR)
 
 
-def test_schema_simulation_invalid_initial_conditions(client, simulation_schema):
+def test_schema_simulation_invalid_initial_conditions():
     simSIR = {
         "step": 5,
         "days": 50,
@@ -48,7 +48,7 @@ def test_schema_simulation_invalid_initial_conditions(client, simulation_schema)
         Simulation(**simSIR)
 
 
-def test_schema_simulation_iterate_interval_negative(client, simulation_schema):
+def test_schema_simulation_iterate_interval_negative():
     simSIR = {
         "step": 5,
         "days": 50,

@@ -10,7 +10,7 @@ from ecm.simulator import (
 from pytest import approx, raises
 
 
-def test_sim_basic(client, simulation_schema):
+def test_sim_basic(simulation_schema):
     model = Model(**simulation_schema("models/SIR.json"))
     expectedt = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0]
     expectedData = [
@@ -84,7 +84,7 @@ def test_sim_basic(client, simulation_schema):
     )
 
 
-def test_sim_missing_compartment(client, simulation_schema):
+def test_sim_missing_compartment(simulation_schema):
     model = Model(**simulation_schema("models/SIR.json"))
 
     simSIR = {
@@ -100,7 +100,7 @@ def test_sim_missing_compartment(client, simulation_schema):
     assert e.value.args[1] == "Missing initialization for compartment 'R'"
 
 
-def test_sim_missing_parameter(client, simulation_schema):
+def test_sim_missing_parameter(simulation_schema):
     model = Model(**simulation_schema("models/SIR.json"))
 
     simSIR = {
@@ -116,7 +116,7 @@ def test_sim_missing_parameter(client, simulation_schema):
     assert e.value.args[1] == "Missing parameter 'gamma'"
 
 
-def test_sim_model_cannot_solve_symbols(client, simulation_schema):
+def test_sim_model_cannot_solve_symbols(simulation_schema):
     modelData = simulation_schema("models/SIR.json")
     modelData["expressions"] = [
         {"name": "N", "value": "S+1"},
@@ -138,7 +138,7 @@ def test_sim_model_cannot_solve_symbols(client, simulation_schema):
     assert e.value.args[1] == "Deep recursion exceeded unfolding expressions."
 
 
-def test_sim_model_cannot_solve_preconditions(client, simulation_schema):
+def test_sim_model_cannot_solve_preconditions(simulation_schema):
     modelData = simulation_schema("models/SIR.json")
     modelData["preconditions"] = [{"predicate": "(omega + N) > 2"}]
 
@@ -159,7 +159,7 @@ def test_sim_model_cannot_solve_preconditions(client, simulation_schema):
     )
 
 
-def test_sim_precondition_error_1(client, simulation_schema):
+def test_sim_precondition_error_1(simulation_schema):
     model = Model(**simulation_schema("models/SIR.json"))
     simSIR = {
         "step": 5,
@@ -174,7 +174,7 @@ def test_sim_precondition_error_1(client, simulation_schema):
     assert e.value.args[1] == "Precondition not satisisfied: beta >= 0"
 
 
-def test_sim_precondition_error_animate(client, simulation_schema):
+def test_sim_precondition_error_animate(simulation_schema):
     model = Model(**simulation_schema("models/SIR.json"))
     simSIR = {
         "step": 5,
@@ -190,7 +190,7 @@ def test_sim_precondition_error_animate(client, simulation_schema):
     assert e.value.args[1] == "Precondition not satisisfied: beta >= 0"
 
 
-def test_sim_to_latex(client, simulation_schema):
+def test_sim_to_latex(simulation_schema):
     model = Model(**simulation_schema("models/SIR-HL.json"))
     modelDict = modelExtendedLatex(model)
 
@@ -203,7 +203,7 @@ def test_sim_to_latex(client, simulation_schema):
     }
 
 
-def test_process_observables(client, simulation_schema):
+def test_process_observables(simulation_schema):
     model = Model(**simulation_schema("models/SIR-HL.json"))
     simSIR = {
         "step": 1,

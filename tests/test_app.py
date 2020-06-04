@@ -1,4 +1,5 @@
-def test_simulate_endpoint(client, simulation_schema):
+
+def test_simulate_endpoint(client):
     simSIR = {
         "step": 5,
         "days": 50,
@@ -8,7 +9,6 @@ def test_simulate_endpoint(client, simulation_schema):
 
     mimetype = "application/json"
     url = "/simulate/8"
-
     response = client.post(url, json=simSIR, content_type=mimetype)
     assert response.json
     assert response.status_code == 200
