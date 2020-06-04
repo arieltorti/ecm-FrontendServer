@@ -27,6 +27,7 @@ class Expression(BaseModel):
         "description": ""
     }
     """
+
     name: str
     latex: Optional[str]
     value: str
@@ -49,10 +50,7 @@ class Reaction(BaseModel):
     description: str = ""
 
     class Config:
-        fields = {
-            'sfrom': 'from',
-            'sto': 'to'
-        }
+        fields = {"sfrom": "from", "sto": "to"}
 
 
 class Model(BaseModel):

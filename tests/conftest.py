@@ -1,4 +1,3 @@
-
 import json
 import pytest
 from pathlib import Path
@@ -14,6 +13,7 @@ def simulation_schema():
         with open(FIXTURE_DIR / filename, "r") as f:
             data = json.loads(f.read())
         return data
+
     return inner
 
 

@@ -10,10 +10,7 @@ setup(
     author="fudepan",
     author_email="daniel@fudepan.org.ar",
     version=version,
-    package_data={
-        "dist": ["*"],
-        "templates": ["*.html"]
-    },
+    package_data={"dist": ["*"], "templates": ["*.html"]},
     packages=find_packages(),
     install_requires=[
         "flask",

@@ -11,9 +11,9 @@ from ecm import db, models
 
 def load_model_fixture(app):
     fixture_path = app.config["BASE_DIR"] / "fixture" / "models"
-    for filename in fixture_path.glob('*.json'):
+    for filename in fixture_path.glob("*.json"):
         out = None
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             out = json.loads(f.read())
         yield out
 

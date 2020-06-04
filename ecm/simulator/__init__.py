@@ -8,5 +8,5 @@ __all__ = [
     "SimulatorError",
     "Simulator",
     "computeExtraColumns",
-    "modelExtendedLatex"
+    "modelExtendedLatex",
 ]
