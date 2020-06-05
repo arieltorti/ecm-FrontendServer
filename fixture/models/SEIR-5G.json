@@ -2,11 +2,11 @@
     "name": "SEIR-5G",
     "compartments": [
         {
-            "name": "Sg1", "latex": "S_{G_1}", "default": 599800.0, 
+            "name": "Sg1", "latex": "S_{G_1}", "default": 399800.0,
             "description": ""
         },
         {
-            "name": "Sg2", "latex": "S_{G_2}", "default": 399800.0, 
+            "name": "Sg2", "latex": "S_{G_2}", "default": 599800.0,
             "description": ""
         },
         {
@@ -378,12 +378,6 @@
                 "name": "G5",
                 "parameters": ["Cg5", "Ng5"],
                 "compartments": ["Sg5", "Eg5", "Ig5", "Rg5"],
-                "visible": false
-            },
-            {
-                "name": "Global",
-                "parameters": [],
-                "compartments": ["S", "E", "I", "R"],
                 "visible": false
             }
         ]
