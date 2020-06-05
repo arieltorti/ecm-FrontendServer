@@ -3,7 +3,7 @@
     <strong>
       <span v-katex="param.nameLatex"></span>:
     </strong>
-    <div v-if="param.iterable">
+    <div v-if="param.iterable" class="label-input">
       <label for="param">with range:</label>
       <input
         type="radio"
@@ -39,3 +39,9 @@ export default {
   }
 };
 </script>
+
+<style lang="sass" scoped>
+.label-input
+  display: inline-block
+  margin-left: .2em
+</style>
