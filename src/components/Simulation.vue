@@ -8,6 +8,10 @@
     </div>
     <div v-bind:class="{ hidden: isNotDone }">
       <button id="downloadCSV" @click="downloadCSV">Download CSV</button>
+      <GroupControls
+        :model="sim.model"
+        @changeGroupVisibility="changeGroupVisibility"
+      />
       <div id="imageDiv">
         <div id="plotDiv" ref="plotlyInstance" v-once></div>
         <div id="simulationInfo" v-katex:display="simulationInfo"></div>
@@ -23,6 +27,7 @@
   </div>
 </template>
 <script>
+import GroupControls from "./GroupControls.vue";
 import { SIM_STATE, graphLayout } from "../constants";
 import {
   getImageButton,
@@ -33,6 +38,7 @@ import html2canvas from "html2canvas";
 import * as Plotly from "plotly.js";
 
 export default {
+  components: { GroupControls },
   props: ["sim", "simCancel", "simState"],
   data: function() {
     return {
@@ -90,7 +96,10 @@ export default {
     stop: function() {},
 
     saveToImage: function() {
-      this.simulationInfo = extractSimulationInfo(this.sim, this.$refs.plotlyInstance);
+      this.simulationInfo = extractSimulationInfo(
+        this.sim,
+        this.$refs.plotlyInstance
+      );
       const imageDiv = document.getElementById("imageDiv");
       const simulationInfo = document.getElementById("simulationInfo");
 
@@ -138,6 +147,40 @@ export default {
         transition: { duration: 0 },
         frame: { duration: 0, redraw: false },
       });
+    },
+
+    changeGroupVisibility(idx, visible) {
+      const group = this.sim.model.groups[idx];
+      if (group != null) {
+        group.visible = visible;
+      }
+      this.updateGraphLayout();
+    },
+
+    removeHiddenGroups(data) {
+      const hiddenVariables = [];
+      this.sim.model.groups.map((group) => {
+        if (!group.visible) {
+          for (const compartment of group.compartments) {
+            hiddenVariables.push(compartment.name);
+          }
+
+          for (const param of group.params) {
+            hiddenVariables.push(param.name);
+          }
+        }
+      });
+
+      const filteredData = [];
+      for (let frameIdx = 0; frameIdx < data.length; frameIdx++) {
+        filteredData.push([]);
+        for (const variable of data[frameIdx]) {
+          if (hiddenVariables.indexOf(variable._originalName) == -1) {
+            filteredData[frameIdx].push(variable);
+          }
+        }
+      }
+      return filteredData;
     },
 
     handleAnimClick: function() {
@@ -215,6 +258,7 @@ export default {
      * @param {*} data
      */
     makeGraphData(data) {
+      data._originalIndex = data.index.slice();
       this.sim.model.compartments.forEach(function(c) {
         const idx = data.index.findIndex((e) => e == c.name);
         if (idx >= 0) data.index[idx] = `$${c.nameLatex}$`;
@@ -233,6 +277,7 @@ export default {
           y: data.data[i],
           name: data.index[i],
           hoverinfo: "x+y",
+          _originalName: data._originalIndex[i],
         });
       }
 
@@ -248,7 +293,7 @@ export default {
     _getIndexAsString: function(i) {
       return `${this.graphHistoricData[i]._iterVal || i}`;
     },
-    dataFetchingDone: function() {
+    dataFetchingDone: function(drawingFn = "newPlot") {
       /**
        * We have a ton of boilerplate here just to configure the slider and animations
        * as we have to rebuild them all everytime the data changes. In the future we could
@@ -257,9 +302,11 @@ export default {
 
       this.$emit("sim-done");
 
+      const filteredData = this.removeHiddenGroups(this.graphHistoricData);
+
       // Configure the number and style of the slider steps
       var sliderSteps = [];
-      for (let i = 0; i < this.graphHistoricData.length; i++) {
+      for (let i = 0; i < filteredData.length; i++) {
         sliderSteps.push({
           method: "animate",
           label: this._getIndexAsString(i), // Convert to string, plotly behaves weird
@@ -283,18 +330,18 @@ export default {
       ];
 
       var frames = [];
-      for (let i = 0; i < this.graphHistoricData.length; i++) {
+      for (let i = 0; i < filteredData.length; i++) {
         frames.push({
           name: this._getIndexAsString(i),
-          data: this.graphHistoricData[i],
+          data: filteredData[i],
         });
       }
 
       // Plotly mutates the initial data given, hence not allowing us to animate back
       // to the initial frame. We deeply copy the initial data object to avoid this issue.
-      const data = JSON.parse(JSON.stringify(this.graphHistoricData[0]));
+      const data = JSON.parse(JSON.stringify(filteredData[0]));
 
-      Plotly.newPlot("plotDiv", {
+      Plotly[drawingFn]("plotDiv", {
         data: data,
         layout: {
           ...graphLayout,
@@ -303,6 +350,10 @@ export default {
         frames: frames,
         config: this.plotConfig,
       });
+    },
+
+    updateGraphLayout() {
+      this.dataFetchingDone("react");
     },
   },
 };
