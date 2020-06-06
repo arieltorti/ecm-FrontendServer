@@ -293,7 +293,7 @@ export default {
     _getIndexAsString: function(i) {
       return `${this.graphHistoricData[i]._iterVal || i}`;
     },
-    dataFetchingDone: function(drawingFn = "newPlot") {
+    dataFetchingDone: function(drawingFn = "newPlot", initialFrame = 0) {
       /**
        * We have a ton of boilerplate here just to configure the slider and animations
        * as we have to rebuild them all everytime the data changes. In the future we could
@@ -324,6 +324,7 @@ export default {
 
       const slider = [
         {
+          active: initialFrame,
           pad: { l: 130, t: 55 },
           steps: sliderSteps,
         },
@@ -339,7 +340,7 @@ export default {
 
       // Plotly mutates the initial data given, hence not allowing us to animate back
       // to the initial frame. We deeply copy the initial data object to avoid this issue.
-      const data = JSON.parse(JSON.stringify(filteredData[0]));
+      const data = JSON.parse(JSON.stringify(filteredData[initialFrame]));
 
       Plotly[drawingFn]("plotDiv", {
         data: data,
@@ -353,7 +354,11 @@ export default {
     },
 
     updateGraphLayout() {
-      this.dataFetchingDone("react");
+      const slidersArray = this.$refs.plotlyInstance.layout.sliders;
+      const slider = slidersArray[0];
+      const initialFrame = slider.active || 0;
+
+      this.dataFetchingDone("react", initialFrame);
     },
   },
 };
