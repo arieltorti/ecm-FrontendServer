@@ -1,9 +1,14 @@
 <template>
   <div class="container">
-    <span style="text-decoration: underline">Collaborators:</span>
-    <p style="margin: 1em 3em">
-      Mauricio Sanfilippo, Francisco Herrero, Ariel Torti, Matias Iturburu,
-      Daniel Gutson, Nicolás Morando (*), Roberto Daniel Rabinovich (*), María de los Ángeles Pando (*)
+    <span style="text-decoration: underline">Authors:</span>
+    <p class="names">
+      Nicolás Morando (*), Mauricio Sanfilippo, Roberto Daniel Rabinovich (*),
+      María de los Ángeles Pando (*).
+    </p>
+
+    <span style="text-decoration: underline">Programmers:</span>
+    <p class="names">
+      Francisco Herrero, Matias Iturburu, Ariel Torti.
     </p>
     <span
       >*
@@ -19,5 +24,7 @@ export default {};
 
 <style lang="sass" scoped>
 .container
-    margin: 1.5em 0
+  margin: 1.5em 0
+.names
+  margin: 1em 3em
 </style>
