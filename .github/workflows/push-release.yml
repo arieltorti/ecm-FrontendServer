@@ -36,9 +36,10 @@ jobs:
     - name: Commit build files
       run: |
         echo "Pushing ${{ github.ref }}"
-        git add .
+        git add -f dist/
         git config --local user.email "release-action@github.com"
         git config --local user.name "GitHub Release Action"
+        git status
         git commit -m "Action: upload build files" -a | exit 0
 
     - name: Push changes
