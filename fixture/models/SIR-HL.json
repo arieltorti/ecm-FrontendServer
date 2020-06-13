@@ -159,5 +159,21 @@
             "predicate": "(H >= L) & (L >= 0)",
             "description":"H and L consistency"
         }
-    ]
+    ],
+    "template": {
+        "groups": [
+            {
+                "name": "H",
+                "parameters": ["H", "Noh"],
+                "compartments": ["Sh", "Ih", "Rh"],
+                "visible": false
+            },
+            {
+                "name": "L",
+                "parameters": ["L", "Nol"],
+                "compartments": ["Sl", "Il", "Rl"],
+                "visible": false 
+            }
+        ]
+    }
 }
