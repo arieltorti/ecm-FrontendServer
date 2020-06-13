@@ -24,6 +24,7 @@ class Model(Base):
     expressions = db.Column(db.JSON)
     reactions = db.Column(db.JSON)
     preconditions = db.Column(db.JSON)
+    template = db.Column(db.JSON, default={"groups":[]})
 
 metadata = db.MetaData()
 

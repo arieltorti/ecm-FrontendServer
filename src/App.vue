@@ -8,12 +8,12 @@
         }}</option>
       </select>
     </fieldset>
-    <fieldset v-if="modelSelected">
+    <fieldset v-if="modelSelected && currentModel">
       <CurrentModel :currentModel="currentModel" />
     </fieldset>
 
     <Editor
-      v-if="modelSelected"
+      v-if="modelSelected && currentModel"
       :model="currentModel"
       :simulation="simulation"
     />
@@ -28,6 +28,7 @@
       </button>
 
       <Simulation
+        v-if="currentModel"
         :sim="currentSimulation"
         :sim-cancel="simCancel"
         :sim-state="simulationState"
@@ -45,6 +46,58 @@ import Editor from "./components/Editor.vue";
 import Simulation from "./components/Simulation.vue";
 import CurrentModel from "./components/CurrentModel.vue";
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
+
+function populateGroups(model) {
+  if (model.groups != null) {
+    return;
+  }
+  model.groups = [];
+  model.ungrouped = {
+    compartments: [],
+    params: [],
+  };
+
+  const compartmentToGroupMap = {};
+  const paramToGroupMap = {};
+
+  if (model.template && model.template.groups && model.template.groups.length) {
+    for (const group of model.template.groups) {
+      const newGroup = {
+        name: group.name,
+        visible: group.visible,
+        compartments: [],
+        params: [],
+      };
+      model.groups.push(newGroup);
+
+      for (const param of group.parameters) {
+        paramToGroupMap[param] = newGroup;
+      }
+
+      for (const compartment of group.compartments) {
+        compartmentToGroupMap[compartment] = newGroup;
+      }
+    }
+  }
+
+  for (const compartment of model.compartments) {
+    const group = compartmentToGroupMap[compartment.name];
+    if (group != null) {
+      group.compartments.push(compartment);
+    } else {
+      model.ungrouped.compartments.push(compartment);
+    }
+  }
+
+  for (const param of model.params) {
+    const group = paramToGroupMap[param.name];
+    if (group != null) {
+      group.params.push(param);
+    } else {
+      model.ungrouped.params.push(param);
+    }
+  }
+}
 
 function cloneSimulation(simulation) {
   const newSimulation = Object.assign({}, simulation);
@@ -70,7 +123,7 @@ export default {
       errorMsg: null,
       statusMsg: null,
       modelList: {},
-      currentModel: {},
+      currentModel: null,
       modelSelected: 1,
       simulation: {
         step: 1,
@@ -111,8 +164,7 @@ export default {
       });
       this.simulation = simulation;
       this.currentModel = current;
-
-      return current;
+      populateGroups(this.currentModel);
     },
   },
 

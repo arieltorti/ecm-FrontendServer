@@ -212,5 +212,21 @@
             "predicate": "(D >= 0) & (D <= 1)",
             "description": "D consistency"
         }
-    ]
+    ],
+    "template": {
+        "groups": [
+            {
+                "name": "H",
+                "parameters": ["H", "Noh"],
+                "compartments": ["Sh", "Eh", "Ih", "Rh"],
+                "visible": false
+            },
+            {
+                "name": "L",
+                "parameters": ["L", "Nol"],
+                "compartments": ["Sl", "El", "Il", "Rl"],
+                "visible": false 
+            }
+        ]
+    }
 }

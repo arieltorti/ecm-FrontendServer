@@ -11,29 +11,32 @@
     </details>
     <details>
       <summary>Initial conditions</summary>
-      <Condition
-        v-for="comp in model.compartments"
-        :key="comp.name"
-        :comp="comp"
+      <ConditionGroup :group="model.ungrouped" :simulation="simulation" />
+      <ConditionGroup
+        v-for="group in model.groups"
+        :key="group.name"
+        :group="group"
         :simulation="simulation"
       />
     </details>
     <details>
       <summary>Params</summary>
-      <Param
-        v-for="param in model.params"
-        :key="param.name"
-        :param="param"
+      <ParamGroup :group="model.ungrouped" :simulation="simulation" />
+      <ParamGroup
+        v-for="group in model.groups"
+        :key="group.name"
+        :group="group"
         :simulation="simulation"
       />
     </details>
   </fieldset>
 </template>
 <script>
-import Param from "./editor/Param.vue";
-import Condition from "./editor/Condition.vue";
+import ParamGroup from "./editor/ParamGroup.vue";
+import ConditionGroup from "./editor/ConditionGroup.vue";
+
 export default {
   props: ["model", "simulation"],
-  components: { Param, Condition }
+  components: { ParamGroup, ConditionGroup },
 };
 </script>

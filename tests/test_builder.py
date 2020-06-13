@@ -103,10 +103,11 @@ def test_sim_model_cannot_solve_symbols(client, simulation_schema):
         }
     }
     simulation = Simulation(**simSIR)
-    sim = Simulator(ModelContext(model))
+    context = ModelContext(model)
+    sim = Simulator(context)
     with raises(SimulatorError) as e:
         sim.simulate(simulation)
-    assert e.value.args[1] == "Cannot solve symbols: [N + 2]"
+    assert e.value.args[1] == "Deep recursion exceeded unfolding expressions."
 
 def test_sim_model_cannot_solve_preconditions(client, simulation_schema):
     modelData = simulation_schema("models/SIR.json")
