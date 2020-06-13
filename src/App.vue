@@ -1,8 +1,15 @@
 <template>
   <div>
+    <Authors></Authors>
     <fieldset>
       <legend>Choose a model:</legend>
-      <select name="model" id="model" v-model="modelSelected">
+      <label for="model">Model: </label>
+      <select
+        style="display: inline-block"
+        name="model"
+        id="model"
+        v-model="modelSelected"
+      >
         <option v-for="(model, key) in modelList" :key="key" :value="key">{{
           model.name
         }}</option>
@@ -42,6 +49,7 @@
 </template>
 
 <script>
+import Authors from "./components/Authors.vue";
 import Editor from "./components/Editor.vue";
 import Simulation from "./components/Simulation.vue";
 import CurrentModel from "./components/CurrentModel.vue";
@@ -137,7 +145,7 @@ export default {
       pendingChanges: true,
     };
   },
-  components: { Simulation, Editor, CurrentModel },
+  components: { Simulation, Authors, Editor, CurrentModel },
   computed: {
     modelVariables: function() {
       return Object.keys(this.simulation.params);
