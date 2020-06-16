@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Authors></Authors>
     <fieldset>
       <legend>Choose a model:</legend>
       <label for="model">Model: </label>
@@ -45,6 +44,13 @@
         @sim-cancel="handleSimCancel"
       />
     </fieldset>
+    <Authors />
+    <span class="license">
+      This software is licensed under GPLv3 and can be obtained at
+      <a href="https://github.com/maks500/ecm-FrontendServer"
+        >ecm-FrontendServer</a
+      >
+    </span>
   </div>
 </template>
 
