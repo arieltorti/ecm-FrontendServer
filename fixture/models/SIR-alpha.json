@@ -1,115 +1,115 @@
 {
-    "name": "SIR-α",
-    "compartments": [
-        {
-            "name": "S",
-            "default": 999600.0,
-            "description": ""
-        },
-        {
-            "name": "I",
-            "default": 400.0,
-            "description": ""
-        },
-        {
-            "name": "R",
-            "default": 0.0,
-            "description": ""
-        }
-    ],
-    "observables": [],
-    "expressions": [
-        {
-            "name": "Q",
-            "value": "(Noh * (1 - alpha) * H + (Nol + Noh * alpha) * L) / (Noh * H + Nol * L)",
-            "description": ""
-        },
-        {
-            "name": "N",
-            "value": "S_0 + I_0 + R_0",
-            "description": ""
-        }
-    ],
-    "params": [
-        {
-            "name": "beta",
-            "default": 1,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "gamma",
-            "default": 0.0714,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "H",
-            "default": 8.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "L",
-            "default": 1.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Noh",
-            "latex": "N_h",
-            "default": 400000.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "Nol",
-            "latex": "N_l",
-            "default": 600000.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "alpha",
-            "default": 0.0,
-            "description": "",
-            "iterable": true
-        }
-    ],
-    "reactions": [
-        {
-            "from": "S",
-            "to": "I",
-            "function": "(beta * S * I * Q) / N",
-            "description": ""
-        },
-        {
-            "from": "I",
-            "to": "R",
-            "function": "gamma * I",
-            "description": ""
-        }
-    ],
-    "preconditions": [
-        {
-            "predicate": "(I_0 >= 1) & (S_0 >= 1)",
-            "description" : "Initial infected and suceptible can't be zero"
-        },
-        {
-            "predicate": "beta >= 0",
-            "description" : "Valid range for beta"
-        },
-        {
-            "predicate": "gamma >= 0",
-            "description" : "Valid range for gamma"
-        },
-        {
-            "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
-            "description": "Noh + Nol must be the total population"
-        },
-        {
-            "predicate": "(alpha >= 0) & (alpha <= 1)",
-            "description": "alpha consistency"
-        }
-    ]
+  "name": "SIR-α",
+  "compartments": [
+    {
+      "name": "S",
+      "default": 999600.0,
+      "description": ""
+    },
+    {
+      "name": "I",
+      "default": 400.0,
+      "description": ""
+    },
+    {
+      "name": "R",
+      "default": 0.0,
+      "description": ""
+    }
+  ],
+  "observables": [],
+  "expressions": [
+    {
+      "name": "Q",
+      "value": "(Noh * (1 - alpha) * H + (Nol + Noh * alpha) * L) / (Noh * H + Nol * L)",
+      "description": ""
+    },
+    {
+      "name": "N",
+      "value": "S_0 + I_0 + R_0",
+      "description": ""
+    }
+  ],
+  "params": [
+    {
+      "name": "beta",
+      "default": 1,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "gamma",
+      "default": 0.0714,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "H",
+      "default": 8.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "L",
+      "default": 1.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Noh",
+      "latex": "N_h",
+      "default": 400000.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "Nol",
+      "latex": "N_l",
+      "default": 600000.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "alpha",
+      "default": 0.0,
+      "description": "",
+      "iterable": true
+    }
+  ],
+  "reactions": [
+    {
+      "from": "S",
+      "to": "I",
+      "function": "(beta * S * I * Q) / N",
+      "description": ""
+    },
+    {
+      "from": "I",
+      "to": "R",
+      "function": "gamma * I",
+      "description": ""
+    }
+  ],
+  "preconditions": [
+    {
+      "predicate": "(I_0 >= 1) & (S_0 >= 1)",
+      "description": "Initial infected and suceptible can't be zero"
+    },
+    {
+      "predicate": "beta >= 0",
+      "description": "Valid range for beta"
+    },
+    {
+      "predicate": "gamma >= 0",
+      "description": "Valid range for gamma"
+    },
+    {
+      "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
+      "description": "Noh + Nol must be the total population"
+    },
+    {
+      "predicate": "(alpha >= 0) & (alpha <= 1)",
+      "description": "alpha consistency"
+    }
+  ]
 }

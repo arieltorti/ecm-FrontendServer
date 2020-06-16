@@ -1,91 +1,91 @@
 {
-    "name": "SEIR",
-    "compartments": [
-        {
-            "name": "S",
-            "default": 999600.0,
-            "description": ""
-        },
-        {
-            "name": "E",
-            "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "I",
-            "default": 400.0,
-            "description": ""
-        },
-        {
-            "name": "R",
-            "default": 0.0,
-            "description": ""
-        }
-    ],
-    "observables": [],
-    "expressions": [
-        {
-            "name": "N",
-            "value": "S_0 + E_0 + I_0 + R_0",
-            "description": ""
-        }
-    ],
-    "params": [
-        {
-            "name": "beta",
-            "default": 1,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "gamma",
-            "default": 0.0714,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "sigma",
-            "default": 0.14,
-            "description": "",
-            "iterable": true
-        }
-    ],
-    "reactions": [
-        {
-            "from": "S",
-            "to": "E",
-            "function": "(beta * S * I) / N",
-            "description": ""
-        },
-        {
-            "from": "E",
-            "to": "I",
-            "function": "sigma * E",
-            "description": ""
-        },
-        {
-            "from": "I",
-            "to": "R",
-            "function": "gamma * I",
-            "description": ""
-        }
-    ],
-    "preconditions": [
-        {
-            "predicate": "(I_0 >= 1) & (S_0 >= 1)",
-            "description" : "Initial infected and suceptible can't be zero"
-        },
-        {
-            "predicate": "beta >= 0",
-            "description" : "Valid range for beta"
-        },
-        {
-            "predicate": "gamma >= 0",
-            "description" : "Valid range for gamma"
-        },
-        {
-            "predicate": "sigma >= 0",
-            "description" : "Valid range for sigma"
-        }
-    ]
+  "name": "SEIR",
+  "compartments": [
+    {
+      "name": "S",
+      "default": 999600.0,
+      "description": ""
+    },
+    {
+      "name": "E",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "I",
+      "default": 400.0,
+      "description": ""
+    },
+    {
+      "name": "R",
+      "default": 0.0,
+      "description": ""
+    }
+  ],
+  "observables": [],
+  "expressions": [
+    {
+      "name": "N",
+      "value": "S_0 + E_0 + I_0 + R_0",
+      "description": ""
+    }
+  ],
+  "params": [
+    {
+      "name": "beta",
+      "default": 1,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "gamma",
+      "default": 0.0714,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "sigma",
+      "default": 0.14,
+      "description": "",
+      "iterable": true
+    }
+  ],
+  "reactions": [
+    {
+      "from": "S",
+      "to": "E",
+      "function": "(beta * S * I) / N",
+      "description": ""
+    },
+    {
+      "from": "E",
+      "to": "I",
+      "function": "sigma * E",
+      "description": ""
+    },
+    {
+      "from": "I",
+      "to": "R",
+      "function": "gamma * I",
+      "description": ""
+    }
+  ],
+  "preconditions": [
+    {
+      "predicate": "(I_0 >= 1) & (S_0 >= 1)",
+      "description": "Initial infected and suceptible can't be zero"
+    },
+    {
+      "predicate": "beta >= 0",
+      "description": "Valid range for beta"
+    },
+    {
+      "predicate": "gamma >= 0",
+      "description": "Valid range for gamma"
+    },
+    {
+      "predicate": "sigma >= 0",
+      "description": "Valid range for sigma"
+    }
+  ]
 }

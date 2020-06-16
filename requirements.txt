@@ -9,3 +9,7 @@ sqlalchemy
 flask-sqlalchemy
 pydantic
 sympy
+
+black
+flake8
+pre-commit

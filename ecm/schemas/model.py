@@ -1,7 +1,6 @@
-
 from typing import List, Optional, Dict
 from pydantic import BaseModel
-from sympy import Symbol, sympify
+
 
 class Var(BaseModel):
     name: str
@@ -9,12 +8,15 @@ class Var(BaseModel):
     default: float
     description: str = ""
 
+
 class Param(Var):
     iterable: bool
+
 
 class Precondition(BaseModel):
     predicate: str
     description: str = ""
+
 
 class Expression(BaseModel):
     """
@@ -24,10 +26,12 @@ class Expression(BaseModel):
         "description": ""
     }
     """
+
     name: str
     latex: Optional[str]
     value: str
     description: str = ""
+
 
 class Reaction(BaseModel):
     """
@@ -45,10 +49,8 @@ class Reaction(BaseModel):
     description: str = ""
 
     class Config:
-        fields = {
-        'sfrom': 'from',
-        'sto':'to'
-        }
+        fields = {"sfrom": "from", "sto": "to"}
+
 
 class Model(BaseModel):
     id: Optional[int]

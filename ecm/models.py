@@ -1,9 +1,8 @@
-import numpy as np
-from scipy.integrate import odeint
 from flask_sqlalchemy import SQLAlchemy
-from . import schemas
 
 db = SQLAlchemy()
+
+
 class Model(db.Model):
     __tablename__ = "model"
     id = db.Column(db.Integer, primary_key=True)
@@ -14,10 +13,11 @@ class Model(db.Model):
     expressions = db.Column(db.JSON)
     reactions = db.Column(db.JSON)
     preconditions = db.Column(db.JSON)
-    template = db.Column(db.JSON, default={"groups":[]})
+    template = db.Column(db.JSON, default={"groups": []})
 
     def __repr__(self):
         return "<Model %r>" % (self.name)
+
 
 class Simulation(db.Model):
     __tablename__ = "simulation"
