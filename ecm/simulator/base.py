@@ -28,7 +28,6 @@ class ModelContext:
         notReduced = {e:v for e,v in expressions.items() if len(v.free_symbols.intersection(expressionSymbols)) > 0}
         steps = RECURSION_DEPTH
         while len(notReduced) > 0 and steps >= 0:
-            print(notReduced, steps)
             for e in notReduced:
                 expressions[e] = expressions[e].subs(expressions)
             notReduced = {e:v for e,v in notReduced.items() if len(expressions[e].free_symbols.intersection(expressionSymbols)) > 0}
