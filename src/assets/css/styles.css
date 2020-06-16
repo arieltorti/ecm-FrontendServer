@@ -35,8 +35,6 @@
   display: block;
 }
 
-
-
 .variable-selector div.option {
   display: inline-block;
   margin: 0 0.8em;
@@ -50,7 +48,7 @@
 }
 
 #plotAnimDiv button {
-  padding: .6em .8em;
+  padding: 0.6em 0.8em;
 }
 
 .slider-grip-rect {
@@ -62,7 +60,7 @@
   display: none;
 }
 
-.interval-config label{
+.interval-config label {
   display: inline-block !important;
   width: 4em;
   text-align: right;

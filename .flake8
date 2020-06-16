@@ -1,0 +1,6 @@
+[flake8]
+# ignore = E226,E302,E41
+max-line-length = 120
+exclude = node_modules, install
+# whoever gets ./ecm/simulator/latex.py::modelExtendedLatex down to 5 gets a cookie
+max-complexity = 8

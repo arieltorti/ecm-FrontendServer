@@ -25,6 +25,8 @@ $ source ecm-venv/bin/activate
 
 (ecm-venv) $ pip install -r requirements.txt  # notice the name of the "venv" between parens.
 
+(ecm-venv) $ pre-commit install  # install static analysis git hooks
+
 ```
 
 ## Running
@@ -32,6 +34,8 @@ $ source ecm-venv/bin/activate
 ```shell
 
 $ source ecm-venv/bin/activate  # skip if already activated
+
+$ export FLASK_APP=ecm.app
 
 (ecm-venv) $ flask run
  * Environment: development
@@ -53,15 +57,10 @@ $ source ecm-venv/bin/activate  # skip if already activated
 (ecm-venv) $ npm run build
 ```
 
-> Remember to do a build and `git add dist` before making a tag.
+## Contributing
 
-## Maintainers
-
-See `MAINTANERS`.
+See the list of pending [issues](https://github.com/maks500/ecm-FrontendServer/issues), [contributing guidelines](CONTRIBUTING.md) and contact a [maintainer](MAINTAINERS) for details abot how to contribute.
 
 ## License
 
 Software distributed under GPL-V3, full license text in `LICENSE`.
-
-You can now access http://127.0.0.1:5000 and run a simulation.
-

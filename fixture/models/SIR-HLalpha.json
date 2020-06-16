@@ -1,193 +1,193 @@
 {
-    "name": "SIR-HLα",
-    "compartments": [
-        {
-            "name": "Sl",
-            "latex": "S_l",
-            "default": 599800.0,
-            "description": ""
-        },
-        {
-            "name": "Sh",
-            "latex": "S_h",
-            "default": 399800.0,
-            "description": ""
-        },
-        {
-            "name": "Il",
-            "latex": "I_l",
-            "default": 200.0,
-            "description": ""
-        },
-        {
-            "name": "Ih",
-            "latex": "I_h",
-            "default": 200.0,
-            "description": ""
-        },
-        {
-            "name": "Rl",
-            "latex": "R_l",
-            "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Rh",
-            "latex": "R_h",
-            "default": 0.0,
-            "description": ""
-        }
-    ],
-    "observables": [
-        {
-            "name": "S",
-            "value": "Sl + Sh",
-            "description": "Suceptible population"
-        },
-        {
-            "name": "I",
-            "value": "Il + Ih",
-            "description": "Infectious population"
-        },
-        {
-            "name": "R",
-            "value": "Rl + Rh",
-            "description": "Recovered population"
-        }
-    ],
-    "params": [
-        {
-            "name": "p",
-            "default": 0.1818,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "gamma",
-            "default": 0.0714,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "H",
-            "default": 10.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "L",
-            "default": 1.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Noh",
-            "latex": "N_h",
-            "default": 400000.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "Nol",
-            "latex": "N_l",
-            "default": 600000.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "alpha",
-            "default": 0.0,
-            "description": "",
-            "iterable": true
-        }
-    ],
-    "expressions": [
-        {
-            "name": "N",
-            "value": "Sl_0 + Sh_0 + Il_0 + Ih_0 + Rl_0 + Rh_0",
-            "description": "Total population."
-        },
-        {
-            "name": "Q",
-            "value": "(Noh * (1 - alpha) * H + (Nol + Noh * alpha) * L) / T",
-            "description": ""
-        },
-        {
-            "name": "T",
-            "value": "Noh * H + Nol * L",
-            "description": ""
-        }
-    ],
-    "reactions": [
-        {
-            "from": "Sh",
-            "to": "Ih",
-            "function": "(Q * p * H * Sh * (Ih * H + Il * L)) / T",
-            "description": ""
-        },
-        {
-            "from": "Sl",
-            "to": "Il",
-            "function": "(Q * p * L * Sl * (Ih * H + Il * L)) / T",
-            "description": ""
-        },
-        {
-            "from": "Ih",
-            "to": "Rh",
-            "function": "gamma * Ih",
-            "description": ""
-        },
-        {
-            "from": "Il",
-            "to": "Rl",
-            "function": "gamma * Il",
-            "description": ""
-        }
-    ],
-    "preconditions": [
-        {
-            "predicate": "(p <= 1) & (p >= 0)",
-            "description": "Valid range for p"
-        },
-        {
-            "predicate": "gamma >= 0",
-            "description": "Valid range for gamma"
-        },
-        {
-            "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
-            "description": "Noh + Nol must be the total population"
-        },
-        {
-            "predicate": "(Noh <= Sh_0 + Ih_0 + Rh_0) & (Noh >= Sh_0 + Ih_0 + Rh_0)",
-            "description": "Noh consistency"
-        },
-        {
-            "predicate": "(Nol <= Sl_0 + Il_0 + Rl_0) & (Nol >= Sl_0 + Il_0 + Rl_0)",
-            "description": "Nol consistency"
-        },
-        {
-            "predicate": "(H >= L) & (L >= 0)",
-            "description":"H and L consistency"
-        },
-        {
-            "predicate": "(alpha >= 0) & (alpha <= 1)",
-            "description": "alpha consistency"
-        }
-    ],
-    "template": {
-        "groups": [
-            {
-                "name": "H",
-                "parameters": ["H", "Noh"],
-                "compartments": ["Sh", "Ih", "Rh"],
-                "visible": false
-            },
-            {
-                "name": "L",
-                "parameters": ["L", "Nol"],
-                "compartments": ["Sl", "Il", "Rl"],
-                "visible": false 
-            }
-        ]
+  "name": "SIR-HLα",
+  "compartments": [
+    {
+      "name": "Sl",
+      "latex": "S_l",
+      "default": 599800.0,
+      "description": ""
+    },
+    {
+      "name": "Sh",
+      "latex": "S_h",
+      "default": 399800.0,
+      "description": ""
+    },
+    {
+      "name": "Il",
+      "latex": "I_l",
+      "default": 200.0,
+      "description": ""
+    },
+    {
+      "name": "Ih",
+      "latex": "I_h",
+      "default": 200.0,
+      "description": ""
+    },
+    {
+      "name": "Rl",
+      "latex": "R_l",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Rh",
+      "latex": "R_h",
+      "default": 0.0,
+      "description": ""
     }
+  ],
+  "observables": [
+    {
+      "name": "S",
+      "value": "Sl + Sh",
+      "description": "Suceptible population"
+    },
+    {
+      "name": "I",
+      "value": "Il + Ih",
+      "description": "Infectious population"
+    },
+    {
+      "name": "R",
+      "value": "Rl + Rh",
+      "description": "Recovered population"
+    }
+  ],
+  "params": [
+    {
+      "name": "p",
+      "default": 0.1818,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "gamma",
+      "default": 0.0714,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "H",
+      "default": 10.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "L",
+      "default": 1.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Noh",
+      "latex": "N_h",
+      "default": 400000.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "Nol",
+      "latex": "N_l",
+      "default": 600000.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "alpha",
+      "default": 0.0,
+      "description": "",
+      "iterable": true
+    }
+  ],
+  "expressions": [
+    {
+      "name": "N",
+      "value": "Sl_0 + Sh_0 + Il_0 + Ih_0 + Rl_0 + Rh_0",
+      "description": "Total population."
+    },
+    {
+      "name": "Q",
+      "value": "(Noh * (1 - alpha) * H + (Nol + Noh * alpha) * L) / T",
+      "description": ""
+    },
+    {
+      "name": "T",
+      "value": "Noh * H + Nol * L",
+      "description": ""
+    }
+  ],
+  "reactions": [
+    {
+      "from": "Sh",
+      "to": "Ih",
+      "function": "(Q * p * H * Sh * (Ih * H + Il * L)) / T",
+      "description": ""
+    },
+    {
+      "from": "Sl",
+      "to": "Il",
+      "function": "(Q * p * L * Sl * (Ih * H + Il * L)) / T",
+      "description": ""
+    },
+    {
+      "from": "Ih",
+      "to": "Rh",
+      "function": "gamma * Ih",
+      "description": ""
+    },
+    {
+      "from": "Il",
+      "to": "Rl",
+      "function": "gamma * Il",
+      "description": ""
+    }
+  ],
+  "preconditions": [
+    {
+      "predicate": "(p <= 1) & (p >= 0)",
+      "description": "Valid range for p"
+    },
+    {
+      "predicate": "gamma >= 0",
+      "description": "Valid range for gamma"
+    },
+    {
+      "predicate": "(Noh + Nol >= N) & (Noh + Nol <= N)",
+      "description": "Noh + Nol must be the total population"
+    },
+    {
+      "predicate": "(Noh <= Sh_0 + Ih_0 + Rh_0) & (Noh >= Sh_0 + Ih_0 + Rh_0)",
+      "description": "Noh consistency"
+    },
+    {
+      "predicate": "(Nol <= Sl_0 + Il_0 + Rl_0) & (Nol >= Sl_0 + Il_0 + Rl_0)",
+      "description": "Nol consistency"
+    },
+    {
+      "predicate": "(H >= L) & (L >= 0)",
+      "description": "H and L consistency"
+    },
+    {
+      "predicate": "(alpha >= 0) & (alpha <= 1)",
+      "description": "alpha consistency"
+    }
+  ],
+  "template": {
+    "groups": [
+      {
+        "name": "H",
+        "parameters": ["H", "Noh"],
+        "compartments": ["Sh", "Ih", "Rh"],
+        "visible": false
+      },
+      {
+        "name": "L",
+        "parameters": ["L", "Nol"],
+        "compartments": ["Sl", "Il", "Rl"],
+        "visible": false
+      }
+    ]
+  }
 }

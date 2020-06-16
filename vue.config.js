@@ -3,6 +3,7 @@ module.exports = {
     process.env.NODE_ENV === "production"
       ? "https://cdn.jsdelivr.net/gh/maks500/ecm-FrontendServer@release/dist"
       : "/static/",
+  outputDir: "static/",
   configureWebpack: {
     devtool: "source-map",
   },

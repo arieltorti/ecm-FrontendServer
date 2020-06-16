@@ -6,7 +6,7 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -17,32 +17,32 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-    - name: Using Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: '13.x.x'
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Using Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: "13.x.x"
 
-    # Runs a set of commands using the runners shell
-    - name: Npm install and build
-      run: |
-        echo "Building"
-        npm install
-        npm run build
-    
-    - name: Commit build files
-      run: |
-        echo "Pushing ${{ github.ref }}"
-        git add -f dist/
-        git config --local user.email "release-action@github.com"
-        git config --local user.name "GitHub Release Action"
-        git status
-        git commit -m "Action: upload build files" -a | exit 0
+      # Runs a set of commands using the runners shell
+      - name: Npm install and build
+        run: |
+          echo "Building"
+          npm install
+          npm run build
 
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: release
-        force: true
+      - name: Commit build files
+        run: |
+          echo "Pushing ${{ github.ref }}"
+          git add -f dist/
+          git config --local user.email "release-action@github.com"
+          git config --local user.name "GitHub Release Action"
+          git status
+          git commit -m "Action: upload build files" -a | exit 0
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release
+          force: true
