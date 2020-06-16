@@ -7,7 +7,7 @@ def test_simulate_endpoint(app):
     }
 
     mimetype = "application/json"
-    url = "/simulate/2"
+    url = "/simulate/8"
     with app.test_client() as client:
         app.config["WTF_CSRF_ENABLED"] = False
 
