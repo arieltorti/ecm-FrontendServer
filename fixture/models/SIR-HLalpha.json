@@ -1,5 +1,5 @@
 {
-    "name": "SIR-HLD",
+    "name": "SIR-HLα",
     "compartments": [
         {
             "name": "Sl",
@@ -95,7 +95,7 @@
             "iterable": false
         },
         {
-            "name": "D",
+            "name": "alpha",
             "default": 0.0,
             "description": "",
             "iterable": true
@@ -109,7 +109,7 @@
         },
         {
             "name": "Q",
-            "value": "(Noh * (1 - D) * H + (Nol + Noh * D) * L) / T",
+            "value": "(Noh * (1 - alpha) * H + (Nol + Noh * alpha) * L) / T",
             "description": ""
         },
         {
@@ -170,8 +170,8 @@
             "description":"H and L consistency"
         },
         {
-            "predicate": "(D >= 0) & (D <= 1)",
-            "description": "D consistency"
+            "predicate": "(alpha >= 0) & (alpha <= 1)",
+            "description": "alpha consistency"
         }
     ],
     "template": {

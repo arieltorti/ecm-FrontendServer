@@ -1,5 +1,5 @@
 {
-    "name": "SIR-D",
+    "name": "SIR-α",
     "compartments": [
         {
             "name": "S",
@@ -21,7 +21,7 @@
     "expressions": [
         {
             "name": "Q",
-            "value": "(Noh * (1 - D) * H + (Nol + Noh * D) * L) / (Noh * H + Nol * L)",
+            "value": "(Noh * (1 - alpha) * H + (Nol + Noh * alpha) * L) / (Noh * H + Nol * L)",
             "description": ""
         },
         {
@@ -70,7 +70,7 @@
             "iterable": false
         },
         {
-            "name": "D",
+            "name": "alpha",
             "default": 0.0,
             "description": "",
             "iterable": true
@@ -108,8 +108,8 @@
             "description": "Noh + Nol must be the total population"
         },
         {
-            "predicate": "(D >= 0) & (D <= 1)",
-            "description": "D consistency"
+            "predicate": "(alpha >= 0) & (alpha <= 1)",
+            "description": "alpha consistency"
         }
     ]
 }
