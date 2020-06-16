@@ -1,6 +1,10 @@
 <template>
   <div class="group-container">
-    <div v-for="(group, idx) in this.model.groups" :key="group.name" class="group">
+    <div
+      v-for="(group, idx) in this.model.groups"
+      :key="group.name"
+      class="group"
+    >
       <label :for="group.name">{{ group.name }} </label>
       <input
         type="checkbox"

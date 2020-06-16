@@ -1,385 +1,425 @@
 {
-    "name": "SEIR-5G",
-    "compartments": [
-        {
-            "name": "Sg1", "latex": "S_{G_1}", "default": 399800.0,
-            "description": ""
-        },
-        {
-            "name": "Sg2", "latex": "S_{G_2}", "default": 599800.0,
-            "description": ""
-        },
-        {
-            "name": "Sg3", "latex": "S_{G_3}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Sg4", "latex": "S_{G_4}", "default": 0.0, 
-            "description": ""
-        },
-        {
-            "name": "Sg5", "latex": "S_{G_5}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Eg1", "latex": "E_{G_1}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Eg2", "latex": "E_{G_2}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Eg3", "latex": "E_{G_3}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Eg4", "latex": "E_{G_4}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Eg5", "latex": "E_{G_5}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Ig1", "latex": "I_{G_1}", "default": 200.0,
-            "description": ""
-        },
-        {
-            "name": "Ig2", "latex": "I_{G_2}", "default": 200.0,
-            "description": ""
-        },
-        {
-            "name": "Ig3", "latex": "I_{G_3}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Ig4", "latex": "I_{G_4}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Ig5", "latex": "I_{G_5}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Rg1", "latex": "R_{G_1}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Rg2", "latex": "R_{G_2}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Rg3", "latex": "R_{G_3}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Rg4", "latex": "R_{G_4}", "default": 0.0,
-            "description": ""
-        },
-        {
-            "name": "Rg5", "latex": "R_{G_5}", "default": 0.0,
-            "description": ""
-        }
-    ],
-    "params": [
-        {
-            "name": "p",
-            "default": 0.1818,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "gamma",
-            "default": 0.0714,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "sigma",
-            "default": 0.14,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Cg1",
-            "latex": "C_{G_1}",
-            "default": 10.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Cg2",
-            "latex": "C_{G_2}",
-            "default": 1.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Cg3",
-            "latex": "C_{G_3}",
-            "default": 1.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Cg4",
-            "latex": "C_{G_4}",
-            "default": 1.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Cg5",
-            "latex": "C_{G_5}",
-            "default": 1.0,
-            "description": "",
-            "iterable": true
-        },
-        {
-            "name": "Ng1",
-            "latex": "N_{G_1}",
-            "default": 400000.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "Ng2",
-            "latex": "N_{G_2}",
-            "default": 600000.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "Ng3",
-            "latex": "N_{G_3}",
-            "default": 0.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "Ng4",
-            "latex": "N_{G_4}",
-            "default": 0.0,
-            "description": "",
-            "iterable": false
-        },
-        {
-            "name": "Ng5",
-            "latex": "N_{G_5}",
-            "default": 0.0,
-            "description": "",
-            "iterable": false
-        }
-    ],
-    "observables": [
-        {
-            "name": "S",
-            "value": "Sg1 + Sg2 + Sg3 + Sg4 + Sg5",
-            "description": "Suceptible population"
-        },
-        {
-            "name": "E",
-            "value": "Eg1 + Eg2 + Eg3 + Eg4 + Eg5",
-            "description": "Exposed population"
-        },
-        {
-            "name": "I",
-            "value": "Ig1 + Ig2 + Ig3 + Ig4 + Ig5",
-            "description": "Infectious population"
-        },
-        {
-            "name": "R",
-            "value": "Rg1 + Rg2 + Rg3 + Rg4 + Rg5",
-            "description": "Recovered population"
-        }
-    ],
-    "expressions": [
-        {
-            "name": "S_0",
-            "value": "Sg1_0 + Sg2_0 + Sg3_0 + Sg4_0 + Sg5_0",
-            "description": "Initial suceptible population"
-        },
-        {
-            "name": "E_0",
-            "value": "Eg1_0 + Eg2_0 + Eg3_0 + Eg4_0 + Eg5_0",
-            "description": "Initial exposed population"
-        },
-        {
-            "name": "I_0",
-            "value": "Ig1_0 + Ig2_0 + Ig3_0 + Ig4_0 + Ig5_0",
-            "description": "Initial infectious population"
-        },
-        {
-            "name": "R_0",
-            "value": "Rg1_0 + Rg2_0 + Rg3_0 + Rg4_0 + Rg5_0",
-            "description": "Initial recovered population"
-        },
-        {
-            "name": "N",
-            "value": "S_0 + E_0 + I_0 + R_0",
-            "description": "Total population."
-        },
-        {
-            "name": "T",
-            "value": "Ng1 * Cg1 + Ng2 * Cg2 + Ng3 * Cg3 + Ng4 * Cg4 + Ng5 * Cg5",
-            "description": ""
-        }
-    ],
-    "reactions": [
-        {
-            "from": "Sg1",
-            "to": "Eg1",
-            "function": "(p * Cg1 * Sg1 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
-            "description": ""
-        },
-        {
-            "from": "Sg2",
-            "to": "Eg2",
-            "function": "(p * Cg2 * Sg2 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
-            "description": ""
-        },
-        {
-            "from": "Sg3",
-            "to": "Eg3",
-            "function": "(p * Cg3 * Sg3 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
-            "description": ""
-        },
-        {
-            "from": "Sg4",
-            "to": "Eg4",
-            "function": "(p * Cg4 * Sg4 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
-            "description": ""
-        },
-        {
-            "from": "Sg5",
-            "to": "Eg5",
-            "function": "(p * Cg5 * Sg5 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
-            "description": ""
-        },
-        {
-            "from": "Eg1",
-            "to": "Ig1",
-            "function": "sigma * Eg1",
-            "description": ""
-        },
-        {
-            "from": "Eg2",
-            "to": "Ig2",
-            "function": "sigma * Eg2",
-            "description": ""
-        },
-        {
-            "from": "Eg3",
-            "to": "Ig3",
-            "function": "sigma * Eg3",
-            "description": ""
-        },
-        {
-            "from": "Eg4",
-            "to": "Ig4",
-            "function": "sigma * Eg4",
-            "description": ""
-        },
-        {
-            "from": "Eg5",
-            "to": "Ig5",
-            "function": "sigma * Eg5",
-            "description": ""
-        },
-        {
-            "from": "Ig1",
-            "to": "Rg1",
-            "function": "gamma * Ig1",
-            "description": ""
-        },
-        {
-            "from": "Ig2",
-            "to": "Rg2",
-            "function": "gamma * Ig2",
-            "description": ""
-        },
-        {
-            "from": "Ig3",
-            "to": "Rg3",
-            "function": "gamma * Ig3",
-            "description": ""
-        },
-        {
-            "from": "Ig4",
-            "to": "Rg4",
-            "function": "gamma * Ig4",
-            "description": ""
-        },
-        {
-            "from": "Ig5",
-            "to": "Rg5",
-            "function": "gamma * Ig5",
-            "description": ""
-        }
-    ],
-    "preconditions": [
-        {
-            "predicate": "(Ng1 + Ng2 + Ng3 + Ng4 + Ng5 >= N) & (Ng1 + Ng2 + Ng3 + Ng4 + Ng5 <= N)",
-            "description": "Ng1 + Ng2 + Ng3 + Ng4 + Ng5 must be the total population"
-        },
-        {
-            "predicate": "(Ng1 <= Sg1_0 + Eg1_0 + Ig1_0 + Rg1_0) & (Ng1 >= Sg1_0 + Eg1_0 + Ig1_0 + Rg1_0)",
-            "description": "Ng1 consistency"
-        },
-        {
-            "predicate": "(Ng2 <= Sg2_0 + Eg2_0 + Ig2_0 + Rg2_0) & (Ng2 >= Sg2_0 + Eg2_0 + Ig2_0 + Rg2_0)",
-            "description": "Ng2 consistency"
-        },
-        {
-            "predicate": "(Ng3 <= Sg3_0 + Eg3_0 + Ig3_0 + Rg3_0) & (Ng3 >= Sg3_0 + Eg3_0 + Ig3_0 + Rg3_0)",
-            "description": "Ng3 consistency"
-        },
-        {
-            "predicate": "(Ng4 <= Sg4_0 + Eg4_0 + Ig4_0 + Rg4_0) & (Ng4 >= Sg4_0 + Eg4_0 + Ig4_0 + Rg4_0)",
-            "description": "Ng4 consistency"
-        },
-        {
-            "predicate": "(Ng5 <= Sg5_0 + Eg5_0 + Ig5_0 + Rg5_0) & (Ng5 >= Sg5_0 + Eg5_0 + Ig5_0 + Rg5_0)",
-            "description": "Ng5 consistency"
-        },
-        {
-            "predicate": "(Cg5 >= 0) & (Cg4 >= 0) & (Cg3 >= 0) & (Cg2 >= 0) & (Cg1 >= 0)",
-            "description":"C_{G_i} consistency"
-        }
-    ],
-    "template": {
-        "groups": [
-            {
-                "name": "G1",
-                "parameters": ["Cg1", "Ng1"],
-                "compartments": ["Sg1", "Eg1", "Ig1", "Rg1"],
-                "visible": false
-            },
-            {
-                "name": "G2",
-                "parameters": ["Cg2", "Ng2"],
-                "compartments": ["Sg2", "Eg2", "Ig2", "Rg2"],
-                "visible": false 
-            },
-            {
-                "name": "G3",
-                "parameters": ["Cg3", "Ng3"],
-                "compartments": ["Sg3", "Eg3", "Ig3", "Rg3"],
-                "visible": false
-            },
-            {
-                "name": "G4",
-                "parameters": ["Cg4", "Ng4"],
-                "compartments": ["Sg4", "Eg4", "Ig4", "Rg4"],
-                "visible": false
-            },
-            {
-                "name": "G5",
-                "parameters": ["Cg5", "Ng5"],
-                "compartments": ["Sg5", "Eg5", "Ig5", "Rg5"],
-                "visible": false
-            }
-        ]
+  "name": "SEIR-5G",
+  "compartments": [
+    {
+      "name": "Sg1",
+      "latex": "S_{G_1}",
+      "default": 399800.0,
+      "description": ""
+    },
+    {
+      "name": "Sg2",
+      "latex": "S_{G_2}",
+      "default": 599800.0,
+      "description": ""
+    },
+    {
+      "name": "Sg3",
+      "latex": "S_{G_3}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Sg4",
+      "latex": "S_{G_4}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Sg5",
+      "latex": "S_{G_5}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Eg1",
+      "latex": "E_{G_1}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Eg2",
+      "latex": "E_{G_2}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Eg3",
+      "latex": "E_{G_3}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Eg4",
+      "latex": "E_{G_4}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Eg5",
+      "latex": "E_{G_5}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Ig1",
+      "latex": "I_{G_1}",
+      "default": 200.0,
+      "description": ""
+    },
+    {
+      "name": "Ig2",
+      "latex": "I_{G_2}",
+      "default": 200.0,
+      "description": ""
+    },
+    {
+      "name": "Ig3",
+      "latex": "I_{G_3}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Ig4",
+      "latex": "I_{G_4}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Ig5",
+      "latex": "I_{G_5}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Rg1",
+      "latex": "R_{G_1}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Rg2",
+      "latex": "R_{G_2}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Rg3",
+      "latex": "R_{G_3}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Rg4",
+      "latex": "R_{G_4}",
+      "default": 0.0,
+      "description": ""
+    },
+    {
+      "name": "Rg5",
+      "latex": "R_{G_5}",
+      "default": 0.0,
+      "description": ""
     }
+  ],
+  "params": [
+    {
+      "name": "p",
+      "default": 0.1818,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "gamma",
+      "default": 0.0714,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "sigma",
+      "default": 0.14,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Cg1",
+      "latex": "C_{G_1}",
+      "default": 10.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Cg2",
+      "latex": "C_{G_2}",
+      "default": 1.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Cg3",
+      "latex": "C_{G_3}",
+      "default": 1.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Cg4",
+      "latex": "C_{G_4}",
+      "default": 1.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Cg5",
+      "latex": "C_{G_5}",
+      "default": 1.0,
+      "description": "",
+      "iterable": true
+    },
+    {
+      "name": "Ng1",
+      "latex": "N_{G_1}",
+      "default": 400000.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "Ng2",
+      "latex": "N_{G_2}",
+      "default": 600000.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "Ng3",
+      "latex": "N_{G_3}",
+      "default": 0.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "Ng4",
+      "latex": "N_{G_4}",
+      "default": 0.0,
+      "description": "",
+      "iterable": false
+    },
+    {
+      "name": "Ng5",
+      "latex": "N_{G_5}",
+      "default": 0.0,
+      "description": "",
+      "iterable": false
+    }
+  ],
+  "observables": [
+    {
+      "name": "S",
+      "value": "Sg1 + Sg2 + Sg3 + Sg4 + Sg5",
+      "description": "Suceptible population"
+    },
+    {
+      "name": "E",
+      "value": "Eg1 + Eg2 + Eg3 + Eg4 + Eg5",
+      "description": "Exposed population"
+    },
+    {
+      "name": "I",
+      "value": "Ig1 + Ig2 + Ig3 + Ig4 + Ig5",
+      "description": "Infectious population"
+    },
+    {
+      "name": "R",
+      "value": "Rg1 + Rg2 + Rg3 + Rg4 + Rg5",
+      "description": "Recovered population"
+    }
+  ],
+  "expressions": [
+    {
+      "name": "S_0",
+      "value": "Sg1_0 + Sg2_0 + Sg3_0 + Sg4_0 + Sg5_0",
+      "description": "Initial suceptible population"
+    },
+    {
+      "name": "E_0",
+      "value": "Eg1_0 + Eg2_0 + Eg3_0 + Eg4_0 + Eg5_0",
+      "description": "Initial exposed population"
+    },
+    {
+      "name": "I_0",
+      "value": "Ig1_0 + Ig2_0 + Ig3_0 + Ig4_0 + Ig5_0",
+      "description": "Initial infectious population"
+    },
+    {
+      "name": "R_0",
+      "value": "Rg1_0 + Rg2_0 + Rg3_0 + Rg4_0 + Rg5_0",
+      "description": "Initial recovered population"
+    },
+    {
+      "name": "N",
+      "value": "S_0 + E_0 + I_0 + R_0",
+      "description": "Total population."
+    },
+    {
+      "name": "T",
+      "value": "Ng1 * Cg1 + Ng2 * Cg2 + Ng3 * Cg3 + Ng4 * Cg4 + Ng5 * Cg5",
+      "description": ""
+    }
+  ],
+  "reactions": [
+    {
+      "from": "Sg1",
+      "to": "Eg1",
+      "function": "(p * Cg1 * Sg1 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
+      "description": ""
+    },
+    {
+      "from": "Sg2",
+      "to": "Eg2",
+      "function": "(p * Cg2 * Sg2 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
+      "description": ""
+    },
+    {
+      "from": "Sg3",
+      "to": "Eg3",
+      "function": "(p * Cg3 * Sg3 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
+      "description": ""
+    },
+    {
+      "from": "Sg4",
+      "to": "Eg4",
+      "function": "(p * Cg4 * Sg4 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
+      "description": ""
+    },
+    {
+      "from": "Sg5",
+      "to": "Eg5",
+      "function": "(p * Cg5 * Sg5 * (Ig1 * Cg1 + Ig2 * Cg2 + Ig3 * Cg3 + Ig4 * Cg4 + Ig5 * Cg5)) / T",
+      "description": ""
+    },
+    {
+      "from": "Eg1",
+      "to": "Ig1",
+      "function": "sigma * Eg1",
+      "description": ""
+    },
+    {
+      "from": "Eg2",
+      "to": "Ig2",
+      "function": "sigma * Eg2",
+      "description": ""
+    },
+    {
+      "from": "Eg3",
+      "to": "Ig3",
+      "function": "sigma * Eg3",
+      "description": ""
+    },
+    {
+      "from": "Eg4",
+      "to": "Ig4",
+      "function": "sigma * Eg4",
+      "description": ""
+    },
+    {
+      "from": "Eg5",
+      "to": "Ig5",
+      "function": "sigma * Eg5",
+      "description": ""
+    },
+    {
+      "from": "Ig1",
+      "to": "Rg1",
+      "function": "gamma * Ig1",
+      "description": ""
+    },
+    {
+      "from": "Ig2",
+      "to": "Rg2",
+      "function": "gamma * Ig2",
+      "description": ""
+    },
+    {
+      "from": "Ig3",
+      "to": "Rg3",
+      "function": "gamma * Ig3",
+      "description": ""
+    },
+    {
+      "from": "Ig4",
+      "to": "Rg4",
+      "function": "gamma * Ig4",
+      "description": ""
+    },
+    {
+      "from": "Ig5",
+      "to": "Rg5",
+      "function": "gamma * Ig5",
+      "description": ""
+    }
+  ],
+  "preconditions": [
+    {
+      "predicate": "(Ng1 + Ng2 + Ng3 + Ng4 + Ng5 >= N) & (Ng1 + Ng2 + Ng3 + Ng4 + Ng5 <= N)",
+      "description": "Ng1 + Ng2 + Ng3 + Ng4 + Ng5 must be the total population"
+    },
+    {
+      "predicate": "(Ng1 <= Sg1_0 + Eg1_0 + Ig1_0 + Rg1_0) & (Ng1 >= Sg1_0 + Eg1_0 + Ig1_0 + Rg1_0)",
+      "description": "Ng1 consistency"
+    },
+    {
+      "predicate": "(Ng2 <= Sg2_0 + Eg2_0 + Ig2_0 + Rg2_0) & (Ng2 >= Sg2_0 + Eg2_0 + Ig2_0 + Rg2_0)",
+      "description": "Ng2 consistency"
+    },
+    {
+      "predicate": "(Ng3 <= Sg3_0 + Eg3_0 + Ig3_0 + Rg3_0) & (Ng3 >= Sg3_0 + Eg3_0 + Ig3_0 + Rg3_0)",
+      "description": "Ng3 consistency"
+    },
+    {
+      "predicate": "(Ng4 <= Sg4_0 + Eg4_0 + Ig4_0 + Rg4_0) & (Ng4 >= Sg4_0 + Eg4_0 + Ig4_0 + Rg4_0)",
+      "description": "Ng4 consistency"
+    },
+    {
+      "predicate": "(Ng5 <= Sg5_0 + Eg5_0 + Ig5_0 + Rg5_0) & (Ng5 >= Sg5_0 + Eg5_0 + Ig5_0 + Rg5_0)",
+      "description": "Ng5 consistency"
+    },
+    {
+      "predicate": "(Cg5 >= 0) & (Cg4 >= 0) & (Cg3 >= 0) & (Cg2 >= 0) & (Cg1 >= 0)",
+      "description": "C_{G_i} consistency"
+    }
+  ],
+  "template": {
+    "groups": [
+      {
+        "name": "G1",
+        "parameters": ["Cg1", "Ng1"],
+        "compartments": ["Sg1", "Eg1", "Ig1", "Rg1"],
+        "visible": false
+      },
+      {
+        "name": "G2",
+        "parameters": ["Cg2", "Ng2"],
+        "compartments": ["Sg2", "Eg2", "Ig2", "Rg2"],
+        "visible": false
+      },
+      {
+        "name": "G3",
+        "parameters": ["Cg3", "Ng3"],
+        "compartments": ["Sg3", "Eg3", "Ig3", "Rg3"],
+        "visible": false
+      },
+      {
+        "name": "G4",
+        "parameters": ["Cg4", "Ng4"],
+        "compartments": ["Sg4", "Eg4", "Ig4", "Rg4"],
+        "visible": false
+      },
+      {
+        "name": "G5",
+        "parameters": ["Cg5", "Ng5"],
+        "compartments": ["Sg5", "Eg5", "Ig5", "Rg5"],
+        "visible": false
+      }
+    ]
+  }
 }

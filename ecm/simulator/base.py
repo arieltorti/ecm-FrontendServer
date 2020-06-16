@@ -24,19 +24,28 @@ class SimulationResult:
 
 
 class ModelContext:
-
     @staticmethod
     def unfoldExpression(expressions):
         expressionSymbols = {Symbol(e) for e in expressions.keys()}
-        notReduced = {e:v for e,v in expressions.items() if len(v.free_symbols.intersection(expressionSymbols)) > 0}
+        notReduced = {
+            e: v
+            for e, v in expressions.items()
+            if len(v.free_symbols.intersection(expressionSymbols)) > 0
+        }
         steps = RECURSION_DEPTH
         while len(notReduced) > 0 and steps >= 0:
             for e in notReduced:
                 expressions[e] = expressions[e].subs(expressions)
-            notReduced = {e:v for e,v in notReduced.items() if len(expressions[e].free_symbols.intersection(expressionSymbols)) > 0}
+            notReduced = {
+                e: v
+                for e, v in notReduced.items()
+                if len(expressions[e].free_symbols.intersection(expressionSymbols)) > 0
+            }
             steps -= 1
-        if (len(notReduced) > 0):
-            raise SimulatorError('context', "Deep recursion exceeded unfolding expressions.")
+        if len(notReduced) > 0:
+            raise SimulatorError(
+                "context", "Deep recursion exceeded unfolding expressions."
+            )
 
     def __init__(self, model: Model):
         self.params = {p.name: Symbol(p.name) for p in model.params}
@@ -50,7 +59,9 @@ class ModelContext:
         expressionsVars = {e.name: Symbol(e.name) for e in model.expressions}
         self.expressionEnv.update(expressionsVars)
 
-        self.expressions = {e.name: sympify(e.value, self.expressionEnv) for e in model.expressions}
+        self.expressions = {
+            e.name: sympify(e.value, self.expressionEnv) for e in model.expressions
+        }
         self.compartments = {c.name: Symbol(c.name) for c in model.compartments}
         self.preconditions = {
             p.predicate: sympify(p.predicate, self.expressionEnv)
