@@ -12,40 +12,44 @@
 </template>
 
 <script>
+function spaceLines(latexStr, spacing = 12) {
+  return latexStr.replace(/(\\\\)/g, String.raw`$1[${spacing}pt]`);
+}
+
 export default {
   computed: {
-    equations: function () {
+    equations: function() {
       let out = "";
       if (this.currentModel.equations) {
         out += "\\begin{aligned}";
         this.currentModel.equations.forEach((eq) => {
-          out += `${eq.nameLatex} = & ${eq.valueLatex}\\\\`;
+          out += String.raw`${eq.nameLatex} = &\ ${eq.valueLatex}\\`;
         });
         out += "\\end{aligned}";
       }
-      return out;
+      return spaceLines(out);
     },
-    expressions: function () {
+    expressions: function() {
       let out = "";
       if (this.currentModel.expressions) {
         out += "\\begin{aligned}";
         this.currentModel.expressions.forEach((expr) => {
-          out += `${expr.nameLatex} = & ${expr.valueLatex}\\\\`;
+          out += String.raw`${expr.nameLatex} = &\ ${expr.valueLatex}\\`;
         });
         out += "\\end{aligned}";
       }
-      return out;
+      return spaceLines(out);
     },
-    observables: function () {
+    observables: function() {
       let out = "";
       if (this.currentModel.observables.length > 0) {
         out += "\\begin{aligned}";
         this.currentModel.observables.forEach((expr) => {
-          out += `${expr.nameLatex} = & ${expr.valueLatex}\\\\`;
+          out += String.raw`${expr.nameLatex} = &\ ${expr.valueLatex}\\`;
         });
         out += "\\end{aligned}";
       }
-      return out;
+      return spaceLines(out);
     },
   },
   props: ["currentModel"],
