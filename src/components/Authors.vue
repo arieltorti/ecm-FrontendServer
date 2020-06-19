@@ -2,7 +2,7 @@
   <div class="container">
     <span class="category">Authors:</span>
     <p class="names">
-      Nicolás Morando (*), Mauricio Sanfilippo, Roberto Daniel Rabinovich (*),
+      Nicolás Morando (*), Mauricio Sanfilippo, Daniel Gutson, Roberto Daniel Rabinovich (*),
       María de los Ángeles Pando (*).
     </p>
 
