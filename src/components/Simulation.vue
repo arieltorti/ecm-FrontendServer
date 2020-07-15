@@ -35,12 +35,14 @@ import {
 } from "../plotlyExtras/toImageButton";
 import html2canvas from "html2canvas";
 
+import { preciseRound } from "../utils";
+
 import * as Plotly from "plotly.js";
 
 export default {
   components: { GroupControls },
   props: ["sim", "simCancel", "simState"],
-  data: function () {
+  data: function() {
     return {
       SIM_STATE: SIM_STATE,
       graphHistoricData: [],
@@ -54,24 +56,24 @@ export default {
       simulationInfo: "",
     };
   },
-  mounted: function () {
+  mounted: function() {
     this.plotConfig = plotConfig(this.saveToImage);
   },
   computed: {
-    isMultiple: function () {
+    isMultiple: function() {
       return this.sim && this.sim.simulation.iterate.key != null;
     },
-    isNotDone: function () {
+    isNotDone: function() {
       return this.simState !== SIM_STATE.DONE;
     },
   },
   watch: {
-    sim: function (_sim) {
+    sim: function(_sim) {
       if (_sim != null) {
         this.simulate();
       }
     },
-    simCancel: function (stop) {
+    simCancel: function(stop) {
       if (stop) {
         this.abortSignal.abort();
         this.$emit("sim-cancel");
@@ -79,10 +81,10 @@ export default {
     },
   },
   methods: {
-    downloadCSV: function () {
+    downloadCSV: function() {
       generateCSV(this.graphHistoricData, this.isMultiple);
     },
-    handleError: function (err) {
+    handleError: function(err) {
       if (err.ABORT_ERR && err.code === err.ABORT_ERR) {
         this.$emit("sim-cancel");
       } else {
@@ -93,9 +95,9 @@ export default {
       }
     },
 
-    stop: function () {},
+    stop: function() {},
 
-    saveToImage: function () {
+    saveToImage: function() {
       this.simulationInfo = extractSimulationInfo(
         this.sim,
         this.$refs.plotlyInstance
@@ -132,7 +134,7 @@ export default {
       });
     },
 
-    _play: function () {
+    _play: function() {
       Plotly.animate("plotDiv", null, {
         mode: "immediate",
         fromcurrent: true,
@@ -140,7 +142,7 @@ export default {
         frame: { duration: 500, redraw: false },
       }).then(() => (this.playing = false));
     },
-    _pause: function () {
+    _pause: function() {
       Plotly.animate("plotDiv", [null], {
         mode: "immediate",
         fromcurrent: true,
@@ -183,7 +185,7 @@ export default {
       return filteredData;
     },
 
-    handleAnimClick: function () {
+    handleAnimClick: function() {
       if (this.playing) {
         this._pause();
       } else {
@@ -192,7 +194,7 @@ export default {
       this.playing = !this.playing;
     },
 
-    simulate: function () {
+    simulate: function() {
       if (this.sim == null) {
         return;
       }
@@ -213,7 +215,7 @@ export default {
         .then(() => this.dataFetchingDone())
         .catch((err) => this.handleError(err));
     },
-    _simulate: function (simulation, modelId) {
+    _simulate: function(simulation, modelId) {
       const controller = new AbortController();
       const signal = controller.signal;
       this.abortSignal = controller;
@@ -239,10 +241,7 @@ export default {
           if (response.type === "multiple") {
             response.frames.forEach((d, i) => {
               const graphData = this.makeGraphData(d);
-              graphData._iterVal = this._preciseRound(
-                response.param.values[i],
-                2
-              );
+              graphData._iterVal = preciseRound(response.param.values[i], 2);
               this.graphHistoricData.push(graphData);
             });
           } else {
@@ -259,11 +258,11 @@ export default {
      */
     makeGraphData(data) {
       data._originalIndex = data.index.slice();
-      this.sim.model.compartments.forEach(function (c) {
+      this.sim.model.compartments.forEach(function(c) {
         const idx = data.index.findIndex((e) => e == c.name);
         if (idx >= 0) data.index[idx] = `$${c.nameLatex}$`;
       });
-      this.sim.model.observables.forEach(function (c) {
+      this.sim.model.observables.forEach(function(c) {
         const idx = data.index.findIndex((e) => e == c.name);
         if (idx >= 0) data.index[idx] = `$${c.nameLatex}$`;
       });
@@ -283,17 +282,10 @@ export default {
 
       return graphData;
     },
-    /** Precisely rounds number based on the number of significant decimal places */
-    _preciseRound: function (number, presicion = 7) {
-      return (
-        Math.round((number + Number.EPSILON) * Math.pow(10, presicion)) /
-        Math.pow(10, presicion)
-      );
-    },
-    _getIndexAsString: function (i) {
+    _getIndexAsString: function(i) {
       return `${this.graphHistoricData[i]._iterVal || i}`;
     },
-    dataFetchingDone: function (drawingFn = "newPlot", initialFrame = 0) {
+    dataFetchingDone: function(drawingFn = "newPlot", initialFrame = 0) {
       /**
        * We have a ton of boilerplate here just to configure the slider and animations
        * as we have to rebuild them all everytime the data changes. In the future we could

@@ -1,6 +1,9 @@
 <template>
   <div>
     <fieldset>
+      <Calculator />
+    </fieldset>
+    <fieldset>
       <legend>Choose a model:</legend>
       <label for="model">Model: </label>
       <select
@@ -59,6 +62,7 @@ import Authors from "./components/Authors.vue";
 import Editor from "./components/Editor.vue";
 import Simulation from "./components/Simulation.vue";
 import CurrentModel from "./components/CurrentModel.vue";
+import Calculator from "./components/RoCalculator";
 import { SIM_STATE, SIMULATION_MODEL_KEY } from "./constants.js";
 
 function populateGroups(model) {
@@ -129,7 +133,7 @@ export default {
   beforeMount() {
     this.fetchModels();
   },
-  data: function () {
+  data: function() {
     return {
       SIM_STATE: SIM_STATE, // Declare enum variable so vue can access it on the template
 
@@ -151,18 +155,18 @@ export default {
       pendingChanges: true,
     };
   },
-  components: { Simulation, Authors, Editor, CurrentModel },
+  components: { Simulation, Authors, Editor, CurrentModel, Calculator },
   computed: {
-    modelVariables: function () {
+    modelVariables: function() {
       return Object.keys(this.simulation.params);
     },
   },
   watch: {
-    simulationModel: function (val) {
+    simulationModel: function(val) {
       this.pendingChanges = true;
       localStorage.setItem(SIMULATION_MODEL_KEY, val);
     },
-    modelSelected: function (val) {
+    modelSelected: function(val) {
       this.simulationState = SIM_STATE.NONE;
       const current =
         val in this.modelList
@@ -183,7 +187,7 @@ export default {
   },
 
   methods: {
-    simulate: function () {
+    simulate: function() {
       if (this.simulationState === SIM_STATE.INPROGRESS) {
         this.stopSimulation();
       } else {
@@ -191,7 +195,7 @@ export default {
       }
     },
 
-    fetchModels: function () {
+    fetchModels: function() {
       const req = fetch("/api/models/");
       req.then((resp) => {
         if (resp.status >= 400 && resp.status < 600) {
@@ -205,7 +209,7 @@ export default {
         });
       });
     },
-    buildSimulation: function () {
+    buildSimulation: function() {
       // Make all objects given to the simulation inmutable, as they're all bound to vue changes.
       this.currentSimulation = {
         model: Object.assign({}, this.currentModel),
@@ -215,39 +219,39 @@ export default {
         this.pendingChanges = false;
       }, 0); // Wrap in timeout, otherwise Vue doesn't take this change into account
     },
-    stopSimulation: function () {
+    stopSimulation: function() {
       this.simCancel = true;
     },
-    setError: function (message) {
+    setError: function(message) {
       this.errorMsg = `[ERROR]: ${message}`;
       this.statusMsg = null;
     },
-    setStatus: function (message) {
+    setStatus: function(message) {
       this.errorMsg = null;
       this.statusMsg = message;
     },
 
-    handleError: function (error) {
+    handleError: function(error) {
       console.error(error);
       this.setError(error.message);
     },
-    handleSubmit: function (values) {
+    handleSubmit: function(values) {
       if (this.simulationState === SIM_STATE.INPROGRESS) {
         this.stopSimulation();
       } else {
         this.buildSimulation(values);
       }
     },
-    handleSimStart: function () {
+    handleSimStart: function() {
       this.simulationState = SIM_STATE.INPROGRESS;
     },
-    handleSimError: function () {
+    handleSimError: function() {
       this.simulationState = SIM_STATE.FAILED;
     },
-    handleSimDone: function () {
+    handleSimDone: function() {
       this.simulationState = SIM_STATE.DONE;
     },
-    handleSimCancel: function () {
+    handleSimCancel: function() {
       this.simulationState = SIM_STATE.CANCELED;
       this.simCancel = false;
     },
