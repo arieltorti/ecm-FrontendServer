@@ -1,39 +1,49 @@
 <template>
   <div class="container">
-    Ro Calculator
     <details>
-      <summary>General</summary>
-      <label for="p">p:</label>
-      <input
-        name="p"
-        type="number"
-        v-model.number="variables.p"
-        @change="calculateRo"
-      />
+      <summary>Ro Calculator</summary>
 
-      <label for="gamma">Gamma:</label>
-      <input
-        name="gamma"
-        type="number"
-        v-model.number="variables.gamma"
-        @change="calculateRo"
-      />
+      <span>Enter number of individuals and contact rates:</span>
 
-      <label for="s">S:</label>
-      <input
-        name="s"
-        type="number"
-        v-model.number="variables.s"
-        @change="calculateRo"
-      />
+      <div class="section">
+        <label for="p">p:</label>
+        <input
+          name="p"
+          type="number"
+          v-model.number="variables.p"
+          @change="calculateRo"
+        />
 
-      <div>
+        <label for="gamma">Gamma:</label>
+        <input
+          name="gamma"
+          type="number"
+          v-model.number="variables.gamma"
+          @change="calculateRo"
+        />
+
+        <label for="s" title="Number of susceptibles">S:</label>
+        <input
+          name="s"
+          type="number"
+          v-model.number="variables.s"
+          @change="calculateRo"
+        />
+      </div>
+
+      <div class="section">
         <table>
           <tbody>
             <tr>
               <th>Group</th>
               <th>Nc</th>
-              <th v-for="n in numberContagionRates" :key="n">c{{ n }}</th>
+              <th
+                v-for="n in numberContagionRates"
+                :title="'Contact rate ' + n"
+                :key="n"
+              >
+                c{{ n }}
+              </th>
               <th>c</th>
               <th>Nc * c</th>
             </tr>
@@ -65,7 +75,7 @@
         </table>
       </div>
 
-      <div>
+      <div class="section">
         <Results :results="results" />
       </div>
     </details>
@@ -238,4 +248,7 @@ table
     th,
     td
         text-align: center
+
+.section
+  margin-bottom: 2em
 </style>
