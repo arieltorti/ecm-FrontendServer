@@ -4,25 +4,25 @@
     {
       "name": "Sl",
       "latex": "S_l",
-      "default": 599800.0,
+      "default": 799920.0,
       "description": ""
     },
     {
       "name": "Sh",
       "latex": "S_h",
-      "default": 399800.0,
+      "default": 199980.0,
       "description": ""
     },
     {
       "name": "Il",
       "latex": "I_l",
-      "default": 200.0,
+      "default": 80.0,
       "description": ""
     },
     {
       "name": "Ih",
       "latex": "I_h",
-      "default": 200.0,
+      "default": 20.0,
       "description": ""
     },
     {
@@ -71,7 +71,7 @@
   "params": [
     {
       "name": "p",
-      "default": 0.1818,
+      "default": 0.06,
       "description": "",
       "iterable": true
     },
@@ -96,14 +96,14 @@
     {
       "name": "Noh",
       "latex": "N_h",
-      "default": 400000.0,
+      "default": 200000.0,
       "description": "",
       "iterable": false
     },
     {
       "name": "Nol",
       "latex": "N_l",
-      "default": 600000.0,
+      "default": 800000.0,
       "description": "",
       "iterable": false
     }

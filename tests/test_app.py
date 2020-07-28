@@ -2,12 +2,12 @@ def test_simulate_endpoint(app):
     simSIR = {
         "step": 5,
         "days": 50,
-        "initial_conditions": {"S": 999600, "I": 400, "R": 0},
-        "params": {"beta": 1, "gamma": 0.0714},
+        "initial_conditions": {"S": 999900, "I": 100, "R": 0},
+        "params": {"beta": 0.22, "gamma": 0.0714},
     }
 
     mimetype = "application/json"
-    url = "/simulate/8"
+    url = "/simulate/1"
     with app.test_client() as client:
         app.config["WTF_CSRF_ENABLED"] = False
 

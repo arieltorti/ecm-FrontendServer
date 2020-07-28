@@ -3,12 +3,12 @@
   "compartments": [
     {
       "name": "S",
-      "default": 999600.0,
+      "default": 999900.0,
       "description": ""
     },
     {
       "name": "I",
-      "default": 400.0,
+      "default": 100.0,
       "description": ""
     },
     {
@@ -33,7 +33,7 @@
   "params": [
     {
       "name": "beta",
-      "default": 1,
+      "default": 0.22,
       "description": "",
       "iterable": true
     },
@@ -58,14 +58,14 @@
     {
       "name": "Noh",
       "latex": "N_h",
-      "default": 400000.0,
+      "default": 200000.0,
       "description": "",
       "iterable": false
     },
     {
       "name": "Nol",
       "latex": "N_l",
-      "default": 600000.0,
+      "default": 800000.0,
       "description": "",
       "iterable": false
     },
