@@ -4,7 +4,7 @@
     {
       "name": "Sg1",
       "latex": "S_{G_1}",
-      "default": 0.0,
+      "default": 1.0,
       "description": ""
     },
     {
@@ -144,7 +144,7 @@
     {
       "name": "Cg1",
       "latex": "C_{G_1}",
-      "default": 0.0,
+      "default": 1.0,
       "description": "",
       "iterable": true
     },
@@ -179,7 +179,7 @@
     {
       "name": "Ng1",
       "latex": "N_{G_1}",
-      "default": 0.0,
+      "default": 1.0,
       "description": "",
       "iterable": false
     },
@@ -386,6 +386,10 @@
     {
       "predicate": "(Cg5 >= 0) & (Cg4 >= 0) & (Cg3 >= 0) & (Cg2 >= 0) & (Cg1 >= 0)",
       "description": "C_{G_i} consistency"
+    },
+    {
+      "predicate": "T > 0",
+      "description": "T consistency"
     }
   ],
   "template": {
