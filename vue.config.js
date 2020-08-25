@@ -1,7 +1,7 @@
 module.exports = {
   publicPath:
     process.env.NODE_ENV === "production"
-      ? "https://cdn.jsdelivr.net/gh/maks500/ecm-FrontendServer@release/dist"
+      ? "https://cdn.jsdelivr.net/gh/maks500/ecm-FrontendServer@release/static"
       : "/static/",
   outputDir: "static/",
   configureWebpack: {
