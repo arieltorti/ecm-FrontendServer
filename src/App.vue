@@ -48,6 +48,8 @@
       />
     </fieldset>
     <Authors />
+    <hr />
+    <Instructions />
     <span class="license">
       This software is licensed under GPLv3 and can be obtained at
       <a href="https://github.com/maks500/ecm-FrontendServer"
@@ -59,6 +61,7 @@
 
 <script>
 import Authors from "./components/Authors.vue";
+import Instructions from "./components/Instructions.vue";
 import Editor from "./components/Editor.vue";
 import Simulation from "./components/Simulation.vue";
 import CurrentModel from "./components/CurrentModel.vue";
@@ -155,7 +158,14 @@ export default {
       pendingChanges: true,
     };
   },
-  components: { Simulation, Authors, Editor, CurrentModel, Calculator },
+  components: {
+    Simulation,
+    Authors,
+    Instructions,
+    Editor,
+    CurrentModel,
+    Calculator,
+  },
   computed: {
     modelVariables: function() {
       return Object.keys(this.simulation.params);
