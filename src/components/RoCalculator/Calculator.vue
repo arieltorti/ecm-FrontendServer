@@ -95,14 +95,12 @@ import { preciseRound } from "../../utils";
 
 function initialTableData(groups, contagionRates) {
   // eslint-disable-next-line no-unused-vars
-  return new Array(groups)
-    .fill()
-    .map((_) => ({
-      n: 0,
-      contagionRates: new Array(contagionRates).fill(0),
-      totalContagion: 0,
-      product: 0,
-    }));
+  return new Array(groups).fill().map((_) => ({
+    n: 0,
+    contagionRates: new Array(contagionRates).fill(0),
+    totalContagion: 0,
+    product: 0,
+  }));
 }
 
 export default {
