@@ -10,6 +10,7 @@
         <input
           name="p"
           type="number"
+          step="any"
           v-model.number="variables.p"
           @change="calculateRo"
         />
@@ -18,6 +19,7 @@
         <input
           name="gamma"
           type="number"
+          step="any"
           v-model.number="variables.gamma"
           @change="calculateRo"
         />
@@ -26,6 +28,7 @@
         <input
           name="s"
           type="number"
+          step="any"
           v-model.number="variables.s"
           @change="calculateRo"
         />
@@ -54,6 +57,7 @@
                 <input
                   class="normal"
                   type="number"
+                  step="any"
                   :value="group.n"
                   @change="(ev) => handlePopulationChange(idx, ev)"
                   v-on:paste="(ev) => handlePaste(idx, -1, ev)"
@@ -63,13 +67,14 @@
                 <input
                   class="small"
                   type="number"
+                  step="any"
                   :value="c"
                   @change="(ev) => handleContagionChange(idx, c_idx, ev)"
                   v-on:paste="(ev) => handlePaste(idx, c_idx, ev)"
                 />
               </td>
               <td>{{ group.totalContagion }}</td>
-              <td>{{ group.product }}</td>
+              <td>{{ group.product | toFixed(2) }}</td>
             </tr>
           </tbody>
         </table>
@@ -90,17 +95,19 @@ import { preciseRound } from "../../utils";
 
 function initialTableData(groups, contagionRates) {
   // eslint-disable-next-line no-unused-vars
-  return new Array(groups).fill().map((_) => ({
-    n: 0,
-    contagionRates: new Array(contagionRates).fill(0),
-    totalContagion: 0,
-    product: 0,
-  }));
+  return new Array(groups)
+    .fill()
+    .map((_) => ({
+      n: 0,
+      contagionRates: new Array(contagionRates).fill(0),
+      totalContagion: 0,
+      product: 0,
+    }));
 }
 
 export default {
   components: { Results },
-  data: function() {
+  data: function () {
     return {
       numberGroups: NUMBER_GROUPS,
       numberContagionRates: NUMBER_CONTAGION_RATES,
@@ -121,12 +128,17 @@ export default {
       },
     };
   },
-  created: function() {
+  created: function () {
     this.loadValues();
+  },
+  filters: {
+    toFixed(value, decimals) {
+      return value.toFixed(decimals);
+    },
   },
   methods: {
     handlePopulationChange(g_idx, ev) {
-      const value = ev.target.value && parseInt(ev.target.value, 10);
+      const value = ev.target.value && parseFloat(ev.target.value, 10);
       const group = this.tableData[g_idx];
 
       group.n = value;
@@ -135,7 +147,7 @@ export default {
       this.calculateRo();
     },
     handleContagionChange(g_idx, c_idx, ev) {
-      const value = ev.target.value && parseInt(ev.target.value, 10);
+      const value = ev.target.value && parseFloat(ev.target.value, 10);
       const group = this.tableData[g_idx];
 
       group.contagionRates[c_idx] = value;
