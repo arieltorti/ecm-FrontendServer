@@ -138,7 +138,7 @@ export default {
   },
   methods: {
     handlePopulationChange(g_idx, ev) {
-      const value = ev.target.value && parseFloat(ev.target.value, 10);
+      const value = ev.target.value && parseFloat(ev.target.value);
       const group = this.tableData[g_idx];
 
       group.n = value;
@@ -147,7 +147,7 @@ export default {
       this.calculateRo();
     },
     handleContagionChange(g_idx, c_idx, ev) {
-      const value = ev.target.value && parseFloat(ev.target.value, 10);
+      const value = ev.target.value && parseFloat(ev.target.value);
       const group = this.tableData[g_idx];
 
       group.contagionRates[c_idx] = value;
@@ -249,17 +249,17 @@ export default {
 
 <style lang="sass" scoped>
 table
-    input
-        border: 1px solid black
+  input
+    border: 1px solid black
 
-        &.small
-            width: 2em
-        &.normal
-            width: 6em
+    &.small
+      width: 2em
+      &.normal
+        width: 6em
 
     th,
     td
-        text-align: center
+      text-align: center
 
 .section
   margin-bottom: 2em
