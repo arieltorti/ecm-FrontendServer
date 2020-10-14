@@ -4,10 +4,20 @@
     <details>
       <summary>General</summary>
       <label for="days">Days:</label>
-      <input name="days" v-model.number="simulation.days" type="number" />
+      <input
+        name="days"
+        v-model.number="simulation.days"
+        type="number"
+        step="any"
+      />
 
       <label for="step">Step:</label>
-      <input name="step" v-model.number="simulation.step" type="number" />
+      <input
+        name="step"
+        v-model.number="simulation.step"
+        type="number"
+        step="any"
+      />
     </details>
     <details>
       <summary>Initial conditions</summary>

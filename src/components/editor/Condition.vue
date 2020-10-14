@@ -4,6 +4,7 @@
     <input
       v-model.number="simulation.initial_conditions[comp.name]"
       type="number"
+      step="any"
     />
   </div>
 </template>

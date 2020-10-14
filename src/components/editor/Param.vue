@@ -17,18 +17,21 @@
         v-model.number="simulation.iterate.start"
         :id="param + 'Start'"
         type="number"
+        step="any"
       />
       <label :for="param + 'End'">End:</label>
       <input
         v-model.number="simulation.iterate.end"
         :id="param + 'End'"
         type="number"
+        step="any"
       />
       <label :for="param + 'Intervals'">Intervals:</label>
       <input
         v-model.number="simulation.iterate.intervals"
         :id="param + 'Intervals'"
         type="number"
+        step="any"
       />
     </div>
     <div v-else>
@@ -36,6 +39,7 @@
       <input
         v-model.number="simulation.params[param.name]"
         type="number"
+        step="any"
         :id="param"
       />
     </div>
