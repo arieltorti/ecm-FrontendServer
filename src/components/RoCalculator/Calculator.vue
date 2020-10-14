@@ -138,7 +138,7 @@ export default {
   },
   methods: {
     handlePopulationChange(g_idx, ev) {
-      const value = ev.target.value && parseFloat(ev.target.value);
+      const value = ev.target.value && Number(ev.target.value);
       const group = this.tableData[g_idx];
 
       group.n = value;
@@ -147,7 +147,7 @@ export default {
       this.calculateRo();
     },
     handleContagionChange(g_idx, c_idx, ev) {
-      const value = ev.target.value && parseFloat(ev.target.value);
+      const value = ev.target.value && Number(ev.target.value);
       const group = this.tableData[g_idx];
 
       group.contagionRates[c_idx] = value;
@@ -254,8 +254,8 @@ table
 
     &.small
       width: 2em
-      &.normal
-        width: 6em
+    &.normal
+      width: 6em
 
     th,
     td
